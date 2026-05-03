@@ -927,9 +927,10 @@ function addTherapistSlot() {
   const picker = document.getElementById('therapist-picker');
   const rows = picker.querySelectorAll('.therapist-picker-row');
   if (rows.length >= 2) { showToast('Max 2 therapists per visit', false); return; }
+  const br = (branch === 'both') ? 'indiranagar' : branch;
   const row = document.createElement('div');
   row.className = 'therapist-picker-row';
-  const opts = buildTherapistOptions(branch);
+  const opts = buildTherapistOptions(br);
   row.innerHTML = '<select id="c-therapist-2">' + opts + '</select>'
     + '<button type="button" class="btn danger" onclick="removeTherapistSlot(this)" style="height:44px">✕</button>';
   picker.appendChild(row);
@@ -941,24 +942,7 @@ function removeTherapistSlot(btn) {
   document.getElementById('add-therapist-btn').classList.remove('hidden');
 }
 
-function buildTherapistOptions(br) {
-  const therapists = (D.therapists || []).filter(t =>
-    t.branch === br || t.interbranch
-  );
-  if (!therapists.length) return '<option value="">No therapists added yet</option>';
-  return '<option value="">Select therapist...</option>' +
-    therapists.map(t => '<option value="' + t.id + '">' + t.name + ' (' + t.id + ')' + (t.interbranch && t.branch !== br ? ' — ' + BRANCH_LABELS[t.branch] : '') + '</option>').join('');
-}
-
-function refreshTherapistPicker() {
-  const br = (branch === 'both') ? 'indiranagar' : branch;
-  const opts = buildTherapistOptions(br);
-  document.querySelectorAll('.therapist-picker select').forEach(s => {
-    const cur = s.value;
-    s.innerHTML = opts;
-    s.value = cur;
-  });
-}
+// buildTherapistOptions and refreshTherapistPicker defined below (attendance-aware versions)
 
 function saveVisit() {
   const name = document.getElementById('c-name').value.trim();
@@ -1551,11 +1535,20 @@ function saveAttendance() {
 }
 
 // helper: get present therapists for a branch on a given date
+// Inter-branch therapists are shown if marked present in EITHER branch
 function getPresentTherapists(br, d) {
   const att = getAttendance(br, d||custDate);
-  return (D.therapists||[]).filter(t =>
-    (t.branch===br || t.interbranch) && (att[t.id]==='P' || att[t.id]==='H')
-  );
+  const attOther = getAttendance(br==='indiranagar'?'koramangala':'indiranagar', d||custDate);
+  return (D.therapists||[]).filter(t => {
+    if (t.branch === br) {
+      // Home branch therapist — check this branch's attendance
+      return att[t.id]==='P' || att[t.id]==='H';
+    } else if (t.interbranch) {
+      // Inter-branch therapist — check attendance in their home branch OR visiting branch
+      return att[t.id]==='P' || att[t.id]==='H' || attOther[t.id]==='P' || attOther[t.id]==='H';
+    }
+    return false;
+  });
 }
 
 // ── THERAPIST PICKER (visit modal) ──
