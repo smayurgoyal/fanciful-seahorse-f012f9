@@ -655,11 +655,17 @@
           <option value="koramangala">Koramangala</option>
         </select>
       </div>
-      <div class="form-row">
-        <label>Inter-branch therapist?</label>
-        <div style="display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--bg)">
-          <input type="checkbox" id="t-interbranch" style="width:20px;height:20px;accent-color:var(--teal);flex-shrink:0"/>
-          <label for="t-interbranch" style="font-size:14px;color:var(--text);text-transform:none;letter-spacing:0;font-weight:400;cursor:pointer">Can work at both branches</label>
+      <div style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:1.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);cursor:pointer" onclick="document.getElementById('t-interbranch').click()">
+          <div>
+            <div style="font-size:15px;font-weight:500;color:var(--text)">Can work at both branches</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:2px">Inter-branch therapist</div>
+          </div>
+          <div style="position:relative;width:48px;height:28px;flex-shrink:0">
+            <input type="checkbox" id="t-interbranch" style="opacity:0;width:0;height:0;position:absolute" onchange="updateToggle()"/>
+            <div id="t-interbranch-track" style="position:absolute;inset:0;border-radius:14px;background:var(--bg3);border:1px solid var(--border2);transition:background 0.2s"></div>
+            <div id="t-interbranch-thumb" style="position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.25);transition:left 0.2s"></div>
+          </div>
         </div>
       </div>
       <div class="form-row"><label>Phone</label><input id="t-phone" type="tel" inputmode="numeric" placeholder="9876543210"/></div>
@@ -1371,8 +1377,19 @@ function useHours() {
 }
 
 // ── THERAPIST MANAGEMENT ──
+function updateToggle() {
+  const checked = document.getElementById('t-interbranch').checked;
+  const track = document.getElementById('t-interbranch-track');
+  const thumb = document.getElementById('t-interbranch-thumb');
+  if (track) track.style.background = checked ? '#1D9E75' : 'var(--bg3)';
+  if (thumb) thumb.style.left = checked ? '23px' : '3px';
+}
+
 function openTherapistModal() {
   previewTherapistId();
+  // Reset toggle
+  const cb = document.getElementById('t-interbranch');
+  if (cb) { cb.checked = false; updateToggle(); }
   document.getElementById('modal-therapist').classList.add('open');
 }
 function closeTherapistModal() { document.getElementById('modal-therapist').classList.remove('open'); }
@@ -1410,7 +1427,8 @@ function saveTherapist() {
   showToast('Therapist ' + name + ' added — ID: ' + id + ' ✓');
   closeTherapistModal();
   ['t-name','t-spec','t-phone'].forEach(i => document.getElementById(i).value='');
-  document.getElementById('t-interbranch').checked = false;
+  const cb = document.getElementById('t-interbranch');
+  if (cb) { cb.checked = false; updateToggle(); }
   renderTherapists();
 }
 
