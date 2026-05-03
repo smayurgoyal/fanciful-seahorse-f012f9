@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Retreat Spa"/>
+<title>Retreat Spa — Dashboard</title>
+<style>
+  :root {
+    --teal: #1D9E75; --teal-d: #0F6E56; --teal-l: #E1F5EE;
+    --blue: #185FA5; --blue-l: #E6F1FB; --blue-d: #0C447C;
+    --red: #A32D2D; --red-l: #FCEBEB;
+    --amber: #BA7517; --amber-l: #FAEEDA;
+    --bg: #ffffff; --bg2: #f5f5f4; --bg3: #eeece8;
+    --text: #1a1a1a; --text2: #6b6b6b; --text3: #9a9a9a;
+    --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.22);
+    --radius: 8px; --radius-lg: 12px; --radius-xl: 16px;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1e; --bg2: #2c2c2e; --bg3: #3a3a3c;
+      --text: #f2f2f7; --text2: #aeaeb2; --text3: #636366;
+      --border: rgba(255,255,255,0.12); --border2: rgba(255,255,255,0.22);
+      --teal-l: #0a3d2b; --blue-l: #0a2540; --red-l: #3d1010; --amber-l: #3d2a00;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; font-family: var(--font); font-size: 15px; color: var(--text); background: var(--bg); }
+  body { display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; min-height: 100vh; }
+  .hidden { display: none !important; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 16px; height: 44px; font-size: 15px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--bg); color: var(--text); cursor: pointer; font-family: var(--font); touch-action: manipulation; -webkit-appearance: none; }
+  .btn:active { opacity: 0.7; }
+  .btn.primary { background: var(--teal); color: #fff; border-color: var(--teal); }
+  .btn.primary:active { background: var(--teal-d); }
+  .btn.sm { height: 36px; font-size: 13px; padding: 0 12px; }
+  .btn.icon { width: 44px; padding: 0; font-size: 20px; }
+  .btn.icon.sm { width: 36px; height: 36px; font-size: 16px; }
+  .btn.full { width: 100%; }
+  .btn.danger { background: var(--red-l); color: var(--red); border-color: var(--red); height: 34px; font-size: 13px; padding: 0 12px; }
+
+  /* FORMS */
+  .form-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .form-row label { font-size: 12px; color: var(--text2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+  .form-row input, .form-row select {
+    height: 48px; font-size: 16px; padding: 0 14px;
+    border-radius: var(--radius); border: 1px solid var(--border2);
+    background: var(--bg); color: var(--text); width: 100%;
+    font-family: var(--font); -webkit-appearance: none; appearance: none;
+  }
+  .form-row input:focus, .form-row select:focus { outline: 2px solid var(--teal); border-color: var(--teal); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* LOGIN */
+  #login-screen { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--bg2); }
+  .login-box { background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 24px; width: 100%; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+  .brand-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .logo-icon { width: 44px; height: 44px; border-radius: 14px; background: var(--teal); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .brand-name { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+  .brand-name span { color: var(--teal); }
+  .login-sub { font-size: 14px; color: var(--text2); margin: 4px 0 22px; }
+  .role-label { font-size: 12px; color: var(--text2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 10px; }
+  .seg { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .seg-btn { text-align: left; padding: 14px 16px; font-size: 15px; border-radius: 12px; cursor: pointer; color: var(--text2); font-family: var(--font); border: 1.5px solid var(--border); background: var(--bg2); touch-action: manipulation; display: flex; align-items: center; justify-content: space-between; transition: border-color 0.15s; }
+  .seg-btn.active { background: var(--bg); color: var(--text); border-color: var(--teal); }
+  .seg-btn .seg-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+  .seg-btn.active .seg-check { background: var(--teal); border-color: var(--teal); }
+  .seg-btn.active .seg-check::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; display: block; }
+  .seg-meta { font-size: 13px; color: var(--text3); margin-top: 2px; }
+  .err-box { font-size: 14px; color: var(--red); margin-top: 10px; padding: 12px 14px; background: var(--red-l); border-radius: var(--radius); border: 1px solid var(--red); }
+
+  /* APP SHELL */
+  #app { flex: 1; display: flex; flex-direction: column; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 10; }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-brand { font-size: 17px; font-weight: 700; }
+  .topbar-brand span { color: var(--teal); }
+  .branch-pill { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 99px; background: var(--teal-l); color: var(--teal-d); }
+  .branch-pill.k { background: var(--blue-l); color: var(--blue-d); }
+  .branch-pill.all { background: var(--bg3); color: var(--text2); }
+
+  /* BRANCH TABS (owner) */
+  .branch-bar { display: flex; overflow-x: auto; padding: 10px 16px 0; border-bottom: 1px solid var(--border); background: var(--bg); gap: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .branch-bar::-webkit-scrollbar { display: none; }
+  .br-tab { padding: 8px 18px; font-size: 14px; cursor: pointer; border-radius: 8px 8px 0 0; color: var(--text2); border: 1px solid transparent; border-bottom: none; white-space: nowrap; font-family: var(--font); background: transparent; touch-action: manipulation; }
+  .br-tab.active { background: var(--bg); border-color: var(--border); border-bottom-color: var(--bg); color: var(--text); font-weight: 600; margin-bottom: -1px; }
+
+  /* OWNER TOP TABS */
+  .owner-tabs { display: flex; overflow-x: auto; padding: 10px 16px 0; border-bottom: 1px solid var(--border); background: var(--bg); gap: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .owner-tabs::-webkit-scrollbar { display: none; }
+  .o-tab { padding: 8px 18px; font-size: 14px; cursor: pointer; border-radius: 8px 8px 0 0; color: var(--text2); border: 1px solid transparent; border-bottom: none; white-space: nowrap; font-family: var(--font); background: transparent; touch-action: manipulation; }
+  .o-tab.active { background: var(--bg); border-color: var(--border); border-bottom-color: var(--bg); color: var(--text); font-weight: 600; margin-bottom: -1px; }
+
+  /* CONTENT */
+  .content { flex: 1; padding: 16px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 90px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* TOOLBAR */
+  .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 10px; }
+  .date-nav { display: flex; align-items: center; gap: 6px; flex: 1; }
+  .date-lbl { flex: 1; font-size: 14px; font-weight: 600; text-align: center; color: var(--text); }
+
+  /* METRICS */
+  .metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
+  .metric { background: var(--bg2); border-radius: 12px; padding: 14px 12px; }
+  .metric .lbl { font-size: 11px; color: var(--text2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; }
+  .metric .val { font-size: 22px; font-weight: 700; }
+
+  /* VISIT CARDS */
+  .visit-list { display: flex; flex-direction: column; gap: 10px; }
+  .visit-card { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .visit-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .visit-name { font-size: 16px; font-weight: 600; }
+  .visit-phone { font-size: 13px; color: var(--text2); margin-top: 2px; }
+  .visit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .visit-field .f-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.3px; font-weight: 600; margin-bottom: 2px; }
+  .visit-field .f-val { font-size: 14px; color: var(--text); }
+  .visit-notes { font-size: 13px; color: var(--text2); background: var(--bg2); border-radius: 8px; padding: 10px 12px; }
+  .visit-bottom { display: flex; align-items: center; justify-content: space-between; padding-top: 4px; border-top: 1px solid var(--border); }
+  .visit-amount { font-size: 20px; font-weight: 700; color: var(--teal); }
+
+  /* EXPENSE CARDS */
+  .exp-list { display: flex; flex-direction: column; gap: 10px; }
+  .exp-card { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; }
+  .exp-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--amber-l); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .exp-body { flex: 1; min-width: 0; }
+  .exp-desc { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .exp-meta { font-size: 12px; color: var(--text2); margin-top: 3px; }
+  .exp-right { text-align: right; flex-shrink: 0; }
+  .exp-amt { font-size: 17px; font-weight: 700; color: var(--red); }
+  .exp-paid { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  /* MEMBERSHIP CARDS */
+  .mem-card { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden; }
+  .mem-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--teal); border-radius: 4px 0 0 4px; }
+  .mem-card.expired::before { background: var(--red); }
+  .mem-card.low::before { background: var(--amber); }
+  .mem-code { font-size: 22px; font-weight: 800; letter-spacing: 2px; color: var(--teal); font-variant-numeric: tabular-nums; }
+  .mem-card.expired .mem-code { color: var(--red); }
+  .mem-card.low .mem-code { color: var(--amber); }
+  .mem-name { font-size: 16px; font-weight: 600; }
+  .mem-phone { font-size: 13px; color: var(--text2); }
+  .mem-hours-bar { height: 8px; background: var(--bg2); border-radius: 4px; overflow: hidden; }
+  .mem-hours-fill { height: 100%; border-radius: 4px; background: var(--teal); transition: width 0.4s; }
+  .mem-card.low .mem-hours-fill { background: var(--amber); }
+  .mem-card.expired .mem-hours-fill { background: var(--red); }
+  .mem-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .mem-stat .ms-lbl { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.3px; font-weight: 600; margin-bottom: 2px; }
+  .mem-stat .ms-val { font-size: 15px; font-weight: 700; }
+  .mem-actions { display: flex; gap: 8px; }
+  .code-lookup { display: flex; gap: 8px; margin-bottom: 16px; }
+  .code-lookup input { flex: 1; height: 48px; font-size: 18px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; padding: 0 14px; border-radius: var(--radius); border: 2px solid var(--teal); background: var(--bg); color: var(--text); font-family: var(--font); }
+  .member-info-box { background: var(--teal-l); border: 1px solid var(--teal); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+  .member-info-box .mi-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .member-info-box .mi-hours { font-size: 13px; color: var(--text2); }
+
+  /* THERAPIST CARDS */
+  .therapist-list { display: flex; flex-direction: column; gap: 8px; }
+  .therapist-card { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+  .therapist-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--teal-l); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--teal-d); flex-shrink: 0; }
+  .therapist-body { flex: 1; min-width: 0; }
+  .therapist-name { font-size: 15px; font-weight: 600; }
+  .therapist-meta { font-size: 12px; color: var(--text2); margin-top: 3px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .therapist-id { font-size: 13px; font-weight: 700; letter-spacing: 1px; color: var(--teal); }
+  /* MULTI-THERAPIST SELECTOR */
+  .therapist-picker { display: flex; flex-direction: column; gap: 6px; }
+  .therapist-picker-row { display: flex; gap: 8px; align-items: center; }
+  .therapist-picker select { flex: 1; height: 44px; font-size: 15px; padding: 0 12px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--bg); color: var(--text); font-family: var(--font); -webkit-appearance: none; }
+  .therapist-picker .add-therapist-btn { height: 44px; white-space: nowrap; }
+  /* RANK LIST */
+  .rank-list { display: flex; flex-direction: column; gap: 8px; }
+  .rank-item { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+  .rank-num { font-size: 16px; font-weight: 800; color: var(--text3); min-width: 24px; }
+  .rank-num.gold { color: #C8922A; }
+  .rank-num.silver { color: #7A8FA6; }
+  .rank-num.bronze { color: #9B6B45; }
+  .rank-body { flex: 1; min-width: 0; }
+  .rank-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rank-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .rank-val { font-size: 18px; font-weight: 700; color: var(--teal); text-align: right; flex-shrink: 0; }
+  .rank-val span { display: block; font-size: 11px; font-weight: 500; color: var(--text3); }
+
+  /* ATTENDANCE */
+  .att-card { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .att-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; flex-shrink: 0; }
+  .att-body { flex: 1; min-width: 0; }
+  .att-name { font-size: 15px; font-weight: 600; }
+  .att-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .att-btns { display: flex; gap: 4px; flex-shrink: 0; }
+  .att-btn { padding: 0 9px; height: 34px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1.5px solid var(--border); background: var(--bg2); color: var(--text2); cursor: pointer; font-family: var(--font); touch-action: manipulation; white-space: nowrap; }
+  .att-btn.sel-P { background: #EAF3DE; color: #27500A; border-color: #6BAF2A; }
+  .att-btn.sel-H { background: #FAEEDA; color: #633806; border-color: #E0941A; }
+  .att-btn.sel-A { background: #FCEBEB; color: #791F1F; border-color: #C43A3A; }
+  .att-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+  .att-sum-card { background: var(--bg2); border-radius: 10px; padding: 10px 12px; text-align: center; }
+  .att-sum-val { font-size: 22px; font-weight: 700; }
+  .att-sum-lbl { font-size: 11px; color: var(--text2); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.3px; font-weight: 600; }
+
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; }
+  .b-green { background: #EAF3DE; color: #27500A; }
+  .b-amber { background: #FAEEDA; color: #633806; }
+  .b-red { background: #FCEBEB; color: #791F1F; }
+  .b-blue { background: #E6F1FB; color: #0C447C; }
+  .b-teal { background: #E1F5EE; color: #085041; }
+  .b-gray { background: #F1EFE8; color: #5F5E5A; }
+  .b-purple { background: #EEEDFE; color: #3C3489; }
+  @media (prefers-color-scheme: dark) {
+    .b-green { background: #173404; color: #C0DD97; }
+    .b-amber { background: #412402; color: #FAC775; }
+    .b-red { background: #501313; color: #F09595; }
+    .b-blue { background: #042C53; color: #85B7EB; }
+    .b-teal { background: #04342C; color: #5DCAA5; }
+    .b-gray { background: #2C2C2A; color: #B4B2A9; }
+    .b-purple { background: #26215C; color: #AFA9EC; }
+  }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 48px 16px; color: var(--text2); display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .empty-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--bg2); display: flex; align-items: center; justify-content: center; }
+  .empty-title { font-size: 16px; font-weight: 600; color: var(--text); }
+  .empty-sub { font-size: 14px; }
+
+  /* BOTTOM SHEET MODAL */
+  .sheet-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: flex-end; justify-content: center; }
+  .sheet-overlay.open { display: flex; }
+  .sheet { background: var(--bg); border-radius: 24px 24px 0 0; width: 100%; max-width: 480px; max-height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .sheet-handle { width: 40px; height: 5px; background: var(--border2); border-radius: 3px; margin: 14px auto 0; }
+  .sheet-header { padding: 16px 18px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .sheet-header h3 { font-size: 17px; font-weight: 700; }
+  .sheet-body { padding: 18px; }
+  .sheet-footer { padding: 14px 18px 28px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+
+  /* BOTTOM NAV */
+  .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; display: flex; border-top: 1px solid var(--border); background: var(--bg); padding: 8px 0 20px; z-index: 10; }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 6px 0; touch-action: manipulation; }
+  .nav-icon { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; }
+  .nav-label { font-size: 11px; color: var(--text2); font-weight: 500; }
+  .nav-item.active .nav-label { color: var(--teal); font-weight: 700; }
+  .nav-item.active svg { stroke: var(--teal) !important; }
+
+  /* ANALYTICS */
+  .kpi-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
+  .kpi { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 14px; border-left-width: 4px; }
+  .kpi-lbl { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; margin-bottom: 5px; }
+  .kpi-val { font-size: 21px; font-weight: 700; }
+  .kpi-sub { font-size: 12px; color: var(--text2); margin-top: 3px; }
+  .a-card { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 10px; }
+  .a-card h4 { font-size: 12px; font-weight: 700; color: var(--text2); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+  .bar-label { font-size: 13px; color: var(--text2); min-width: 90px; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-track { flex: 1; height: 7px; background: var(--bg2); border-radius: 4px; }
+  .bar-fill { height: 7px; border-radius: 4px; }
+  .bar-val { font-size: 12px; color: var(--text2); min-width: 48px; text-align: right; font-weight: 600; }
+  .day-chart { display: flex; align-items: flex-end; gap: 4px; height: 80px; margin-bottom: 6px; }
+  .dbar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .dbar { width: 100%; border-radius: 3px 3px 0 0; min-height: 2px; }
+  .dbar-lbl { font-size: 10px; color: var(--text3); text-align: center; }
+  .range-row { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; scrollbar-width: none; }
+  .range-row::-webkit-scrollbar { display: none; }
+  .range-btn { padding: 8px 16px; font-size: 14px; border-radius: 10px; border: 1px solid var(--border2); background: var(--bg); color: var(--text); cursor: pointer; white-space: nowrap; font-family: var(--font); font-weight: 500; touch-action: manipulation; }
+  .range-btn.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+  .a-section { font-size: 12px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin: 18px 0 10px; }
+  .no-data { font-size: 14px; color: var(--text3); padding: 6px 0; }
+  .compare-row { margin-bottom: 14px; }
+  .compare-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
+  .compare-name { font-size: 14px; font-weight: 700; }
+  .compare-bars { display: flex; flex-direction: column; gap: 4px; }
+  .cbar { height: 8px; border-radius: 4px; min-width: 2px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="brand-logo">
+      <div class="logo-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div>
+        <div class="brand-name"><span>Retreat</span> Spa</div>
+        <div style="font-size:13px;color:var(--text2)">Bangalore</div>
+      </div>
+    </div>
+    <p class="login-sub">Sign in to your dashboard</p>
+    <div class="role-label">Select your role</div>
+    <div class="seg" id="role-seg">
+      <button class="seg-btn active" onclick="setRole('receptionist-indiranagar')">
+        <div>
+          <div>Receptionist · Indiranagar</div>
+          <div class="seg-meta">Indiranagar branch staff</div>
+        </div>
+        <div class="seg-check"></div>
+      </button>
+      <button class="seg-btn" onclick="setRole('receptionist-koramangala')">
+        <div>
+          <div>Receptionist · Koramangala</div>
+          <div class="seg-meta">Koramangala branch staff</div>
+        </div>
+        <div class="seg-check"></div>
+      </button>
+      <button class="seg-btn" onclick="setRole('owner')">
+        <div>
+          <div>Owner · All branches</div>
+          <div class="seg-meta">Full access</div>
+        </div>
+        <div class="seg-check"></div>
+      </button>
+    </div>
+    <div class="form-row">
+      <label>PIN</label>
+      <input type="password" id="pin-input" maxlength="6" placeholder="Enter PIN" inputmode="numeric" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <span style="font-size:12px;color:var(--text3);margin-top:2px">Forgot your PIN? Contact the spa manager.</span>
+    </div>
+    <div id="login-err" class="err-box hidden"></div>
+    <button class="btn primary full" style="margin-top:6px;font-size:16px;font-weight:600" onclick="doLogin()">Sign in</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-brand"><span>Retreat</span> Spa</div>
+      <span id="branch-pill" class="branch-pill"></span>
+    </div>
+    <button class="btn sm" onclick="logout()">Sign out</button>
+  </div>
+
+  <div id="branch-bar" class="branch-bar hidden">
+    <button class="br-tab active" id="brtab-indiranagar" onclick="switchBranch('indiranagar')">Indiranagar</button>
+    <button class="br-tab" id="brtab-koramangala" onclick="switchBranch('koramangala')">Koramangala</button>
+    <button class="br-tab" id="brtab-both" onclick="switchBranch('both')">Combined</button>
+  </div>
+
+  <div id="owner-tabs" class="owner-tabs hidden">
+    <button class="o-tab active" id="otab-customers" onclick="showTab('customers')">Visits</button>
+    <button class="o-tab" id="otab-attendance" onclick="showTab('attendance')">Attendance</button>
+    <button class="o-tab" id="otab-memberships" onclick="showTab('memberships')">Members</button>
+    <button class="o-tab" id="otab-expenses" onclick="showTab('expenses')">Expenses</button>
+    <button class="o-tab" id="otab-therapists" onclick="showTab('therapists')">Therapists</button>
+    <button class="o-tab" id="otab-analytics" onclick="showTab('analytics')">Analytics</button>
+  </div>
+
+  <div class="content">
+    <!-- VISITS -->
+    <div class="section active" id="tab-customers">
+      <div class="toolbar">
+        <div class="date-nav">
+          <button class="btn icon sm" onclick="changeDate(-1)">&#8592;</button>
+          <span class="date-lbl" id="cust-date-lbl"></span>
+          <button class="btn icon sm" onclick="changeDate(1)">&#8594;</button>
+        </div>
+        <button class="btn primary sm" onclick="openVisitModal()" style="font-weight:600">+ Add</button>
+      </div>
+      <div class="metrics" id="cust-metrics"></div>
+      <div class="visit-list" id="visit-list"></div>
+    </div>
+
+    <!-- EXPENSES -->
+    <div class="section" id="tab-expenses">
+      <div class="toolbar">
+        <div class="date-nav">
+          <button class="btn icon sm" onclick="changeExpDate(-1)">&#8592;</button>
+          <span class="date-lbl" id="exp-date-lbl"></span>
+          <button class="btn icon sm" onclick="changeExpDate(1)">&#8594;</button>
+        </div>
+        <button class="btn primary sm" onclick="openExpModal()" style="font-weight:600">+ Add</button>
+      </div>
+      <div class="metrics" id="exp-metrics"></div>
+      <div class="exp-list" id="exp-list"></div>
+    </div>
+
+    <!-- MEMBERSHIPS -->
+    <div class="section" id="tab-memberships">
+      <div class="toolbar">
+        <span style="font-size:15px;font-weight:700">Memberships</span>
+        <button class="btn primary sm" onclick="openMemModal()" style="font-weight:600">+ New</button>
+      </div>
+      <div class="metrics" id="mem-metrics"></div>
+      <div id="mem-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+
+    <!-- ATTENDANCE -->
+    <div class="section" id="tab-attendance">
+      <div class="toolbar">
+        <div class="date-nav">
+          <button class="btn icon sm" onclick="changeAttDate(-1)">&#8592;</button>
+          <span class="date-lbl" id="att-date-lbl"></span>
+          <button class="btn icon sm" onclick="changeAttDate(1)">&#8594;</button>
+        </div>
+        <button class="btn primary sm" onclick="saveAttendance()" style="font-weight:600">Save</button>
+      </div>
+      <div class="att-summary" id="att-summary"></div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px;font-weight:500">Tap to mark: <span style="color:#27500A;font-weight:700">P</span> = Present &nbsp; <span style="color:#633806;font-weight:700">H</span> = Half day &nbsp; <span style="color:#791F1F;font-weight:700">A</span> = Absent</div>
+      <div id="att-list"></div>
+    </div>
+
+    <!-- THERAPISTS -->
+    <div class="section" id="tab-therapists">
+      <div class="toolbar">
+        <span style="font-size:15px;font-weight:700">Therapists</span>
+        <button class="btn primary sm" onclick="openTherapistModal()" style="font-weight:600">+ Add</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none">
+        <button class="range-btn active" id="tbr-both" onclick="setTherapistBranch('both',this)">All</button>
+        <button class="range-btn" id="tbr-indiranagar" onclick="setTherapistBranch('indiranagar',this)">Indiranagar</button>
+        <button class="range-btn" id="tbr-koramangala" onclick="setTherapistBranch('koramangala',this)">Koramangala</button>
+      </div>
+      <div class="therapist-list" id="therapist-list"></div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="section" id="tab-analytics">
+      <div class="range-row">
+        <button class="range-btn active" onclick="setRange(7,this)">7 days</button>
+        <button class="range-btn" onclick="setRange(14,this)">14 days</button>
+        <button class="range-btn" onclick="setRange(30,this)">30 days</button>
+      </div>
+      <div id="analytics-content"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV (receptionist) -->
+  <div id="bottom-nav" class="bottom-nav hidden">
+    <div class="nav-item active" id="nav-customers" onclick="navTo('customers')">
+      <div class="nav-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <span class="nav-label">Visits</span>
+    </div>
+    <div class="nav-item" id="nav-attendance" onclick="navTo('attendance')">
+      <div class="nav-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+      </div>
+      <span class="nav-label">Attendance</span>
+    </div>
+    <div class="nav-item" id="nav-memberships" onclick="navTo('memberships')">
+      <div class="nav-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+          <line x1="7" y1="15" x2="10" y2="15"/><line x1="13" y1="15" x2="17" y2="15"/>
+        </svg>
+      </div>
+      <span class="nav-label">Members</span>
+    </div>
+    <div class="nav-item" id="nav-expenses" onclick="navTo('expenses')">
+      <div class="nav-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+        </svg>
+      </div>
+      <span class="nav-label">Expenses</span>
+    </div>
+  </div>
+</div>
+
+<!-- VISIT MODAL -->
+<div class="sheet-overlay" id="modal-visit">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3>Add customer visit</h3>
+      <button class="btn icon sm" onclick="closeVisitModal()">&#10005;</button>
+    </div>
+    <div class="sheet-body">
+      <div class="form-row"><label>Customer name *</label><input id="c-name" placeholder="e.g. Priya Sharma" autocomplete="off"/></div>
+      <div class="form-row"><label>Phone</label><input id="c-phone" placeholder="9876543210" type="tel" inputmode="numeric"/></div>
+      <div class="form-row"><label>Service *</label>
+        <select id="c-service">
+          <option>Swedish Massage</option><option>Deep Tissue Massage</option><option>Aromatherapy</option>
+          <option>Hot Stone Therapy</option><option>Body Scrub</option><option>Body Wrap</option>
+          <option>Classic Facial</option><option>Gold Facial</option><option>Pedicure</option>
+          <option>Manicure</option><option>Mani-Pedi Combo</option><option>Head Massage</option>
+          <option>Couple Spa Package</option><option>Day Spa Package</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Therapist(s)</label>
+        <div class="therapist-picker" id="therapist-picker">
+          <div class="therapist-picker-row">
+            <select id="c-therapist-1" onchange="updateTherapistPicker()">
+              <option value="">Select therapist...</option>
+            </select>
+          </div>
+        </div>
+        <button type="button" class="btn sm" id="add-therapist-btn" onclick="addTherapistSlot()" style="margin-top:6px;font-size:12px;align-self:flex-start">+ Add 2nd therapist</button>
+      </div>
+      <div class="form-row"><label>Time slot</label><input id="c-time" type="time"/></div>
+      <div class="two-col">
+        <div class="form-row"><label>Duration (min)</label><input id="c-dur" type="number" inputmode="numeric" placeholder="60"/></div>
+        <div class="form-row"><label>Amount (₹) *</label><input id="c-amt" type="number" inputmode="numeric" placeholder="1500"/></div>
+      </div>
+      <div class="two-col">
+        <div class="form-row"><label>Payment</label>
+          <select id="c-pay"><option>Cash</option><option>UPI</option><option>Card</option><option>Online</option><option>Voucher</option></select>
+        </div>
+        <div class="form-row"><label>Status</label>
+          <select id="c-status"><option>Confirmed</option><option>Completed</option><option>Cancelled</option><option>No-Show</option></select>
+        </div>
+      </div>
+      <div class="form-row"><label>Notes</label><input id="c-notes" placeholder="e.g. Allergic to lavender"/></div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn full" onclick="closeVisitModal()">Cancel</button>
+      <button class="btn primary full" onclick="saveVisit()" style="font-weight:600">Save visit</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXPENSE MODAL -->
+<div class="sheet-overlay" id="modal-exp">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3>Add expense</h3>
+      <button class="btn icon sm" onclick="closeExpModal()">&#10005;</button>
+    </div>
+    <div class="sheet-body">
+      <!-- Branch selector — visible to owner only -->
+      <div class="form-row hidden" id="exp-branch-row">
+        <label>Branch *</label>
+        <select id="e-branch">
+          <option value="indiranagar">Indiranagar</option>
+          <option value="koramangala">Koramangala</option>
+          <option value="both">Both branches (shared expense)</option>
+        </select>
+      </div>
+      <div class="form-row"><label>Description *</label><input id="e-desc" placeholder="e.g. Lavender essential oil"/></div>
+      <div class="two-col">
+        <div class="form-row"><label>Category</label>
+          <select id="e-cat">
+            <option>Supplies &amp; Products</option><option>Utilities</option><option>Therapist Salary</option>
+            <option>Staff Salary</option><option>Rent</option><option>Marketing</option>
+            <option>Maintenance</option><option>Food &amp; Refreshments</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-row"><label>Amount (&#8377;) *</label><input id="e-amt" type="number" inputmode="numeric" placeholder="800"/></div>
+      </div>
+      <div class="two-col">
+        <div class="form-row"><label>Vendor</label><input id="e-vendor" placeholder="e.g. Forest Essentials"/></div>
+        <div class="form-row"><label>Paid by</label>
+          <select id="e-paid"><option>Cash</option><option>UPI</option><option>Bank Transfer</option><option>Card</option></select>
+        </div>
+      </div>
+      <div class="form-row"><label>Receipt / Bill no.</label><input id="e-receipt" placeholder="e.g. INV-051"/></div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn full" onclick="closeExpModal()">Cancel</button>
+      <button class="btn primary full" onclick="saveExpense()" style="font-weight:600">Save expense</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW MEMBERSHIP MODAL -->
+<div class="sheet-overlay" id="modal-mem">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3>Create membership</h3>
+      <button class="btn icon sm" onclick="closeMemModal()">&#10005;</button>
+    </div>
+    <div class="sheet-body">
+      <div class="form-row"><label>Customer name *</label><input id="m-name" placeholder="e.g. Priya Sharma" autocomplete="off"/></div>
+      <div class="form-row"><label>Phone *</label><input id="m-phone" placeholder="9876543210" type="tel" inputmode="numeric"/></div>
+      <div class="two-col">
+        <div class="form-row"><label>Total hours *</label><input id="m-hours" type="number" inputmode="numeric" placeholder="10"/></div>
+        <div class="form-row"><label>Amount paid (&#8377;) *</label><input id="m-amt" type="number" inputmode="numeric" placeholder="5000"/></div>
+      </div>
+      <div class="two-col">
+        <div class="form-row"><label>Payment mode</label>
+          <select id="m-pay"><option>Cash</option><option>UPI</option><option>Card</option><option>Online</option></select>
+        </div>
+        <div class="form-row"><label>Valid till</label><input id="m-expiry" type="date"/></div>
+      </div>
+      <div class="form-row"><label>Notes</label><input id="m-notes" placeholder="e.g. Corporate package, 3 months"/></div>
+      <div style="background:var(--teal-l);border:1px solid var(--teal);border-radius:12px;padding:12px;font-size:13px;color:var(--text2)">
+        A unique membership code will be auto-generated for this customer.
+      </div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn full" onclick="closeMemModal()">Cancel</button>
+      <button class="btn primary full" onclick="saveMembership()" style="font-weight:600">Create membership</button>
+    </div>
+  </div>
+</div>
+
+<!-- USE HOURS MODAL -->
+<div class="sheet-overlay" id="modal-use-hours">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3>Record member visit</h3>
+      <button class="btn icon sm" onclick="closeUseModal()">&#10005;</button>
+    </div>
+    <div class="sheet-body">
+      <div class="code-lookup">
+        <input id="lookup-code" placeholder="Enter code e.g. IND-427" maxlength="8" oninput="this.value=this.value.toUpperCase()" autocomplete="off"/>
+        <button class="btn primary" onclick="lookupMember()" style="font-weight:600">Find</button>
+      </div>
+      <div id="member-info-box" class="hidden"></div>
+      <div id="use-hours-fields" class="hidden">
+        <div class="form-row"><label>Service *</label>
+          <select id="u-service">
+            <option>Swedish Massage</option><option>Deep Tissue Massage</option><option>Aromatherapy</option>
+            <option>Hot Stone Therapy</option><option>Body Scrub</option><option>Body Wrap</option>
+            <option>Classic Facial</option><option>Gold Facial</option><option>Pedicure</option>
+            <option>Manicure</option><option>Mani-Pedi Combo</option><option>Head Massage</option><option>Other</option>
+          </select>
+        </div>
+        <div class="two-col">
+          <div class="form-row"><label>Therapist</label><input id="u-therapist" placeholder="e.g. Kavya"/></div>
+          <div class="form-row"><label>Time slot</label><input id="u-time" type="time"/></div>
+        </div>
+        <div class="two-col">
+          <div class="form-row"><label>Hours to deduct *</label><input id="u-hours" type="number" inputmode="decimal" placeholder="1.5" step="0.5"/></div>
+          <div class="form-row"><label>Status</label>
+            <select id="u-status"><option>Completed</option><option>Confirmed</option><option>Cancelled</option></select>
+          </div>
+        </div>
+        <div class="form-row"><label>Notes</label><input id="u-notes" placeholder="Any notes..."/></div>
+      </div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn full" onclick="closeUseModal()">Cancel</button>
+      <button class="btn primary full" id="use-hours-btn" onclick="useHours()" style="font-weight:600;display:none">Record visit</button>
+    </div>
+  </div>
+</div>
+
+<!-- THERAPIST MODAL -->
+<div class="sheet-overlay" id="modal-therapist">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3>Add therapist</h3>
+      <button class="btn icon sm" onclick="closeTherapistModal()">&#10005;</button>
+    </div>
+    <div class="sheet-body">
+      <div class="form-row"><label>Full name *</label><input id="t-name" placeholder="e.g. Kavya Reddy" autocomplete="off"/></div>
+      <div class="form-row"><label>Specialisation</label><input id="t-spec" placeholder="e.g. Swedish, Facial"/></div>
+      <div class="form-row"><label>Home branch *</label>
+        <select id="t-branch" onchange="previewTherapistId()">
+          <option value="indiranagar">Indiranagar</option>
+          <option value="koramangala">Koramangala</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Inter-branch therapist?</label>
+        <div style="display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--bg)">
+          <input type="checkbox" id="t-interbranch" style="width:20px;height:20px;accent-color:var(--teal);flex-shrink:0"/>
+          <label for="t-interbranch" style="font-size:14px;color:var(--text);text-transform:none;letter-spacing:0;font-weight:400;cursor:pointer">Can work at both branches</label>
+        </div>
+      </div>
+      <div class="form-row"><label>Phone</label><input id="t-phone" type="tel" inputmode="numeric" placeholder="9876543210"/></div>
+      <div id="t-id-preview" style="background:var(--teal-l);border:1px solid var(--teal);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--text2)">
+        Therapist ID will be auto-generated on save.
+      </div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn full" onclick="closeTherapistModal()">Cancel</button>
+      <button class="btn primary full" onclick="saveTherapist()" style="font-weight:600">Add therapist</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxhD0l5sSw2ANvkG_7fe_JrFSrd4j4Qkgqc-rwOqQnGJ5vKQWCOFKPFBq7wjMTP1tLa/exec';
+
+async function syncToSheet(type, record, br, date) {
+  try {
+    const payload = { type, branch: br, date: date.toISOString().slice(0,10), record };
+    const form = new FormData();
+    form.append('data', JSON.stringify(payload));
+    await fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', body: form });
+  } catch(e) { console.warn('Sheet sync failed:', e); }
+}
+
+function showToast(msg, ok=true) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:99px;font-size:14px;font-weight:600;color:#fff;z-index:999;transition:opacity .4s;white-space:nowrap;max-width:90vw;text-align:center';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.background = ok ? '#1D9E75' : '#A32D2D';
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+}
+
+const PINS = {'receptionist-indiranagar':'4729','receptionist-koramangala':'8163','owner':'5501'};
+const BRANCH_LABELS = {indiranagar:'Indiranagar',koramangala:'Koramangala'};
+const BRANCH_COLOR = {indiranagar:'#1D9E75',koramangala:'#185FA5'};
+const TEAL='#1D9E75', BLUE='#185FA5', RED='#A32D2D', AMBER='#BA7517';
+const STORE = 'retreat_spa_v4';
+const CAT_ICONS = {'Supplies & Products':'📦','Utilities':'💡','Therapist Salary':'👤','Staff Salary':'👥','Rent':'🏠','Marketing':'📢','Maintenance':'🔧','Food & Refreshments':'☕','Other':'📄'};
+
+let role='', branch='indiranagar', loginRole='receptionist-indiranagar', analyticsRange=7, currentTab='customers';
+let custDate=new Date(), expDate=new Date(), attDate=new Date();
+let therapistFilterBranch = 'both';
+let D = {
+  indiranagar:{customers:{},expenses:{},memberships:{},attendance:{}},
+  koramangala:{customers:{},expenses:{},memberships:{},attendance:{}},
+  therapists:[]
+};
+let activeMemberCode = null;
+function loadData() {
+  try { const s=localStorage.getItem(STORE); if(s) D=JSON.parse(s); } catch(e){}
+  ['indiranagar','koramangala'].forEach(br => {
+    if (!D[br]) D[br]={customers:{},expenses:{},memberships:{},attendance:{}};
+    if (!D[br].memberships) D[br].memberships=[];
+    if (Array.isArray(D[br].memberships)) { /* already array, ok */ }
+    if (!D[br].attendance) D[br].attendance={};
+  });
+  if (!D.therapists) D.therapists=[];
+}
+function saveData() {
+  try { localStorage.setItem(STORE, JSON.stringify(D)); } catch(e){}
+}
+
+function setRole(r) {
+  loginRole = r;
+  document.querySelectorAll('.seg-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['receptionist-indiranagar','receptionist-koramangala','owner'][i] === r);
+  });
+}
+
+function doLogin() {
+  const pin = document.getElementById('pin-input').value;
+  const err = document.getElementById('login-err');
+  if (pin === PINS[loginRole]) {
+    err.classList.add('hidden');
+    role = loginRole;
+    branch = role==='owner' ? 'indiranagar' : role.replace('receptionist-','');
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    setupApp();
+  } else {
+    err.textContent = 'Incorrect PIN — please try again.';
+    err.classList.remove('hidden');
+  }
+}
+
+function logout() {
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('pin-input').value = '';
+  document.getElementById('login-err').classList.add('hidden');
+  loginRole = 'receptionist-indiranagar';
+  document.querySelectorAll('.seg-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+}
+
+function setupApp() {
+  const isOwner = role === 'owner';
+  const pill = document.getElementById('branch-pill');
+  if (isOwner) { pill.textContent='All branches'; pill.className='branch-pill all'; }
+  else { pill.textContent=BRANCH_LABELS[branch]; pill.className='branch-pill'+(branch==='koramangala'?' k':''); }
+  document.getElementById('branch-bar').classList.toggle('hidden', !isOwner);
+  document.getElementById('owner-tabs').classList.toggle('hidden', !isOwner);
+  document.getElementById('bottom-nav').classList.toggle('hidden', isOwner);
+  if (isOwner) showTab('customers');
+  else navTo('customers');
+}
+
+function switchBranch(b) {
+  branch = b;
+  ['indiranagar','koramangala','both'].forEach(br => {
+    const el = document.getElementById('brtab-'+br);
+    if (el) el.classList.toggle('active', br===b);
+  });
+  if (b==='both') showTab('analytics');
+  else showTab(currentTab==='analytics'?'customers':currentTab);
+}
+
+function showTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.querySelectorAll('.o-tab').forEach(t => t.classList.remove('active'));
+  const ot = document.getElementById('otab-'+tab);
+  if (ot) ot.classList.add('active');
+  if (tab==='customers') renderVisits();
+  else if (tab==='expenses') renderExpenses();
+  else if (tab==='memberships') renderMemberships();
+  else if (tab==='attendance') renderAttendance();
+  else if (tab==='therapists') renderTherapists();
+  else renderAnalytics();
+}
+
+function navTo(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('nav-'+tab).classList.add('active');
+  if (tab==='customers') renderVisits();
+  else if (tab==='attendance') renderAttendance();
+  else if (tab==='memberships') renderMemberships();
+  else renderExpenses();
+}
+
+function dk(d) { return d.toISOString().slice(0,10); }
+function fmt(d) { return d.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'2-digit'}); }
+function changeDate(dir) { custDate.setDate(custDate.getDate()+dir); renderVisits(); }
+function changeExpDate(dir) { expDate.setDate(expDate.getDate()+dir); renderExpenses(); }
+
+function getList(type, d, br) {
+  const b = br || branch;
+  if (b==='both') return [];
+  const k = dk(d);
+  if (!D[b]) D[b] = {customers:{},expenses:{}};
+  if (!D[b][type][k]) D[b][type][k] = [];
+  return D[b][type][k];
+}
+
+function openVisitModal() {
+  refreshTherapistPicker();
+  document.getElementById('modal-visit').classList.add('open');
+}
+function closeVisitModal() { document.getElementById('modal-visit').classList.remove('open'); }
+function closeExpModal() { document.getElementById('modal-exp').classList.remove('open'); }
+document.querySelectorAll('.sheet-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
+
+const statusCls = {Confirmed:'b-blue',Completed:'b-green',Cancelled:'b-red','No-Show':'b-amber'};
+const payCls = {Cash:'b-green',UPI:'b-teal',Card:'b-blue',Online:'b-amber',Voucher:'b-gray','Bank Transfer':'b-purple'};
+const bdg = (t,c) => `<span class="badge ${c||'b-gray'}">${t}</span>`;
+
+function renderVisits() {
+  const list = getList('customers', custDate);
+  document.getElementById('cust-date-lbl').textContent = fmt(custDate);
+  const rev = list.filter(r=>r.status!=='Cancelled'&&r.status!=='No-Show').reduce((s,r)=>s+(+r.amt||0),0);
+  const done = list.filter(r=>r.status==='Completed').length;
+  const avg = done>0 ? Math.round(rev/done) : 0;
+  const canc = list.filter(r=>r.status==='Cancelled'||r.status==='No-Show').length;
+  document.getElementById('cust-metrics').innerHTML = `
+    <div class="metric"><div class="lbl">Visits</div><div class="val" style="color:${BLUE}">${list.length}</div></div>
+    <div class="metric"><div class="lbl">Revenue</div><div class="val" style="color:${TEAL}">₹${rev.toLocaleString('en-IN')}</div></div>
+    <div class="metric"><div class="lbl">Completed</div><div class="val" style="color:${TEAL}">${done}</div></div>
+    <div class="metric"><div class="lbl">Avg ticket</div><div class="val" style="color:${AMBER}">₹${avg.toLocaleString('en-IN')}</div></div>
+  `;
+  const el = document.getElementById('visit-list');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="empty-title">No visits today</div><div class="empty-sub">Tap + Add to log a customer visit</div></div>`;
+    return;
+  }
+  el.innerHTML = list.map((r,i) => `
+    <div class="visit-card">
+      <div class="visit-card-top">
+        <div><div class="visit-name">${r.name}</div>${r.phone?`<div class="visit-phone">${r.phone}</div>`:''}</div>
+        ${bdg(r.status, statusCls[r.status])}
+      </div>
+      <div class="visit-grid">
+        <div class="visit-field"><div class="f-label">Service</div><div class="f-val">${r.service}</div></div>
+        <div class="visit-field"><div class="f-label">Therapist</div><div class="f-val">${r.therapist||'—'}</div></div>
+        <div class="visit-field"><div class="f-label">Time</div><div class="f-val">${r.time||'—'}${r.dur?' · '+r.dur+'m':''}</div></div>
+        <div class="visit-field"><div class="f-label">Payment</div><div class="f-val">${bdg(r.pay,payCls[r.pay])}</div></div>
+      </div>
+      ${r.notes?`<div class="visit-notes">${r.notes}</div>`:''}
+      <div class="visit-bottom">
+        <div class="visit-amount">₹${(+r.amt||0).toLocaleString('en-IN')}</div>
+        <button class="btn danger" onclick="deleteVisit(${i})">Remove</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderExpenses() {
+  const list = getList('expenses', expDate);
+  document.getElementById('exp-date-lbl').textContent = fmt(expDate);
+  const total = list.reduce((s,r) => s+(+r.amt||0), 0);
+  document.getElementById('exp-metrics').innerHTML = `
+    <div class="metric"><div class="lbl">Entries</div><div class="val" style="color:${BLUE}">${list.length}</div></div>
+    <div class="metric"><div class="lbl">Total spent</div><div class="val" style="color:${RED}">₹${total.toLocaleString('en-IN')}</div></div>
+  `;
+  const el = document.getElementById('exp-list');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><div class="empty-title">No expenses today</div><div class="empty-sub">Tap + Add to record an expense</div></div>`;
+    return;
+  }
+  el.innerHTML = list.map((r,i) => `
+    <div class="exp-card">
+      <div class="exp-icon">${CAT_ICONS[r.cat]||'📄'}</div>
+      <div class="exp-body">
+        <div class="exp-desc">${r.desc}</div>
+        <div class="exp-meta">${r.cat}${r.vendor?' · '+r.vendor:''}${r.receipt?' · '+r.receipt:''}</div>
+        <div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">
+          ${r.addedBy==='owner' ? '<span class="badge b-purple" style="font-size:10px">Owner entry</span>' : ''}
+          ${r.shared ? '<span class="badge b-blue" style="font-size:10px">Both branches</span>' : ''}
+        </div>
+      </div>
+      <div class="exp-right">
+        <div class="exp-amt">₹${(+r.amt||0).toLocaleString('en-IN')}</div>
+        <div class="exp-paid">${r.paid}</div>
+        <button class="btn danger" style="margin-top:8px" onclick="deleteExpense(${i})">Remove</button>
+      </div>
+    </div>`).join('');
+}
+
+function deleteVisit(i) { D[branch].customers[dk(custDate)].splice(i,1); saveData(); renderVisits(); }
+function deleteExpense(i) { D[branch].expenses[dk(expDate)].splice(i,1); saveData(); renderExpenses(); }
+
+function getSelectedTherapists() {
+  const vals = [];
+  document.querySelectorAll('.therapist-picker select').forEach(s => {
+    if (s.value) vals.push(s.value);
+  });
+  return [...new Set(vals)]; // deduplicate
+}
+
+function updateTherapistPicker() {
+  // Remove second slot remove button if first is empty
+}
+
+function addTherapistSlot() {
+  const picker = document.getElementById('therapist-picker');
+  const rows = picker.querySelectorAll('.therapist-picker-row');
+  if (rows.length >= 2) { showToast('Max 2 therapists per visit', false); return; }
+  const row = document.createElement('div');
+  row.className = 'therapist-picker-row';
+  const opts = buildTherapistOptions(branch);
+  row.innerHTML = '<select id="c-therapist-2">' + opts + '</select>'
+    + '<button type="button" class="btn danger" onclick="removeTherapistSlot(this)" style="height:44px">✕</button>';
+  picker.appendChild(row);
+  document.getElementById('add-therapist-btn').classList.add('hidden');
+}
+
+function removeTherapistSlot(btn) {
+  btn.closest('.therapist-picker-row').remove();
+  document.getElementById('add-therapist-btn').classList.remove('hidden');
+}
+
+function buildTherapistOptions(br) {
+  const therapists = (D.therapists || []).filter(t =>
+    t.branch === br || t.interbranch
+  );
+  if (!therapists.length) return '<option value="">No therapists added yet</option>';
+  return '<option value="">Select therapist...</option>' +
+    therapists.map(t => '<option value="' + t.id + '">' + t.name + ' (' + t.id + ')' + (t.interbranch && t.branch !== br ? ' — ' + BRANCH_LABELS[t.branch] : '') + '</option>').join('');
+}
+
+function refreshTherapistPicker() {
+  const br = (branch === 'both') ? 'indiranagar' : branch;
+  const opts = buildTherapistOptions(br);
+  document.querySelectorAll('.therapist-picker select').forEach(s => {
+    const cur = s.value;
+    s.innerHTML = opts;
+    s.value = cur;
+  });
+}
+
+function saveVisit() {
+  const name = document.getElementById('c-name').value.trim();
+  if (!name) { alert('Please enter customer name'); return; }
+  const therapists = getSelectedTherapists();
+  getList('customers', custDate).push({
+    name, phone:document.getElementById('c-phone').value.trim(),
+    service:document.getElementById('c-service').value,
+    therapists: therapists,               // array of therapist IDs
+    therapist: therapists.join(' + '),    // legacy string for display
+    time:document.getElementById('c-time').value,
+    dur:document.getElementById('c-dur').value,
+    pay:document.getElementById('c-pay').value,
+    amt:document.getElementById('c-amt').value,
+    status:document.getElementById('c-status').value,
+    notes:document.getElementById('c-notes').value.trim()
+  });
+  saveData();
+  syncToSheet('visit', getList('customers', custDate)[getList('customers', custDate).length-1], branch, custDate)
+    .then(() => showToast('Visit saved & synced to Google Sheet ✓'))
+    .catch(() => showToast('Saved locally (sheet sync failed)', false));
+  closeVisitModal();
+  ['c-name','c-phone','c-time','c-dur','c-amt','c-notes'].forEach(id => document.getElementById(id).value='');
+  // reset therapist picker
+  const picker = document.getElementById('therapist-picker');
+  picker.querySelectorAll('.therapist-picker-row:not(:first-child)').forEach(r => r.remove());
+  document.getElementById('c-therapist-1').value = '';
+  document.getElementById('add-therapist-btn').classList.remove('hidden');
+  renderVisits();
+}
+
+function openExpModal() {
+  const isOwner = role === 'owner';
+  const branchRow = document.getElementById('exp-branch-row');
+  branchRow.classList.toggle('hidden', !isOwner);
+  // Default branch selector to current branch (or indiranagar for combined view)
+  if (isOwner) {
+    const sel = document.getElementById('e-branch');
+    sel.value = (branch === 'both') ? 'indiranagar' : branch;
+  }
+  document.getElementById('modal-exp').classList.add('open');
+}
+
+function saveExpense() {
+  const desc = document.getElementById('e-desc').value.trim();
+  const amt = document.getElementById('e-amt').value;
+  if (!desc || !amt) { alert('Please enter description and amount'); return; }
+
+  const isOwner = role === 'owner';
+  const targetBranch = isOwner
+    ? document.getElementById('e-branch').value
+    : branch;
+
+  const record = {
+    desc, cat: document.getElementById('e-cat').value,
+    vendor: document.getElementById('e-vendor').value.trim(),
+    amt, paid: document.getElementById('e-paid').value,
+    receipt: document.getElementById('e-receipt').value.trim(),
+    addedBy: isOwner ? 'owner' : 'receptionist'
+  };
+
+  if (targetBranch === 'both') {
+    // Split entry into both branches — each gets the full record tagged as shared
+    ['indiranagar', 'koramangala'].forEach(br => {
+      const sharedRecord = { ...record, shared: true, sharedNote: 'Shared expense (both branches)' };
+      getList('expenses', expDate, br).push(sharedRecord);
+      syncToSheet('expense', sharedRecord, br, expDate);
+    });
+    showToast('Shared expense saved to both branches ✓');
+  } else {
+    getList('expenses', expDate, targetBranch).push(record);
+    syncToSheet('expense', record, targetBranch, expDate)
+      .then(() => showToast('Expense saved to ' + BRANCH_LABELS[targetBranch] + ' ✓'))
+      .catch(() => showToast('Saved locally (sheet sync failed)', false));
+  }
+
+  saveData();
+  closeExpModal();
+  ['e-desc','e-vendor','e-amt','e-receipt'].forEach(id => document.getElementById(id).value='');
+  renderExpenses();
+}
+
+function setRange(n, btn) {
+  analyticsRange = n;
+  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAnalytics();
+}
+
+function getBranchStats(b, days) {
+  let rev=0, exp=0, visits=0;
+  const svcMap={}, expCatMap={}, payMap={}, dayData=[];
+  days.forEach(d => {
+    const k = dk(d);
+    const custs = (D[b]?.customers?.[k]) || [];
+    const exps = (D[b]?.expenses?.[k]) || [];
+    const dRev = custs.filter(r=>r.status!=='Cancelled'&&r.status!=='No-Show').reduce((s,r)=>s+(+r.amt||0),0);
+    rev+=dRev; exp+=exps.reduce((s,r)=>s+(+r.amt||0),0); visits+=custs.length;
+    dayData.push({d, rev:dRev});
+    custs.forEach(c => { if(c.service) svcMap[c.service]=(svcMap[c.service]||0)+1; });
+    exps.forEach(e => { expCatMap[e.cat]=(expCatMap[e.cat]||0)+(+e.amt||0); });
+    custs.forEach(c => { if(c.pay) payMap[c.pay]=(payMap[c.pay]||0)+(+c.amt||0); });
+  });
+  return {rev, exp, profit:rev-exp, visits, svcMap, expCatMap, payMap, dayData};
+}
+
+function renderAnalytics() {
+  const days = [];
+  const today = new Date();
+  for (let i=analyticsRange-1; i>=0; i--) { const d=new Date(today); d.setDate(d.getDate()-i); days.push(d); }
+  const isBoth = branch==='both';
+  const branches = isBoth ? ['indiranagar','koramangala'] : [branch];
+  const stats = {};
+  branches.forEach(b => stats[b] = getBranchStats(b, days));
+  let html = '';
+
+  if (isBoth) {
+    const totalRev = branches.reduce((s,b)=>s+stats[b].rev,0);
+    const totalExp = branches.reduce((s,b)=>s+stats[b].exp,0);
+    const profit = totalRev - totalExp;
+    const totalVisits = branches.reduce((s,b)=>s+stats[b].visits,0);
+    html += `<div class="kpi-grid">
+      <div class="kpi" style="border-left-color:${TEAL}"><div class="kpi-lbl">Revenue</div><div class="kpi-val" style="color:${TEAL}">₹${totalRev.toLocaleString('en-IN')}</div><div class="kpi-sub">Last ${analyticsRange} days</div></div>
+      <div class="kpi" style="border-left-color:${RED}"><div class="kpi-lbl">Expenses</div><div class="kpi-val" style="color:${RED}">₹${totalExp.toLocaleString('en-IN')}</div><div class="kpi-sub">Last ${analyticsRange} days</div></div>
+      <div class="kpi" style="border-left-color:${profit>=0?TEAL:RED}"><div class="kpi-lbl">Net profit</div><div class="kpi-val" style="color:${profit>=0?TEAL:RED}">₹${profit.toLocaleString('en-IN')}</div><div class="kpi-sub">${profit>=0?'Profit':'Loss'}</div></div>
+      <div class="kpi" style="border-left-color:${BLUE}"><div class="kpi-lbl">Visits</div><div class="kpi-val" style="color:${BLUE}">${totalVisits}</div><div class="kpi-sub">Both branches</div></div>
+    </div>
+    <div class="a-section">Branch comparison</div>
+    <div class="a-card"><h4>Revenue vs expenses</h4>`;
+    branches.forEach(b => {
+      const s=stats[b], mx=Math.max(s.rev,s.exp,1);
+      html += `<div class="compare-row">
+        <div class="compare-top"><span class="compare-name" style="color:${BRANCH_COLOR[b]}">${BRANCH_LABELS[b]}</span><span style="font-size:13px;font-weight:600;color:${s.profit>=0?TEAL:RED}">${s.profit>=0?'+':''}₹${s.profit.toLocaleString('en-IN')}</span></div>
+        <div class="compare-bars">
+          <div class="cbar" style="width:${Math.round((s.rev/mx)*100)}%;background:${TEAL}"></div>
+          <div class="cbar" style="width:${Math.round((s.exp/mx)*100)}%;background:${RED}"></div>
+        </div>
+        <div style="display:flex;gap:14px;margin-top:4px">
+          <span style="font-size:12px;color:${TEAL};font-weight:600">Rev ₹${s.rev.toLocaleString('en-IN')}</span>
+          <span style="font-size:12px;color:${RED};font-weight:600">Exp ₹${s.exp.toLocaleString('en-IN')}</span>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+    branches.forEach(b => {
+      const s=stats[b], top=Object.entries(s.svcMap).sort((a,c)=>c[1]-a[1]).slice(0,5);
+      const mx=Math.max(...Object.values(s.svcMap),1);
+      html += `<div class="a-card"><h4 style="color:${BRANCH_COLOR[b]}">${BRANCH_LABELS[b]} · Top services</h4>
+        ${top.length ? top.map(([n,c])=>`<div class="bar-row"><div class="bar-label" title="${n}">${n}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round((c/mx)*100)}%;background:${BRANCH_COLOR[b]}"></div></div><div class="bar-val">${c}</div></div>`).join('') : `<div class="no-data">No data yet</div>`}
+      </div>`;
+    });
+  } else {
+    const s = stats[branch];
+    const col = BRANCH_COLOR[branch];
+    const maxRev = Math.max(...s.dayData.map(d=>d.rev), 1);
+    const top = Object.entries(s.svcMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+    const topExp = Object.entries(s.expCatMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const maxSvc = Math.max(...Object.values(s.svcMap), 1);
+    const maxExp = Math.max(...Object.values(s.expCatMap), 1);
+    html += `<div class="kpi-grid">
+      <div class="kpi" style="border-left-color:${TEAL}"><div class="kpi-lbl">Revenue</div><div class="kpi-val" style="color:${TEAL}">₹${s.rev.toLocaleString('en-IN')}</div><div class="kpi-sub">Last ${analyticsRange} days</div></div>
+      <div class="kpi" style="border-left-color:${RED}"><div class="kpi-lbl">Expenses</div><div class="kpi-val" style="color:${RED}">₹${s.exp.toLocaleString('en-IN')}</div><div class="kpi-sub">Last ${analyticsRange} days</div></div>
+      <div class="kpi" style="border-left-color:${s.profit>=0?TEAL:RED}"><div class="kpi-lbl">Net profit</div><div class="kpi-val" style="color:${s.profit>=0?TEAL:RED}">₹${s.profit.toLocaleString('en-IN')}</div><div class="kpi-sub">${s.profit>=0?'Profit':'Loss'}</div></div>
+      <div class="kpi" style="border-left-color:${BLUE}"><div class="kpi-lbl">Visits</div><div class="kpi-val" style="color:${BLUE}">${s.visits}</div><div class="kpi-sub">Avg ₹${s.visits?Math.round(s.rev/s.visits).toLocaleString('en-IN'):0}/visit</div></div>
+    </div>
+    <div class="a-card"><h4>Daily revenue</h4>
+      <div class="day-chart">${s.dayData.map(({d,rev})=>`<div class="dbar-wrap"><div class="dbar" style="height:${Math.round((rev/maxRev)*72)}px;background:${rev>0?col:'var(--bg2)'}"></div><div class="dbar-lbl">${d.getDate()}</div></div>`).join('')}</div>
+      ${s.dayData.every(d=>d.rev===0)?`<div class="no-data" style="text-align:center;margin-top:8px">Enter visit data to see chart</div>`:''}
+    </div>
+    <div class="a-card"><h4>Top services</h4>${top.length?top.map(([n,c])=>`<div class="bar-row"><div class="bar-label" title="${n}">${n}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round((c/maxSvc)*100)}%;background:${col}"></div></div><div class="bar-val">${c} visits</div></div>`).join(''):`<div class="no-data">No visit data yet</div>`}</div>
+    <div class="a-card"><h4>Expenses by category</h4>${topExp.length?topExp.map(([cat,amt])=>`<div class="bar-row"><div class="bar-label" title="${cat}">${cat}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round((amt/maxExp)*100)}%;background:${RED}"></div></div><div class="bar-val">₹${amt.toLocaleString('en-IN')}</div></div>`).join(''):`<div class="no-data">No expense data yet</div>`}</div>
+    <div class="a-card"><h4>Payment mode</h4>${Object.keys(s.payMap).length?Object.entries(s.payMap).sort((a,b)=>b[1]-a[1]).map(([p,amt])=>`<div class="bar-row"><div class="bar-label">${p}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round((amt/s.rev)*100)}%;background:${BLUE}"></div></div><div class="bar-val">₹${amt.toLocaleString('en-IN')}</div></div>`).join(''):`<div class="no-data">No payment data yet</div>`}</div>`;
+  }
+  document.getElementById('analytics-content').innerHTML = html;
+}
+
+// ── MEMBERSHIP FUNCTIONS ──
+function genCode(br) {
+  const prefix = br === 'indiranagar' ? 'IND' : 'KOR';
+  const mems = D[br].memberships || [];
+  const existingNums = mems.map(m => parseInt(m.code.split('-')[1])||0);
+  let num;
+  do { num = Math.floor(100 + Math.random() * 900); } while (existingNums.includes(num));
+  return prefix + '-' + num;
+}
+
+function openMemModal() {
+  document.getElementById('modal-mem').classList.add('open');
+  // Set default expiry to 6 months from now
+  const d = new Date(); d.setMonth(d.getMonth()+6);
+  document.getElementById('m-expiry').value = d.toISOString().slice(0,10);
+}
+function closeMemModal() { document.getElementById('modal-mem').classList.remove('open'); }
+
+function saveMembership() {
+  const name = document.getElementById('m-name').value.trim();
+  const phone = document.getElementById('m-phone').value.trim();
+  const hours = parseFloat(document.getElementById('m-hours').value);
+  const amt = parseFloat(document.getElementById('m-amt').value);
+  if (!name || !phone || !hours || !amt) { alert('Please fill in all required fields'); return; }
+  if (!D[branch].memberships) D[branch].memberships = [];
+  const code = genCode(branch);
+  const mem = {
+    code, name, phone,
+    totalHours: hours, usedHours: 0,
+    amt, pay: document.getElementById('m-pay').value,
+    expiry: document.getElementById('m-expiry').value,
+    notes: document.getElementById('m-notes').value.trim(),
+    branch, createdAt: new Date().toISOString(),
+    history: []
+  };
+  D[branch].memberships.push(mem);
+  saveData();
+  syncToSheet('membership', mem, branch, new Date())
+    .then(() => showToast('Membership ' + code + ' created & synced ✓'))
+    .catch(() => showToast('Membership ' + code + ' created ✓'));
+  closeMemModal();
+  ['m-name','m-phone','m-hours','m-amt','m-notes'].forEach(id => document.getElementById(id).value='');
+  renderMemberships();
+}
+
+function renderMemberships() {
+  const br = branch === 'both' ? null : branch;
+  let mems = [];
+  if (br) {
+    mems = (D[br].memberships || []);
+  } else {
+    mems = [...(D.indiranagar.memberships||[]).map(m=>({...m,_br:'indiranagar'})),
+            ...(D.koramangala.memberships||[]).map(m=>({...m,_br:'koramangala'}))];
+  }
+
+  const active = mems.filter(m => (m.totalHours - m.usedHours) > 0 && (!m.expiry || new Date(m.expiry) >= new Date()));
+  const expiredOrDone = mems.filter(m => (m.totalHours - m.usedHours) <= 0 || (m.expiry && new Date(m.expiry) < new Date()));
+
+  document.getElementById('mem-metrics').innerHTML = `
+    <div class="metric"><div class="lbl">Total members</div><div class="val" style="color:${BLUE}">${mems.length}</div></div>
+    <div class="metric"><div class="lbl">Active</div><div class="val" style="color:${TEAL}">${active.length}</div></div>
+    <div class="metric"><div class="lbl">Revenue</div><div class="val" style="color:${TEAL}">&#8377;${mems.reduce((s,m)=>s+(+m.amt||0),0).toLocaleString('en-IN')}</div></div>
+    <div class="metric"><div class="lbl">Expired/Done</div><div class="val" style="color:${AMBER}">${expiredOrDone.length}</div></div>
+  `;
+
+  const el = document.getElementById('mem-list');
+  if (!mems.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">&#127881;</div><div class="empty-title">No memberships yet</div><div class="empty-sub">Tap + New to create a package membership</div></div>';
+    return;
+  }
+
+  // Sort: active first, then expired
+  const sorted = [...active, ...expiredOrDone];
+  el.innerHTML = sorted.map((m, idx) => {
+    const remaining = m.totalHours - m.usedHours;
+    const pct = Math.max(0, Math.round((remaining / m.totalHours) * 100));
+    const isExpired = (m.expiry && new Date(m.expiry) < new Date()) || remaining <= 0;
+    const isLow = !isExpired && pct <= 25;
+    const cardClass = isExpired ? 'expired' : isLow ? 'low' : '';
+    const statusBadge = isExpired
+      ? '<span class="badge b-red">Expired / Done</span>'
+      : isLow
+        ? '<span class="badge b-amber">Low hours</span>'
+        : '<span class="badge b-green">Active</span>';
+    const expiryFmt = m.expiry ? new Date(m.expiry).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : 'No expiry';
+    // find original index in branch array
+    const branchKey = m._br || branch;
+    const origIdx = D[branchKey].memberships.findIndex(x => x.code === m.code);
+    return `<div class="mem-card ${cardClass}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div>
+          <div class="mem-code">${m.code}</div>
+          <div class="mem-name">${m.name}</div>
+          <div class="mem-phone">${m.phone}${m._br ? ' &middot; '+BRANCH_LABELS[m._br] : ''}</div>
+        </div>
+        ${statusBadge}
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px">
+          <span>${remaining.toFixed(1)} hrs remaining of ${m.totalHours} hrs</span>
+          <span>${pct}%</span>
+        </div>
+        <div class="mem-hours-bar"><div class="mem-hours-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="mem-stats">
+        <div class="mem-stat"><div class="ms-lbl">Paid</div><div class="ms-val">&#8377;${(+m.amt||0).toLocaleString('en-IN')}</div></div>
+        <div class="mem-stat"><div class="ms-lbl">Used</div><div class="ms-val">${m.usedHours.toFixed(1)} hrs</div></div>
+        <div class="mem-stat"><div class="ms-lbl">Valid till</div><div class="ms-val" style="font-size:12px">${expiryFmt}</div></div>
+      </div>
+      ${m.notes ? '<div class="visit-notes">'+m.notes+'</div>' : ''}
+      ${m.history && m.history.length ? '<div style="font-size:12px;color:var(--text2);background:var(--bg2);border-radius:8px;padding:10px 12px"><b>Visit history</b><div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">'+m.history.slice(-3).reverse().map(h=>'<div style="display:flex;justify-content:space-between"><span>'+h.date+' &middot; '+h.service+(h.crossBranch?'<span class="badge b-blue" style="font-size:10px;margin-left:4px">'+BRANCH_LABELS[h.visitBranch||'indiranagar']+'</span>':'')+'</span><span style="font-weight:600">-'+h.hoursUsed+'h</span></div>').join('')+'</div>'+(m.history.length>3?'<div style="margin-top:4px;color:var(--text3)">+' + (m.history.length-3)+' more visits</div>':'')+'</div>' : ''}
+      <div class="mem-actions">
+        ${!isExpired ? '<button class="btn primary sm" onclick="openUseModal(\''+m.code+'\',\''+branchKey+'\')" style="flex:1;font-weight:600">&#128336; Record visit</button>' : ''}
+        <button class="btn danger" onclick="deleteMembership(\''+branchKey+'\','+origIdx+')">Remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function deleteMembership(br, idx) {
+  if (!confirm('Remove this membership?')) return;
+  D[br].memberships.splice(idx, 1);
+  saveData();
+  renderMemberships();
+}
+
+// USE HOURS
+let _useCode = null, _useBranch = null;
+function openUseModal(code, br) {
+  _useCode = code; _useBranch = br;
+  document.getElementById('lookup-code').value = code || '';
+  document.getElementById('member-info-box').classList.add('hidden');
+  document.getElementById('use-hours-fields').classList.add('hidden');
+  document.getElementById('use-hours-btn').style.display = 'none';
+  document.getElementById('modal-use-hours').classList.add('open');
+  if (code) lookupMember();
+}
+function closeUseModal() {
+  document.getElementById('modal-use-hours').classList.remove('open');
+  _useCode = null; _useBranch = null;
+  ['u-therapist','u-time','u-hours','u-notes'].forEach(id => document.getElementById(id).value='');
+}
+
+function lookupMember() {
+  const code = document.getElementById('lookup-code').value.trim().toUpperCase();
+  let found = null, foundBr = null;
+  ['indiranagar','koramangala'].forEach(br => {
+    const m = (D[br].memberships||[]).find(x => x.code === code);
+    if (m) { found = m; foundBr = br; }
+  });
+  const infoBox = document.getElementById('member-info-box');
+  const fields = document.getElementById('use-hours-fields');
+  const btn = document.getElementById('use-hours-btn');
+  if (!found) {
+    infoBox.className = 'member-info-box';
+    infoBox.style.background = 'var(--red-l)';
+    infoBox.style.borderColor = 'var(--red)';
+    infoBox.innerHTML = '<div class="mi-name" style="color:var(--red)">Code not found</div><div class="mi-hours">Please check the membership code and try again.</div>';
+    infoBox.classList.remove('hidden');
+    fields.classList.add('hidden');
+    btn.style.display = 'none';
+    return;
+  }
+  // Store the home branch (where membership lives) separately from visit branch
+  _useCode = code;
+  _useBranch = foundBr; // home branch — membership data lives here
+  const remaining = found.totalHours - found.usedHours;
+  const isExpired = (found.expiry && new Date(found.expiry) < new Date()) || remaining <= 0;
+  const visitingBranch = (branch === 'both') ? foundBr : branch;
+  const crossBranch = visitingBranch !== foundBr;
+  infoBox.className = 'member-info-box';
+  infoBox.style.background = isExpired ? 'var(--red-l)' : 'var(--teal-l)';
+  infoBox.style.borderColor = isExpired ? 'var(--red)' : 'var(--teal)';
+  infoBox.classList.remove('hidden');
+  infoBox.innerHTML =
+    '<div class="mi-name">' + found.name + ' &mdash; <span style="letter-spacing:1px">' + found.code + '</span></div>' +
+    '<div class="mi-hours" style="margin-top:4px">' +
+      (isExpired
+        ? '&#x26A0;&#xFE0F; Membership expired or hours exhausted'
+        : '<b>' + remaining.toFixed(1) + ' hrs remaining</b> of ' + found.totalHours + ' hrs &middot; Valid till ' + (found.expiry ? new Date(found.expiry).toLocaleDateString('en-IN') : 'No expiry')
+      ) +
+    '</div>' +
+    '<div style="margin-top:6px;font-size:12px;color:var(--text2)">Home branch: <b>' + BRANCH_LABELS[foundBr] + '</b>' +
+      (crossBranch ? ' &nbsp;&#x2192;&nbsp; Visiting: <b style="color:' + BRANCH_COLOR[visitingBranch] + '">' + BRANCH_LABELS[visitingBranch] + '</b> <span class="badge b-blue" style="font-size:10px">Cross-branch</span>' : '') +
+    '</div>';
+  if (!isExpired) {
+    fields.classList.remove('hidden');
+    btn.style.display = '';
+  }
+}
+
+function useHours() {
+  if (!_useCode || !_useBranch) return;
+  const hrs = parseFloat(document.getElementById('u-hours').value);
+  if (!hrs || hrs <= 0) { alert('Please enter hours to deduct'); return; }
+
+  // Membership always lives in the home branch (_useBranch)
+  const mems = D[_useBranch].memberships || [];
+  const mem = mems.find(m => m.code === _useCode);
+  if (!mem) { alert('Membership not found'); return; }
+  const remaining = mem.totalHours - mem.usedHours;
+  if (hrs > remaining) { alert('Only ' + remaining.toFixed(1) + ' hours remaining. Cannot deduct ' + hrs + ' hours.'); return; }
+
+  // Deduct hours from membership (always in home branch)
+  mem.usedHours = parseFloat((mem.usedHours + hrs).toFixed(2));
+  if (!mem.history) mem.history = [];
+
+  // The visit is recorded against whichever branch the customer is visiting TODAY
+  const visitBranch = (branch === 'both') ? _useBranch : branch;
+  const crossBranch = visitBranch !== _useBranch;
+
+  const visitRecord = {
+    date: dk(custDate),
+    visitBranch: visitBranch,
+    homeBranch: _useBranch,
+    crossBranch: crossBranch,
+    service: document.getElementById('u-service').value,
+    therapist: document.getElementById('u-therapist').value.trim(),
+    time: document.getElementById('u-time').value,
+    hoursUsed: hrs,
+    status: document.getElementById('u-status').value,
+    notes: document.getElementById('u-notes').value.trim()
+  };
+  mem.history.push(visitRecord);
+
+  // Log visit against the branch the customer is physically at today
+  getList('customers', custDate, visitBranch).push({
+    name: mem.name,
+    phone: mem.phone,
+    service: visitRecord.service,
+    therapist: visitRecord.therapist,
+    time: visitRecord.time,
+    dur: Math.round(hrs * 60),
+    pay: 'Package / Membership',
+    amt: 0,
+    status: visitRecord.status,
+    notes: 'Member: ' + _useCode + (crossBranch ? ' (Home: ' + BRANCH_LABELS[_useBranch] + ')' : '') + (visitRecord.notes ? ' | ' + visitRecord.notes : ''),
+    memberCode: _useCode
+  });
+
+  saveData();
+  syncToSheet('visit', getList('customers', custDate, visitBranch)[getList('customers', custDate, visitBranch).length-1], visitBranch, custDate);
+  const toastMsg = hrs + ' hrs deducted from ' + _useCode + '. '
+    + (mem.totalHours - mem.usedHours).toFixed(1) + ' hrs remaining'
+    + (crossBranch ? ' (cross-branch visit ✓)' : ' ✓');
+  showToast(toastMsg);
+  closeUseModal();
+  renderMemberships();
+  if (currentTab === 'customers') renderVisits();
+}
+
+// ── THERAPIST MANAGEMENT ──
+function openTherapistModal() {
+  previewTherapistId();
+  document.getElementById('modal-therapist').classList.add('open');
+}
+function closeTherapistModal() { document.getElementById('modal-therapist').classList.remove('open'); }
+
+function genTherapistId(br) {
+  const prefix = br === 'indiranagar' ? 'IND-T' : 'KOR-T';
+  const existing = (D.therapists||[])
+    .filter(t => t.id.startsWith(prefix))
+    .map(t => parseInt(t.id.replace(prefix,''))||0);
+  const next = existing.length ? Math.max(...existing) + 1 : 1;
+  return prefix + String(next).padStart(3, '0');
+}
+
+function previewTherapistId() {
+  const br = document.getElementById('t-branch')?.value || 'indiranagar';
+  const id = genTherapistId(br);
+  const el = document.getElementById('t-id-preview');
+  if (el) el.innerHTML = 'Auto-generated ID: <b style="color:var(--teal);font-size:15px;letter-spacing:1px">' + id + '</b>';
+}
+
+function saveTherapist() {
+  const name = document.getElementById('t-name').value.trim();
+  if (!name) { alert('Please enter therapist name'); return; }
+  if (!D.therapists) D.therapists = [];
+  const br = document.getElementById('t-branch').value;
+  const id = genTherapistId(br);  // auto-generate
+  D.therapists.push({
+    id, name,
+    spec: document.getElementById('t-spec').value.trim(),
+    branch: br,
+    interbranch: document.getElementById('t-interbranch').checked,
+    phone: document.getElementById('t-phone').value.trim()
+  });
+  saveData();
+  showToast('Therapist ' + name + ' added — ID: ' + id + ' ✓');
+  closeTherapistModal();
+  ['t-name','t-spec','t-phone'].forEach(i => document.getElementById(i).value='');
+  document.getElementById('t-interbranch').checked = false;
+  renderTherapists();
+}
+
+function setTherapistBranch(br, btn) {
+  therapistFilterBranch = br;
+  document.querySelectorAll('[id^="tbr-"]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTherapists();
+}
+
+function renderTherapists() {
+  if (!D.therapists) D.therapists = [];
+  const all = D.therapists;
+  const list = therapistFilterBranch === 'both' ? all
+    : all.filter(t => t.branch === therapistFilterBranch || t.interbranch);
+  const el = document.getElementById('therapist-list');
+  if (!el) return;
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon" style="font-size:28px">💆</div><div class="empty-title">No therapists added yet</div><div class="empty-sub">Tap + Add to register a therapist</div></div>';
+    return;
+  }
+  el.innerHTML = list.map(t => {
+    const origIdx = D.therapists.findIndex(x => x.id === t.id);
+    const initials = t.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const brColor = t.branch === 'indiranagar' ? TEAL : BLUE;
+    return '<div class="therapist-card">'
+      + '<div class="therapist-avatar" style="background:' + brColor + '22;color:' + brColor + '">' + initials + '</div>'
+      + '<div class="therapist-body">'
+        + '<div class="therapist-name">' + t.name + '</div>'
+        + '<div class="therapist-meta">'
+          + '<span class="therapist-id">' + t.id + '</span>'
+          + ' &middot; <span class="badge ' + (t.branch==='indiranagar'?'b-teal':'b-blue') + '" style="font-size:11px">' + BRANCH_LABELS[t.branch] + '</span>'
+          + (t.interbranch ? ' <span class="badge b-purple" style="font-size:11px">Inter-branch ✦</span>' : '')
+          + (t.spec ? ' &middot; ' + t.spec : '')
+        + '</div>'
+      + '</div>'
+      + '<button class="btn danger" onclick="deleteTherapist(' + origIdx + ')">✕</button>'
+      + '</div>';
+  }).join('');
+}
+
+function deleteTherapist(idx) {
+  if (!confirm('Remove this therapist?')) return;
+  D.therapists.splice(idx, 1);
+  saveData(); renderTherapists();
+}
+
+// ── ATTENDANCE FUNCTIONS ──
+function changeAttDate(dir) { attDate.setDate(attDate.getDate()+dir); renderAttendance(); }
+
+function getAttendance(br, d) {
+  const k = dk(d||attDate);
+  if (!D[br]) D[br]={customers:{},expenses:{},memberships:[],attendance:{}};
+  if (!D[br].attendance) D[br].attendance={};
+  if (!D[br].attendance[k]) D[br].attendance[k]={};
+  return D[br].attendance[k];
+}
+
+function setAttStatus(tid, status) {
+  const br = (branch==='both') ? 'indiranagar' : branch;
+  const att = getAttendance(br, attDate);
+  att[tid] = status;
+  saveData();
+  // re-render just the buttons for this therapist
+  document.querySelectorAll('.att-btn[data-tid="'+tid+'"]').forEach(btn => {
+    const s = btn.dataset.status;
+    btn.className = 'att-btn' + (status===s ? ' sel-'+s : '');
+  });
+  renderAttSummary(br);
+  // refresh therapist picker in visit modal (attendance changed)
+  refreshTherapistPicker();
+}
+
+function renderAttSummary(br) {
+  const att = getAttendance(br, attDate);
+  const therapists = (D.therapists||[]).filter(t => t.branch===br || t.interbranch);
+  const present = therapists.filter(t => att[t.id]==='P').length;
+  const half = therapists.filter(t => att[t.id]==='H').length;
+  const absent = therapists.filter(t => att[t.id]==='A').length;
+  const el = document.getElementById('att-summary');
+  if (!el) return;
+  el.innerHTML =
+    '<div class="att-sum-card"><div class="att-sum-val" style="color:'+TEAL+'">'+present+'</div><div class="att-sum-lbl">Present</div></div>'
+    +'<div class="att-sum-card"><div class="att-sum-val" style="color:'+AMBER+'">'+half+'</div><div class="att-sum-lbl">Half day</div></div>'
+    +'<div class="att-sum-card"><div class="att-sum-val" style="color:'+RED+'">'+absent+'</div><div class="att-sum-lbl">Absent</div></div>';
+}
+
+function renderAttendance() {
+  const br = (branch==='both') ? 'indiranagar' : branch;
+  document.getElementById('att-date-lbl').textContent = fmt(attDate);
+  const therapists = (D.therapists||[]).filter(t => t.branch===br || t.interbranch);
+  const att = getAttendance(br, attDate);
+  renderAttSummary(br);
+  const el = document.getElementById('att-list');
+  if (!el) return;
+  if (!therapists.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon" style="font-size:28px">💆</div><div class="empty-title">No therapists registered</div><div class="empty-sub">Ask the owner to add therapists first</div></div>';
+    return;
+  }
+  el.innerHTML = therapists.map(t => {
+    const status = att[t.id] || '';
+    const initials = t.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const brColor = t.branch==='indiranagar' ? TEAL : BLUE;
+    return '<div class="att-card">'
+      + '<div class="att-avatar" style="background:'+brColor+'22;color:'+brColor+'">'+initials+'</div>'
+      + '<div class="att-body">'
+        + '<div class="att-name">'+t.name+'</div>'
+        + '<div class="att-meta">'+t.id+(t.interbranch?' &middot; <span class="badge b-purple" style="font-size:10px">Inter-branch</span>':'')+(t.spec?' &middot; '+t.spec:'')+'</div>'
+      + '</div>'
+      + '<div class="att-btns">'
+        + '<button class="att-btn'+( status==='P'?' sel-P':'')+'" data-tid="'+t.id+'" data-status="P" onclick="setAttStatus(\''+t.id+'\',\'P\')">P</button>'
+        + '<button class="att-btn'+( status==='H'?' sel-H':'')+'" data-tid="'+t.id+'" data-status="H" onclick="setAttStatus(\''+t.id+'\',\'H\')">H</button>'
+        + '<button class="att-btn'+( status==='A'?' sel-A':'')+'" data-tid="'+t.id+'" data-status="A" onclick="setAttStatus(\''+t.id+'\',\'A\')">A</button>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function saveAttendance() {
+  saveData();
+  showToast('Attendance saved ✓');
+}
+
+// helper: get present therapists for a branch on a given date
+function getPresentTherapists(br, d) {
+  const att = getAttendance(br, d||custDate);
+  return (D.therapists||[]).filter(t =>
+    (t.branch===br || t.interbranch) && (att[t.id]==='P' || att[t.id]==='H')
+  );
+}
+
+// ── THERAPIST PICKER (visit modal) ──
+// Shows only therapists present today at this branch
+function buildTherapistOptions(br) {
+  const present = getPresentTherapists(br, custDate);
+  const all = (D.therapists||[]).filter(t => t.branch===br || t.interbranch);
+  if (!all.length) return '<option value="">No therapists added yet — ask owner to add</option>';
+  if (!present.length) {
+    // No attendance marked yet — show all with a note
+    return '<option value="">-- Mark attendance first or select below --</option>'
+      + all.map(t => '<option value="'+t.id+'">'+t.name+' ['+t.id+']'
+          +(t.interbranch&&t.branch!==br?' · '+BRANCH_LABELS[t.branch]:'')+' ⚠ unverified</option>').join('');
+  }
+  return '<option value="">Select therapist...</option>'
+    + present.map(t => '<option value="'+t.id+'">'+t.name+' ['+t.id+']'
+        +(t.interbranch&&t.branch!==br?' · '+BRANCH_LABELS[t.branch]:'')
+        +(getAttendance(br,custDate)[t.id]==='H'?' (Half day)':'')+'</option>').join('');
+}
+
+function refreshTherapistPicker() {
+  const br = (branch === 'both') ? 'indiranagar' : branch;
+  const opts = buildTherapistOptions(br);
+  document.querySelectorAll('.therapist-picker select').forEach(s => {
+    const cur = s.value; s.innerHTML = opts; s.value = cur;
+  });
+}
+
+function addTherapistSlot() {
+  const picker = document.getElementById('therapist-picker');
+  if (picker.querySelectorAll('.therapist-picker-row').length >= 2) {
+    showToast('Max 2 therapists per visit', false); return;
+  }
+  const br = (branch === 'both') ? 'indiranagar' : branch;
+  const row = document.createElement('div');
+  row.className = 'therapist-picker-row';
+  row.innerHTML = '<select id="c-therapist-2">' + buildTherapistOptions(br) + '</select>'
+    + '<button type="button" class="btn danger" onclick="removeTherapistSlot(this)" style="height:44px;margin-left:4px">✕</button>';
+  picker.appendChild(row);
+  document.getElementById('add-therapist-btn').classList.add('hidden');
+}
+
+function removeTherapistSlot(btn) {
+  btn.closest('.therapist-picker-row').remove();
+  document.getElementById('add-therapist-btn').classList.remove('hidden');
+}
+
+function getSelectedTherapists() {
+  const vals = [];
+  document.querySelectorAll('.therapist-picker select').forEach(s => { if (s.value) vals.push(s.value); });
+  return [...new Set(vals)];
+}
+
+// ── ANALYTICS ──
+function setRange(n, btn) {
+  analyticsRange = n;
+  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAnalytics();
+}
+
+function getDays(n) {
+  const days=[], today=new Date();
+  for (let i=n-1; i>=0; i--) { const d=new Date(today); d.setDate(d.getDate()-i); days.push(d); }
+  return days;
+}
+
+function getBranchStats(b, days) {
+  let rev=0, exp=0, visits=0;
+  const svcMap={}, expCatMap={}, payMap={}, dayData={};
+  const customerMap={}, therapistMap={};
+  days.forEach(d => {
+    const k=dk(d);
+    const custs=(D[b]?.customers?.[k])||[];
+    const exps=(D[b]?.expenses?.[k])||[];
+    const dRev=custs.filter(r=>r.status!=='Cancelled'&&r.status!=='No-Show').reduce((s,r)=>s+(+r.amt||0),0);
+    rev+=dRev; exp+=exps.reduce((s,r)=>s+(+r.amt||0),0); visits+=custs.length;
+    dayData[k]=dRev;
+    custs.forEach(c => {
+      if (c.service) svcMap[c.service]=(svcMap[c.service]||0)+1;
+      if (c.pay) payMap[c.pay]=(payMap[c.pay]||0)+(+c.amt||0);
+      // Customer ranking
+      if (c.status!=='Cancelled'&&c.status!=='No-Show') {
+        const key = c.memberCode||c.phone||c.name;
+        const label = c.memberCode ? c.memberCode+' ('+c.name+')' : c.name+(c.phone?' · '+c.phone:'');
+        if (!customerMap[key]) customerMap[key]={label,visits:0,isMember:!!c.memberCode};
+        customerMap[key].visits++;
+      }
+      // Therapist tally — supports array or legacy string
+      const tIds = Array.isArray(c.therapists)&&c.therapists.length ? c.therapists
+                   : (c.therapist ? c.therapist.split(' + ') : []);
+      tIds.forEach(tid => {
+        if (!tid) return;
+        if (!therapistMap[tid]) therapistMap[tid]={services:0,hrs:0};
+        therapistMap[tid].services++;
+        therapistMap[tid].hrs += c.dur?(+c.dur/60):0;
+      });
+    });
+    exps.forEach(e => { expCatMap[e.cat]=(expCatMap[e.cat]||0)+(+e.amt||0); });
+  });
+  const topCustomers=Object.values(customerMap).sort((a,b)=>b.visits-a.visits).slice(0,7);
+  const topTherapists=Object.entries(therapistMap).sort((a,b)=>b[1].services-a[1].services);
+  const dayArr=days.map(d=>({d,rev:dayData[dk(d)]||0}));
+  return {rev,exp,profit:rev-exp,visits,svcMap,expCatMap,payMap,dayData:dayArr,topCustomers,topTherapists};
+}
+
+function rankNumEmoji(i){return i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);}
+
+function renderRankList(items, valFn, subFn) {
+  if (!items.length) return '<div class="no-data">No data for this period</div>';
+  return '<div class="rank-list">'+items.map((item,i)=>
+    '<div class="rank-item">'
+    +'<div class="rank-num">'+rankNumEmoji(i)+'</div>'
+    +'<div class="rank-body"><div class="rank-name">'+item.label+'</div>'+(subFn?'<div class="rank-sub">'+subFn(item)+'</div>':'')+'</div>'
+    +'<div class="rank-val">'+valFn(item)+'</div>'
+    +'</div>'
+  ).join('')+'</div>';
+}
+
+function renderAnalytics() {
+  const days=getDays(analyticsRange);
+  const isBoth=branch==='both';
+  const branches=isBoth?['indiranagar','koramangala']:[branch];
+  const stats={};
+  branches.forEach(b=>stats[b]=getBranchStats(b,days));
+  let html='';
+
+  if (isBoth) {
+    const totalRev=branches.reduce((s,b)=>s+stats[b].rev,0);
+    const totalExp=branches.reduce((s,b)=>s+stats[b].exp,0);
+    const profit=totalRev-totalExp;
+    const totalVisits=branches.reduce((s,b)=>s+stats[b].visits,0);
+    html+='<div class="kpi-grid">'
+      +'<div class="kpi" style="border-left-color:'+TEAL+'"><div class="kpi-lbl">Revenue</div><div class="kpi-val" style="color:'+TEAL+'">&#8377;'+totalRev.toLocaleString('en-IN')+'</div><div class="kpi-sub">Last '+analyticsRange+' days</div></div>'
+      +'<div class="kpi" style="border-left-color:'+RED+'"><div class="kpi-lbl">Expenses</div><div class="kpi-val" style="color:'+RED+'">&#8377;'+totalExp.toLocaleString('en-IN')+'</div><div class="kpi-sub">Last '+analyticsRange+' days</div></div>'
+      +'<div class="kpi" style="border-left-color:'+(profit>=0?TEAL:RED)+'"><div class="kpi-lbl">Net profit</div><div class="kpi-val" style="color:'+(profit>=0?TEAL:RED)+'">&#8377;'+profit.toLocaleString('en-IN')+'</div><div class="kpi-sub">'+(profit>=0?'Profit':'Loss')+'</div></div>'
+      +'<div class="kpi" style="border-left-color:'+BLUE+'"><div class="kpi-lbl">Visits</div><div class="kpi-val" style="color:'+BLUE+'">'+totalVisits+'</div><div class="kpi-sub">Both branches</div></div>'
+      +'</div>';
+    // Branch comparison
+    html+='<div class="a-section">Branch comparison</div><div class="a-card"><h4>Revenue vs expenses</h4>';
+    branches.forEach(b=>{
+      const s=stats[b],mx=Math.max(s.rev,s.exp,1);
+      html+='<div class="compare-row"><div class="compare-top"><span class="compare-name" style="color:'+BRANCH_COLOR[b]+'">'+BRANCH_LABELS[b]+'</span><span style="font-size:13px;font-weight:600;color:'+(s.profit>=0?TEAL:RED)+'">'+(s.profit>=0?'+':'')+'&#8377;'+s.profit.toLocaleString('en-IN')+'</span></div>'
+        +'<div class="compare-bars"><div class="cbar" style="width:'+Math.round((s.rev/mx)*100)+'%;background:'+TEAL+'"></div><div class="cbar" style="width:'+Math.round((s.exp/mx)*100)+'%;background:'+RED+'"></div></div>'
+        +'<div style="display:flex;gap:14px;margin-top:4px"><span style="font-size:12px;color:'+TEAL+';font-weight:600">&#8377;'+s.rev.toLocaleString('en-IN')+'</span><span style="font-size:12px;color:'+RED+';font-weight:600">&#8377;'+s.exp.toLocaleString('en-IN')+'</span></div></div>';
+    });
+    html+='</div>';
+    // Top customers per branch
+    html+='<div class="a-section">Top customers — last '+analyticsRange+' days</div>';
+    branches.forEach(b=>{
+      html+='<div class="a-card"><h4 style="color:'+BRANCH_COLOR[b]+'">'+BRANCH_LABELS[b]+'</h4>'
+        +renderRankList(stats[b].topCustomers,
+          item=>'<span>'+item.visits+'</span><span style="font-size:11px">visit'+(item.visits>1?'s':'')+'</span>',
+          item=>item.isMember?'🎫 Member':'Walk-in')
+        +'</div>';
+    });
+    // Combined therapist analysis
+    const combTh={};
+    branches.forEach(b=>stats[b].topTherapists.forEach(([tid,v])=>{
+      if(!combTh[tid])combTh[tid]={services:0,hrs:0};
+      combTh[tid].services+=v.services; combTh[tid].hrs+=v.hrs;
+    }));
+    const combThArr=Object.entries(combTh).sort((a,b)=>b[1].services-a[1].services);
+    html+='<div class="a-section">Therapist performance — combined</div><div class="a-card"><h4>Services completed</h4>';
+    if(combThArr.length){
+      const mx=Math.max(...combThArr.map(([,v])=>v.services),1);
+      html+=combThArr.map(([tid,v])=>{
+        const t=(D.therapists||[]).find(x=>x.id===tid);
+        const nm=t?t.name:tid;
+        const brBadge=t?(' <span class="badge '+(t.branch==='indiranagar'?'b-teal':'b-blue')+'" style="font-size:10px">'+BRANCH_LABELS[t.branch]+(t.interbranch?' ✦':'')+'</span>'):'';
+        return '<div class="bar-row"><div class="bar-label" title="'+nm+'">'+nm+'</div>'
+          +'<div class="bar-track"><div class="bar-fill" style="width:'+Math.round((v.services/mx)*100)+'%;background:'+TEAL+'"></div></div>'
+          +'<div class="bar-val">'+v.services+brBadge+'</div></div>';
+      }).join('');
+    } else { html+='<div class="no-data">No therapist data yet — add therapists and log visits</div>'; }
+    html+='</div>';
+  } else {
+    const s=stats[branch];
+    const col=BRANCH_COLOR[branch];
+    const maxRev=Math.max(...s.dayData.map(d=>d.rev),1);
+    const top=Object.entries(s.svcMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+    const topExp=Object.entries(s.expCatMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const maxSvc=Math.max(...Object.values(s.svcMap),1);
+    const maxExp=Math.max(...Object.values(s.expCatMap),1);
+    html+='<div class="kpi-grid">'
+      +'<div class="kpi" style="border-left-color:'+TEAL+'"><div class="kpi-lbl">Revenue</div><div class="kpi-val" style="color:'+TEAL+'">&#8377;'+s.rev.toLocaleString('en-IN')+'</div><div class="kpi-sub">Last '+analyticsRange+' days</div></div>'
+      +'<div class="kpi" style="border-left-color:'+RED+'"><div class="kpi-lbl">Expenses</div><div class="kpi-val" style="color:'+RED+'">&#8377;'+s.exp.toLocaleString('en-IN')+'</div><div class="kpi-sub">Last '+analyticsRange+' days</div></div>'
+      +'<div class="kpi" style="border-left-color:'+(s.profit>=0?TEAL:RED)+'"><div class="kpi-lbl">Net profit</div><div class="kpi-val" style="color:'+(s.profit>=0?TEAL:RED)+'">&#8377;'+s.profit.toLocaleString('en-IN')+'</div><div class="kpi-sub">'+(s.profit>=0?'Profit':'Loss')+'</div></div>'
+      +'<div class="kpi" style="border-left-color:'+BLUE+'"><div class="kpi-lbl">Visits</div><div class="kpi-val" style="color:'+BLUE+'">'+s.visits+'</div><div class="kpi-sub">Avg &#8377;'+(s.visits?Math.round(s.rev/s.visits).toLocaleString('en-IN'):0)+'/visit</div></div>'
+      +'</div>';
+    // Daily chart
+    html+='<div class="a-card"><h4>Daily revenue</h4><div class="day-chart">'
+      +s.dayData.map(({d,rev})=>'<div class="dbar-wrap"><div class="dbar" style="height:'+Math.round((rev/maxRev)*72)+'px;background:'+(rev>0?col:'var(--bg2)')+'"></div><div class="dbar-lbl">'+d.getDate()+'</div></div>').join('')
+      +'</div>'+(s.dayData.every(d=>d.rev===0)?'<div class="no-data" style="text-align:center;margin-top:8px">Enter visit data to see chart</div>':'')+'</div>';
+    // Top customers
+    html+='<div class="a-section">Top customers — last '+analyticsRange+' days</div>'
+      +'<div class="a-card"><h4>By number of visits</h4>'
+      +renderRankList(s.topCustomers,
+        item=>'<span>'+item.visits+'</span><span style="font-size:11px">visit'+(item.visits>1?'s':'')+'</span>',
+        item=>item.isMember?'🎫 Member':'Walk-in')
+      +'</div>';
+    // Therapist analysis
+    html+='<div class="a-section">Therapist performance — last '+analyticsRange+' days</div><div class="a-card"><h4>Services completed</h4>';
+    if(s.topTherapists.length){
+      const mx=Math.max(...s.topTherapists.map(([,v])=>v.services),1);
+      html+=s.topTherapists.map(([tid,v])=>{
+        const t=(D.therapists||[]).find(x=>x.id===tid);
+        const nm=t?t.name:tid;
+        const hrs=v.hrs>0?' · '+v.hrs.toFixed(1)+' hrs':'';
+        const ibBadge=t&&t.interbranch?' <span class="badge b-purple" style="font-size:10px">Inter-branch</span>':'';
+        return '<div class="bar-row"><div class="bar-label" title="'+nm+'">'+nm+'</div>'
+          +'<div class="bar-track"><div class="bar-fill" style="width:'+Math.round((v.services/mx)*100)+'%;background:'+col+'"></div></div>'
+          +'<div class="bar-val">'+v.services+ibBadge+'</div></div>'
+          +'<div style="font-size:11px;color:var(--text3);text-align:right;margin:-5px 0 5px">'+nm+hrs+'</div>';
+      }).join('');
+    } else { html+='<div class="no-data">Select therapists when logging visits to see this analysis</div>'; }
+    html+='</div>';
+    // Top services
+    html+='<div class="a-card"><h4>Top services</h4>'+(top.length?top.map(([n,c])=>'<div class="bar-row"><div class="bar-label" title="'+n+'">'+n+'</div><div class="bar-track"><div class="bar-fill" style="width:'+Math.round((c/maxSvc)*100)+'%;background:'+col+'"></div></div><div class="bar-val">'+c+' visits</div></div>').join(''):'<div class="no-data">No visit data yet</div>')+'</div>';
+    // Expenses
+    html+='<div class="a-card"><h4>Expenses by category</h4>'+(topExp.length?topExp.map(([cat,amt])=>'<div class="bar-row"><div class="bar-label" title="'+cat+'">'+cat+'</div><div class="bar-track"><div class="bar-fill" style="width:'+Math.round((amt/maxExp)*100)+'%;background:'+RED+'"></div></div><div class="bar-val">&#8377;'+amt.toLocaleString('en-IN')+'</div></div>').join(''):'<div class="no-data">No expense data yet</div>')+'</div>';
+    // Payment mode
+    html+='<div class="a-card"><h4>Payment mode</h4>'+(Object.keys(s.payMap).length?Object.entries(s.payMap).sort((a,b)=>b[1]-a[1]).map(([p,amt])=>'<div class="bar-row"><div class="bar-label">'+p+'</div><div class="bar-track"><div class="bar-fill" style="width:'+Math.round((amt/s.rev)*100)+'%;background:'+BLUE+'"></div></div><div class="bar-val">&#8377;'+amt.toLocaleString('en-IN')+'</div></div>').join(''):'<div class="no-data">No payment data yet</div>')+'</div>';
+  }
+  document.getElementById('analytics-content').innerHTML=html;
+}
+
+loadData();
+</script>
+</body>
+</html>
