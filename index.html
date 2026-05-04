@@ -471,7 +471,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
 </div>
 
 <script>
-const SHEET_URL='https://script.google.com/macros/s/AKfycbxhD0l5sSw2ANvkG_7fe_JrFSrd4j4Qkgqc-rwOqQnGJ5vKQWCOFKPFBq7wjMTP1tLa/exec';
+const SHEET_URL='https://script.google.com/macros/s/AKfycbzVw2RyExfCYotE60UiQDBcJR6_hBngAiCmIsdSR6eI5Fian7e0QM6CibS5qkLQHjpk/exec';
 const PINS={'receptionist-indiranagar':'4729','receptionist-koramangala':'8163','owner':'5501'};
 const BRANCH_LABELS={indiranagar:'Indiranagar',koramangala:'Koramangala'};
 const BRANCH_COLOR={indiranagar:'#1D9E75',koramangala:'#185FA5'};
@@ -501,13 +501,19 @@ function showToast(msg,ok=true){
 }
 
 // ── SHEETS API ──
-async function sheetsGet(params){
-  try{
-    const url=SHEET_URL+'?'+Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
-    const res=await fetch(url,{method:'GET',mode:'cors'});
-    const json=await res.json();
-    return json;
-  }catch(e){console.warn('GET failed:',e);return null;}
+// Use JSONP for GET requests (bypasses CORS on Google Apps Script)
+function sheetsGet(params){
+  return new Promise((resolve)=>{
+    const cbName='_cb'+Date.now()+'_'+Math.floor(Math.random()*9999);
+    const url=SHEET_URL+'?callback='+cbName+'&'+Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
+    const script=document.createElement('script');
+    const timer=setTimeout(()=>{cleanup();resolve(null);},15000);
+    window[cbName]=(data)=>{cleanup();resolve(data);};
+    function cleanup(){clearTimeout(timer);delete window[cbName];if(script.parentNode)script.parentNode.removeChild(script);}
+    script.onerror=()=>{cleanup();resolve(null);};
+    script.src=url;
+    document.head.appendChild(script);
+  });
 }
 
 async function sheetsPost(payload){
