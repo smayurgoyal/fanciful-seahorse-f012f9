@@ -505,11 +505,19 @@ function showToast(msg,ok=true){
 function sheetsGet(params){
   return new Promise((resolve)=>{
     const cbName='_cb'+Date.now()+'_'+Math.floor(Math.random()*9999);
+    // Also register a fallback 'callback' handler in case redirect strips the param
+    const fallback='callback';
     const url=SHEET_URL+'?callback='+cbName+'&'+Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
     const script=document.createElement('script');
-    const timer=setTimeout(()=>{cleanup();resolve(null);},15000);
+    const timer=setTimeout(()=>{cleanup();resolve(null);},20000);
     window[cbName]=(data)=>{cleanup();resolve(data);};
-    function cleanup(){clearTimeout(timer);delete window[cbName];if(script.parentNode)script.parentNode.removeChild(script);}
+    window[fallback]=(data)=>{cleanup();resolve(data);};
+    function cleanup(){
+      clearTimeout(timer);
+      delete window[cbName];
+      // Don't delete window.callback as it may be shared
+      if(script.parentNode)script.parentNode.removeChild(script);
+    }
     script.onerror=()=>{cleanup();resolve(null);};
     script.src=url;
     document.head.appendChild(script);
