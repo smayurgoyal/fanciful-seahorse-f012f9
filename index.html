@@ -581,8 +581,17 @@ async function loadMemberships(){
 
 async function loadAttendance(){
   const br=(branch==='both')?'indiranagar':branch;
-  const res=await sheetsGet({action:'getData',branch:br,date:dk(attDate)});
-  if(res&&res.success)liveAttendance=res.data.attendance||[];
+  showLoading('Loading attendance...');
+  try{
+    const res=await sheetsGet({action:'getData',branch:br,date:dk(attDate)});
+    if(res&&res.success){
+      liveAttendance=res.data.attendance||[];
+      // Always refresh therapists so attendance tab shows correct names
+      if(res.data.therapists&&res.data.therapists.length>0){
+        liveTherapists=res.data.therapists;
+      }
+    }
+  }finally{hideLoading();}
 }
 
 async function refreshData(){
@@ -685,7 +694,12 @@ async function loadVisitsForDate(){
   try{
     const br=(branch==='both')?'indiranagar':branch;
     const res=await sheetsGet({action:'getData',branch:br,date:dk(custDate)});
-    if(res&&res.success)liveVisits=res.data.visits||[];
+    if(res&&res.success){
+      liveVisits=res.data.visits||[];
+      // Always refresh therapists and attendance so picker shows correct names
+      if(res.data.therapists&&res.data.therapists.length>0) liveTherapists=res.data.therapists;
+      if(res.data.attendance&&res.data.attendance.length>0) liveAttendance=res.data.attendance;
+    }
     if(branch==='both'){
       const k=await sheetsGet({action:'getData',branch:'koramangala',date:dk(custDate)});
       if(k&&k.success)liveVisits=[...liveVisits,...(k.data.visits||[]).map(v=>({...v,_br:'koramangala'}))];
