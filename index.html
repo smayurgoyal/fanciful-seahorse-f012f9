@@ -520,9 +520,11 @@ async function sheetsPost(payload){
   try{
     const form=new FormData();
     form.append('data',JSON.stringify(payload));
+    // Use no-cors — we can't read the response but the request goes through
     await fetch(SHEET_URL,{method:'POST',mode:'no-cors',body:form});
     return true;
   }catch(e){console.warn('POST failed:',e);return false;}
+  finally{hideLoading();}
 }
 
 // ── LOAD DATA FROM SHEETS ──
@@ -839,9 +841,17 @@ async function saveVisit(){
   const br=(branch==='both')?'indiranagar':branch;
   const record={name,phone:document.getElementById('c-phone').value.trim(),service:document.getElementById('c-service').value,therapists,therapist:therapists.join(' + '),time:document.getElementById('c-time').value,dur:document.getElementById('c-dur').value,pay:document.getElementById('c-pay').value,amt:document.getElementById('c-amt').value,status:document.getElementById('c-status').value,notes:document.getElementById('c-notes').value.trim()};
   showLoading('Saving visit...');
-  const ok=await sheetsPost({type:'visit',branch:br,date:dk(custDate),record});
-  if(ok){showToast('Visit saved ✓');closeVisitModal();['c-name','c-phone','c-time','c-dur','c-amt','c-notes'].forEach(id=>document.getElementById(id).value='');const picker=document.getElementById('therapist-picker');picker.querySelectorAll('.therapist-picker-row:not(:first-child)').forEach(r=>r.remove());document.getElementById('c-therapist-1').value='';document.getElementById('add-therapist-btn').classList.remove('hidden');await loadVisitsForDate();renderVisits();}
-  else{showToast('Save failed — check connection',false);hideLoading();}
+  try{
+    await sheetsPost({type:'visit',branch:br,date:dk(custDate),record});
+    showToast('Visit saved ✓');
+    closeVisitModal();
+    ['c-name','c-phone','c-time','c-dur','c-amt','c-notes'].forEach(id=>document.getElementById(id).value='');
+    const picker=document.getElementById('therapist-picker');
+    picker.querySelectorAll('.therapist-picker-row:not(:first-child)').forEach(r=>r.remove());
+    document.getElementById('c-therapist-1').value='';
+    document.getElementById('add-therapist-btn').classList.remove('hidden');
+    await loadVisitsForDate();renderVisits();
+  }finally{hideLoading();}
 }
 
 // ── SAVE EXPENSE ──
@@ -860,10 +870,14 @@ async function saveExpense(){
   const targetBranch=isOwner?document.getElementById('e-branch').value:branch;
   const record={desc,cat:document.getElementById('e-cat').value,vendor:document.getElementById('e-vendor').value.trim(),amt,paid:document.getElementById('e-paid').value,receipt:document.getElementById('e-receipt').value.trim(),addedBy:isOwner?'owner':'receptionist'};
   showLoading('Saving expense...');
-  const branches=targetBranch==='both'?['indiranagar','koramangala']:[targetBranch];
-  for(const br of branches)await sheetsPost({type:'expense',branch:br,date:dk(expDate),record:{...record,shared:targetBranch==='both'}});
-  showToast('Expense saved ✓');closeExpModal();['e-desc','e-vendor','e-amt','e-receipt'].forEach(id=>document.getElementById(id).value='');
-  await loadExpensesForDate();renderExpenses();
+  try{
+    const branches=targetBranch==='both'?['indiranagar','koramangala']:[targetBranch];
+    for(const br of branches)await sheetsPost({type:'expense',branch:br,date:dk(expDate),record:{...record,shared:targetBranch==='both'}});
+    showToast('Expense saved ✓');
+    closeExpModal();
+    ['e-desc','e-vendor','e-amt','e-receipt'].forEach(id=>document.getElementById(id).value='');
+    await loadExpensesForDate();renderExpenses();
+  }finally{hideLoading();}
 }
 
 // ── MEMBERSHIPS ──
@@ -887,9 +901,13 @@ async function saveMembership(){
   const code=genCode(br);
   const record={code,name,phone,totalHours:hours,usedHours:0,amt,pay:document.getElementById('m-pay').value,expiry:document.getElementById('m-expiry').value,notes:document.getElementById('m-notes').value.trim(),branch:br,createdAt:new Date().toISOString()};
   showLoading('Creating membership...');
-  await sheetsPost({type:'membership',branch:br,date:dk(new Date()),record});
-  showToast('Membership '+code+' created ✓');closeMemModal();['m-name','m-phone','m-hours','m-amt','m-notes'].forEach(id=>document.getElementById(id).value='');
-  await loadMemberships();renderMemberships();
+  try{
+    await sheetsPost({type:'membership',branch:br,date:dk(new Date()),record});
+    showToast('Membership '+code+' created ✓');
+    closeMemModal();
+    ['m-name','m-phone','m-hours','m-amt','m-notes'].forEach(id=>document.getElementById(id).value='');
+    await loadMemberships();renderMemberships();
+  }finally{hideLoading();}
 }
 
 function openUseModal(code,br){
@@ -940,11 +958,14 @@ async function useHours(){
   const visitRecord={name:mem['Customer Name']||mem.name||'',phone:mem['Phone']||mem.phone||'',service:document.getElementById('u-service').value,therapist:document.getElementById('u-therapist').value.trim(),time:document.getElementById('u-time').value,dur:Math.round(hrs*60),pay:'Package / Membership',amt:0,status:document.getElementById('u-status').value,notes:'Member: '+_useCode+(crossBranch?' (Home: '+BRANCH_LABELS[_useBranch]+')':'')+(document.getElementById('u-notes').value?' | '+document.getElementById('u-notes').value:''),memberCode:_useCode};
   const newUsed=parseFloat((used+hrs).toFixed(2));
   showLoading('Recording visit...');
-  await sheetsPost({type:'visit',branch:visitBranch,date:dk(custDate),record:visitRecord});
-  await sheetsPost({type:'updateMembership',branch:_useBranch,date:dk(custDate),record:{code:_useCode,branch:_useBranch,usedHours:newUsed}});
-  showToast(hrs+' hrs deducted from '+_useCode+'. '+(total-newUsed).toFixed(1)+' remaining'+(crossBranch?' (cross-branch ✓)':' ✓'));
-  closeUseModal();await loadMemberships();renderMemberships();
-  if(currentTab==='customers'){await loadVisitsForDate();renderVisits();}
+  try{
+    await sheetsPost({type:'visit',branch:visitBranch,date:dk(custDate),record:visitRecord});
+    await sheetsPost({type:'updateMembership',branch:_useBranch,date:dk(custDate),record:{code:_useCode,branch:_useBranch,usedHours:newUsed}});
+    showToast(hrs+' hrs deducted from '+_useCode+'. '+(total-newUsed).toFixed(1)+' remaining'+(crossBranch?' (cross-branch ✓)':' ✓'));
+    closeUseModal();
+    await loadMemberships();renderMemberships();
+    if(currentTab==='customers'){await loadVisitsForDate();renderVisits();}
+  }finally{hideLoading();}
 }
 
 // ── DELETE ──
@@ -952,16 +973,20 @@ async function deleteVisit(i){
   if(!confirm('Remove this visit?'))return;
   const br=(branch==='both')?(liveVisits[i]._br||'indiranagar'):branch;
   showLoading('Removing...');
-  await sheetsPost({type:'deleteVisit',branch:br,rowIndex:i});
-  await loadVisitsForDate();renderVisits();
+  try{
+    await sheetsPost({type:'deleteVisit',branch:br,rowIndex:i});
+    await loadVisitsForDate();renderVisits();
+  }finally{hideLoading();}
 }
 
 async function deleteExpense(i){
   if(!confirm('Remove this expense?'))return;
   const br=(branch==='both')?(liveExpenses[i]._br||'indiranagar'):branch;
   showLoading('Removing...');
-  await sheetsPost({type:'deleteExpense',branch:br,rowIndex:i});
-  await loadExpensesForDate();renderExpenses();
+  try{
+    await sheetsPost({type:'deleteExpense',branch:br,rowIndex:i});
+    await loadExpensesForDate();renderExpenses();
+  }finally{hideLoading();}
 }
 
 // ── THERAPISTS ──
@@ -987,9 +1012,17 @@ async function saveTherapist(){
   const newTherapist={id,name,spec:document.getElementById('t-spec').value.trim(),branch:br,interbranch:document.getElementById('t-interbranch').checked,phone:document.getElementById('t-phone').value.trim()};
   liveTherapists.push(newTherapist);
   showLoading('Saving therapist...');
-  await sheetsPost({type:'saveTherapists',therapists:liveTherapists});
-  showToast('Therapist '+name+' added — '+id+' ✓');closeTherapistModal();['t-name','t-spec','t-phone'].forEach(i=>document.getElementById(i).value='');const cb=document.getElementById('t-interbranch');if(cb){cb.checked=false;updateToggle();}
-  renderTherapists();
+  try{
+    await sheetsPost({type:'saveTherapists',therapists:liveTherapists});
+    showToast('Therapist '+name+' added — '+id+' ✓');
+    closeTherapistModal();
+    ['t-name','t-spec','t-phone'].forEach(i=>document.getElementById(i).value='');
+    const cb=document.getElementById('t-interbranch');if(cb){cb.checked=false;updateToggle();}
+    renderTherapists();
+  }catch(e){
+    showToast('Failed to save — please try again',false);
+    liveTherapists.pop();// rollback
+  }finally{hideLoading();}
 }
 
 function setTherapistBranch(br,btn){therapistFilterBranch=br;document.querySelectorAll('[id^="tbr-"]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTherapists();}
@@ -1022,8 +1055,10 @@ async function deleteTherapist(idx){
   if(!confirm('Remove this therapist?'))return;
   liveTherapists.splice(idx,1);
   showLoading('Removing...');
-  await sheetsPost({type:'saveTherapists',therapists:liveTherapists});
-  renderTherapists();hideLoading();
+  try{
+    await sheetsPost({type:'saveTherapists',therapists:liveTherapists});
+    renderTherapists();
+  }finally{hideLoading();}
 }
 
 // ── ATTENDANCE ──
@@ -1085,8 +1120,10 @@ async function saveAttendance(){
   const br=(branch==='both')?'indiranagar':branch;
   const records=liveTherapists.filter(t=>(t['Branch']||t.branch||'').toLowerCase()===br||(t['Inter-branch']||t.interbranch)==='true'||t.interbranch===true).map(t=>({id:t['ID']||t.id,name:t['Name']||t.name,status:localAttStatus[t['ID']||t.id]||''})).filter(r=>r.status);
   showLoading('Saving attendance...');
-  await sheetsPost({type:'attendance',branch:br,date:dk(attDate),records});
-  showToast('Attendance saved ✓');hideLoading();
+  try{
+    await sheetsPost({type:'attendance',branch:br,date:dk(attDate),records});
+    showToast('Attendance saved ✓');
+  }finally{hideLoading();}
 }
 
 // ── THERAPIST PICKER ──
