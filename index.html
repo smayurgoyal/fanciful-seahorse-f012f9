@@ -807,8 +807,22 @@ async function navTo(tab){
   else{await loadExpensesForDate();renderExpenses();}
 }
 
-function dk(d){return d.toISOString().slice(0,10);}
+// Date helpers — always use LOCAL date (IST), never UTC
+function dk(d){
+  // Use local year/month/day to avoid UTC offset shifting the date
+  const yr=d.getFullYear();
+  const mo=String(d.getMonth()+1).padStart(2,'0');
+  const dy=String(d.getDate()).padStart(2,'0');
+  return yr+'-'+mo+'-'+dy;
+}
 function fmt(d){return d.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'2-digit'});}
+function localDateStr(d){
+  // Same as dk but for any date — used for memberships expiry default
+  const yr=d.getFullYear();
+  const mo=String(d.getMonth()+1).padStart(2,'0');
+  const dy=String(d.getDate()).padStart(2,'0');
+  return yr+'-'+mo+'-'+dy;
+}
 
 async function loadVisitsForDate(){
   showLoading('Loading visits...');
@@ -1185,9 +1199,12 @@ async function saveVisit(){
       await sheetsPost({type:'visit', branch:br, date:dk(custDate), record});
       await sheetsPost({type:'updateMembership', branch:memBranch, date:dk(custDate), record:{code, branch:memBranch, usedHours:newUsed}});
       showToast(hrs+' hrs deducted from '+code+'. '+(total-newUsed).toFixed(1)+' remaining ✓');
+      // Add to local list immediately so it shows without waiting for JSONP
+      liveVisits.push({'Customer Name':record.name,'Phone':record.phone,'Service':record.service,'Therapist':record.therapist||'','Time':record.time||'','Duration (min)':record.dur,'Payment Mode':'Package / Membership','Amount (Rs)':0,'Status':record.status,'Notes':record.notes,'Date':dk(custDate),'Branch':br,'Member Code':code});
       closeVisitModal();
       resetVisitForm();
-      await loadVisitsForDate(); renderVisits();
+      renderVisits();
+      loadVisitsForDate().then(()=>renderVisits());
     }finally{ hideLoading(); }
   } else {
     // Regular visit
@@ -1213,9 +1230,15 @@ async function saveVisit(){
       }
       await sheetsPost({type:'visit', branch:br, date:dk(custDate), record});
       showToast(_editingVisitIdx>=0?'Visit updated ✓':'Visit saved ✓');
+      // Immediately add to local list so it shows without waiting for JSONP
+      if(_editingVisitIdx>=0){
+        liveVisits.splice(_editingVisitIdx, 1);
+      }
+      liveVisits.push({'Customer Name':record.name,'Phone':record.phone,'Service':record.service,'Therapist':record.therapist,'Time':record.time,'Duration (min)':record.dur,'Payment Mode':record.pay,'Amount (Rs)':record.amt,'Status':record.status,'Notes':record.notes,'Date':dk(custDate),'Branch':br});
       closeVisitModal();
       resetVisitForm();
-      await loadVisitsForDate(); renderVisits();
+      renderVisits(); // Show immediately
+      loadVisitsForDate().then(()=>renderVisits()); // Then refresh from sheet in background
     }finally{ hideLoading(); }
   }
 }
@@ -1273,11 +1296,15 @@ async function saveExpense(){
     const branches=targetBranch==='both'?['indiranagar','koramangala']:[targetBranch];
     for(const br of branches)await sheetsPost({type:'expense',branch:br,date:dk(expDate),record:{...record,shared:targetBranch==='both'}});
     showToast(_editingExpenseIdx>=0?'Expense updated ✓':'Expense saved ✓');
+    // Add to local list immediately
+    if(_editingExpenseIdx>=0){ liveExpenses.splice(_editingExpenseIdx,1); }
+    liveExpenses.push({'Description':record.desc,'Category':record.cat,'Vendor':record.vendor,'Amount (Rs)':record.amt,'Paid By':record.paid,'Receipt No':record.receipt,'Date':dk(expDate),'Branch':targetBranch==='both'?'Both':targetBranch,'Shared':targetBranch==='both'?'Yes':'No','Added By':record.addedBy});
     closeExpModal();
     ['e-desc','e-vendor','e-amt','e-receipt'].forEach(id=>document.getElementById(id).value='');
     _editingExpenseIdx=-1;
     const header=document.querySelector('#modal-exp .sheet-header h3');if(header)header.textContent='Add expense';
-    await loadExpensesForDate();renderExpenses();
+    renderExpenses(); // Show immediately
+    loadExpensesForDate().then(()=>renderExpenses()); // Refresh from sheet in background
   }finally{hideLoading();}
 }
 
@@ -1289,7 +1316,12 @@ function genCode(br){
   return prefix+'-'+num;
 }
 
-function openMemModal(){document.getElementById('modal-mem').classList.add('open');const d=new Date();d.setMonth(d.getMonth()+6);document.getElementById('m-expiry').value=d.toISOString().slice(0,10);}
+function openMemModal(){
+  document.getElementById('modal-mem').classList.add('open');
+  const d=new Date();
+  d.setMonth(d.getMonth()+6);
+  document.getElementById('m-expiry').value=localDateStr(d);
+}
 function closeMemModal(){document.getElementById('modal-mem').classList.remove('open');}
 
 async function saveMembership(){
@@ -1302,10 +1334,10 @@ async function saveMembership(){
   if(isNaN(amt)||amt<=0){alert('Please enter valid amount (greater than 0)');return;}
   const br=(branch==='both')?'indiranagar':branch;
   const code=genCode(br);
-  const record={code,name,phone,totalHours:hours,usedHours:0,amt,pay:document.getElementById('m-pay').value,expiry:document.getElementById('m-expiry').value,notes:document.getElementById('m-notes').value.trim(),branch:br,createdAt:new Date().toISOString()};
+  const record={code,name,phone,totalHours:hours,usedHours:0,amt,pay:document.getElementById('m-pay').value,expiry:document.getElementById('m-expiry').value,notes:document.getElementById('m-notes').value.trim(),branch:br,createdAt:localDateStr(new Date())};
   showLoading('Creating membership...');
   try{
-    await sheetsPost({type:'membership',branch:br,date:dk(new Date()),record});
+    await sheetsPost({type:'membership',branch:br,date:localDateStr(new Date()),record});
     showToast('Membership '+code+' created ✓');
     closeMemModal();
     ['m-name','m-phone','m-hours','m-amt','m-notes'].forEach(id=>document.getElementById(id).value='');
