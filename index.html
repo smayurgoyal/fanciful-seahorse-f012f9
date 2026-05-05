@@ -262,6 +262,9 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
         <span style="font-size:15px;font-weight:700">Memberships</span>
         <button class="btn primary sm" onclick="openMemModal()" style="font-weight:600">+ New</button>
       </div>
+      <div class="form-row" style="margin-bottom:12px">
+        <input id="mem-search" placeholder="🔍 Search by name, phone or code..." style="height:44px;font-size:15px;padding:0 14px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg);color:var(--text);width:100%;font-family:var(--font)" oninput="debouncedRenderMemberships()"/>
+      </div>
       <div class="metrics" id="mem-metrics"></div>
       <div id="mem-list" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
@@ -325,8 +328,41 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     <div class="sheet-handle"></div>
     <div class="sheet-header"><h3>Add customer visit</h3><button class="btn icon sm" onclick="closeVisitModal()">&#10005;</button></div>
     <div class="sheet-body">
-      <div class="form-row"><label>Customer name *</label><input id="c-name" placeholder="e.g. Priya Sharma" autocomplete="off"/></div>
-      <div class="form-row"><label>Phone</label><input id="c-phone" placeholder="9876543210" type="tel" inputmode="numeric"/></div>
+
+      <!-- MEMBERSHIP TOGGLE -->
+      <div style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius);background:var(--bg2);cursor:pointer" onclick="toggleMemberVisit()">
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text)">🎫 Membership visit</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:2px">Toggle on if customer has a membership</div>
+          </div>
+          <div style="position:relative;width:44px;height:26px;flex-shrink:0">
+            <input type="checkbox" id="c-is-member" style="opacity:0;width:0;height:0;position:absolute" onchange="toggleMemberVisit()"/>
+            <div id="c-member-track" style="position:absolute;inset:0;border-radius:13px;background:var(--bg3);border:1px solid var(--border2);transition:background .2s"></div>
+            <div id="c-member-thumb" style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .2s"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEMBERSHIP LOOKUP (shown when toggle ON) -->
+      <div id="member-lookup-section" class="hidden">
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <input id="c-member-code" placeholder="Enter membership code e.g. IND-427" style="flex:1;height:48px;font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:0 14px;border-radius:var(--radius);border:2px solid var(--teal);background:var(--bg);color:var(--text);font-family:var(--font)" oninput="this.value=this.value.toUpperCase()" autocomplete="off"/>
+          <button class="btn primary" onclick="lookupMemberInVisit()" style="font-weight:600;height:48px">Find</button>
+        </div>
+        <div id="visit-member-info" class="hidden" style="background:var(--teal-l);border:1px solid var(--teal);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px"></div>
+        <div class="two-col" id="member-hours-row" style="display:none">
+          <div class="form-row"><label>Hours to deduct *</label><input id="c-mem-hours" type="number" inputmode="decimal" placeholder="1.5" step="0.5"/></div>
+          <div class="form-row"><label>Remaining hrs</label><input id="c-mem-remaining" readonly style="background:var(--bg2);color:var(--text2)"/></div>
+        </div>
+      </div>
+
+      <!-- REGULAR FIELDS -->
+      <div id="regular-visit-fields">
+        <div class="form-row"><label>Customer name *</label><input id="c-name" placeholder="e.g. Priya Sharma" autocomplete="off"/></div>
+        <div class="form-row"><label>Phone</label><input id="c-phone" placeholder="9876543210" type="tel" inputmode="numeric"/></div>
+      </div>
+
       <div class="form-row"><label>Service *</label>
         <select id="c-service"><option>Swedish Massage</option><option>Deep Tissue Massage</option><option>Aromatherapy</option><option>Hot Stone Therapy</option><option>Body Scrub</option><option>Body Wrap</option><option>Classic Facial</option><option>Gold Facial</option><option>Pedicure</option><option>Manicure</option><option>Mani-Pedi Combo</option><option>Head Massage</option><option>Couple Spa Package</option><option>Day Spa Package</option><option>Other</option></select>
       </div>
@@ -340,9 +376,9 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
       <div class="form-row"><label>Time slot</label><input id="c-time" type="time"/></div>
       <div class="two-col">
         <div class="form-row"><label>Duration (min)</label><input id="c-dur" type="number" inputmode="numeric" placeholder="60"/></div>
-        <div class="form-row"><label>Amount (&#8377;) *</label><input id="c-amt" type="number" inputmode="numeric" placeholder="1500"/></div>
+        <div class="form-row" id="amt-row"><label>Amount (&#8377;) *</label><input id="c-amt" type="number" inputmode="numeric" placeholder="1500"/></div>
       </div>
-      <div class="two-col">
+      <div class="two-col" id="payment-row">
         <div class="form-row"><label>Payment</label><select id="c-pay"><option>Cash</option><option>UPI</option><option>Card</option><option>Online</option><option>Voucher</option></select></div>
         <div class="form-row"><label>Status</label><select id="c-status"><option>Confirmed</option><option>Completed</option><option>Cancelled</option><option>No-Show</option></select></div>
       </div>
@@ -571,7 +607,6 @@ async function sheetsPost(payload){
     await fetch(SHEET_URL,{method:'POST',mode:'no-cors',body:form});
     return true;
   }catch(e){console.warn('POST failed:',e);return false;}
-  finally{hideLoading();}
 }
 
 // Push therapists to cache after owner saves them so receptionists can read them
@@ -602,32 +637,36 @@ async function loadAllData(showSpinner=true){
   try{
     const br=(branch==='both')?'indiranagar':branch;
     const dateStr=dk(custDate);
+    // Load visits/expenses/attendance for today, memberships for ALL dates
     const visitRes=await sheetsGet({action:'getData',branch:br,date:dateStr});
     if(visitRes&&visitRes.success){
       liveVisits=visitRes.data.visits||[];
       liveExpenses=visitRes.data.expenses||[];
-      liveMemberships=visitRes.data.memberships||[];
       liveAttendance=visitRes.data.attendance||[];
       if(visitRes.data.therapists&&visitRes.data.therapists.length>0){
         liveTherapists=visitRes.data.therapists;
-        cacheTherapists(liveTherapists); // Seed cache for all devices
+        cacheTherapists(liveTherapists);
       } else {
         const cached=getCachedTherapists();
         if(cached.length>0) liveTherapists=cached;
       }
     } else {
-      // JSONP failed — use cache
       const cached=getCachedTherapists();
       if(cached.length>0) liveTherapists=cached;
     }
+    // Load ALL memberships (no date filter)
+    const memRes=await sheetsGet({action:'getData',branch:br,date:''});
+    if(memRes&&memRes.success) liveMemberships=memRes.data.memberships||[];
+
     if(branch==='both'){
       const korRes=await sheetsGet({action:'getData',branch:'koramangala',date:dateStr});
       if(korRes&&korRes.success){
         liveVisits=[...liveVisits,...(korRes.data.visits||[])];
         liveExpenses=[...liveExpenses,...(korRes.data.expenses||[])];
-        liveMemberships=[...liveMemberships,...(korRes.data.memberships||[])];
         liveAttendance=[...liveAttendance,...(korRes.data.attendance||[])];
       }
+      const korMem=await sheetsGet({action:'getData',branch:'koramangala',date:''});
+      if(korMem&&korMem.success) liveMemberships=[...liveMemberships,...(korMem.data.memberships||[]).map(m=>({...m,_br:'koramangala'}))];
     }
   }finally{if(showSpinner)hideLoading();}
 }
@@ -639,14 +678,18 @@ async function loadTherapists(){
 
 async function loadMemberships(){
   const br=(branch==='both')?'indiranagar':branch;
-  const res=await sheetsGet({action:'getData',branch:br,date:dk(custDate)});
-  if(res&&res.success){
-    liveMemberships=res.data.memberships||[];
-    if(branch==='both'){
-      const k=await sheetsGet({action:'getData',branch:'koramangala',date:dk(custDate)});
-      if(k&&k.success)liveMemberships=[...liveMemberships,...(k.data.memberships||[]).map(m=>({...m,_br:'koramangala'}))];
+  showLoading('Loading memberships...');
+  try{
+    // Pass date as empty string so Apps Script returns ALL memberships (no date filter)
+    const res=await sheetsGet({action:'getData',branch:br,date:''});
+    if(res&&res.success){
+      liveMemberships=res.data.memberships||[];
+      if(branch==='both'){
+        const k=await sheetsGet({action:'getData',branch:'koramangala',date:''});
+        if(k&&k.success)liveMemberships=[...liveMemberships,...(k.data.memberships||[]).map(m=>({...m,_br:'koramangala'}))];
+      }
     }
-  }
+  }finally{hideLoading();}
 }
 
 async function loadAttendance(){
@@ -811,10 +854,65 @@ async function changeDate(dir){custDate.setDate(custDate.getDate()+dir);await lo
 async function changeExpDate(dir){expDate.setDate(expDate.getDate()+dir);await loadExpensesForDate();renderExpenses();}
 async function changeAttDate(dir){attDate.setDate(attDate.getDate()+dir);await loadAttendance();renderAttendance();}
 
+// ── EDIT STATE ──
+let _editingVisitIdx = -1;
+let _editingExpenseIdx = -1;
+
+function editVisit(i){
+  const r = liveVisits[i];
+  if(!r) return;
+  _editingVisitIdx = i;
+  // Populate the visit modal with this visit's data
+  document.getElementById('c-name').value = r['Customer Name']||r.name||'';
+  document.getElementById('c-phone').value = r['Phone']||r.phone||'';
+  document.getElementById('c-service').value = r['Service']||r.service||'Swedish Massage';
+  document.getElementById('c-time').value = r['Time']||r.time||'';
+  document.getElementById('c-dur').value = r['Duration (min)']||r.dur||'';
+  document.getElementById('c-amt').value = r['Amount (Rs)']||r.amt||'';
+  document.getElementById('c-pay').value = r['Payment Mode']||r.pay||'Cash';
+  document.getElementById('c-status').value = r['Status']||r.status||'Confirmed';
+  document.getElementById('c-notes').value = r['Notes']||r.notes||'';
+  // Set therapist if exists
+  const ther = (r['Therapist']||r.therapist||'').split(' + ').filter(t=>t);
+  refreshTherapistPicker();
+  setTimeout(()=>{
+    if(ther[0]) document.getElementById('c-therapist-1').value = ther[0];
+    if(ther[1]){ addTherapistSlot(); setTimeout(()=>{ const sec=document.getElementById('c-therapist-2'); if(sec) sec.value=ther[1]; },50); }
+  },50);
+  // Update modal title
+  const header = document.querySelector('#modal-visit .sheet-header h3');
+  if(header) header.textContent = 'Edit visit';
+  document.getElementById('modal-visit').classList.add('open');
+}
+
+function editExpense(i){
+  const r = liveExpenses[i];
+  if(!r) return;
+  _editingExpenseIdx = i;
+  // For receptionists, hide branch row; for owner, show
+  const isOwner = role==='owner';
+  document.getElementById('exp-branch-row').classList.toggle('hidden', !isOwner);
+  if(isOwner) document.getElementById('e-branch').value = r._br||((branch==='both')?'indiranagar':branch);
+  document.getElementById('e-desc').value = r['Description']||r.desc||'';
+  document.getElementById('e-cat').value = r['Category']||r.cat||'Supplies & Products';
+  document.getElementById('e-amt').value = r['Amount (Rs)']||r.amt||'';
+  document.getElementById('e-vendor').value = r['Vendor']||r.vendor||'';
+  document.getElementById('e-paid').value = r['Paid By']||r.paid||'Cash';
+  document.getElementById('e-receipt').value = r['Receipt No']||r.receipt||'';
+  const header = document.querySelector('#modal-exp .sheet-header h3');
+  if(header) header.textContent = 'Edit expense';
+  document.getElementById('modal-exp').classList.add('open');
+}
+
 // ── MODALS ──
 function openVisitModal(){refreshTherapistPicker();document.getElementById('modal-visit').classList.add('open');}
-function closeVisitModal(){document.getElementById('modal-visit').classList.remove('open');}
-function closeExpModal(){document.getElementById('modal-exp').classList.remove('open');}
+function closeVisitModal(){document.getElementById('modal-visit').classList.remove('open');resetVisitForm();}
+function closeExpModal(){
+  document.getElementById('modal-exp').classList.remove('open');
+  _editingExpenseIdx = -1;
+  const header = document.querySelector('#modal-exp .sheet-header h3');
+  if(header) header.textContent = 'Add expense';
+}
 document.querySelectorAll('.sheet-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 
 const statusCls={Confirmed:'b-blue',Completed:'b-green',Cancelled:'b-red','No-Show':'b-amber'};
@@ -851,7 +949,10 @@ function renderVisits(){
       ${(r['Notes']||r.notes)?`<div class="visit-notes">${r['Notes']||r.notes}</div>`:''}
       <div class="visit-bottom">
         <div class="visit-amount">&#8377;${(+(r['Amount (Rs)']||r.amt)||0).toLocaleString('en-IN')}</div>
-        <button class="btn danger" onclick="deleteVisit(${i})">Remove</button>
+        <div style="display:flex;gap:6px">
+          <button class="btn sm" onclick="editVisit(${i})" style="font-size:13px">Edit</button>
+          ${role==='owner'?`<button class="btn danger" onclick="deleteVisit(${i})">Remove</button>`:''}
+        </div>
       </div>
     </div>`).join('');
 }
@@ -881,23 +982,56 @@ function renderExpenses(){
       <div class="exp-right">
         <div class="exp-amt">&#8377;${(+(r['Amount (Rs)']||r.amt)||0).toLocaleString('en-IN')}</div>
         <div class="exp-paid">${r['Paid By']||r.paid||''}</div>
-        <button class="btn danger" style="margin-top:8px" onclick="deleteExpense(${i})">Remove</button>
+        <div style="display:flex;gap:4px;margin-top:8px;justify-content:flex-end">
+          <button class="btn sm" onclick="editExpense(${i})" style="font-size:11px;height:28px;padding:0 8px">Edit</button>
+          ${role==='owner'?`<button class="btn danger" style="height:28px;font-size:11px" onclick="deleteExpense(${i})">✕</button>`:''}
+        </div>
       </div>
     </div>`).join('');
 }
 
 // ── RENDER MEMBERSHIPS ──
+let _memSearchTimer=null;
+function debouncedRenderMemberships(){
+  clearTimeout(_memSearchTimer);
+  _memSearchTimer=setTimeout(renderMemberships,200);
+}
 function renderMemberships(){
-  const list=liveMemberships;
-  const active=list.filter(m=>{const rem=(+(m['Total Hours']||m.totalHours)||0)-(+(m['Used Hours']||m.usedHours)||0);return rem>0&&(!m['Expiry']||new Date(m['Expiry'])>=new Date());});
+  const searchEl=document.getElementById('mem-search');
+  const q=(searchEl?searchEl.value:'').toLowerCase().trim();
+  // Filter by search query
+  let list=liveMemberships.filter(m=>{
+    if(!q)return true;
+    const code=(m['Code']||m.code||'').toLowerCase();
+    const name=(m['Customer Name']||m.name||'').toLowerCase();
+    const phone=(m['Phone']||m.phone||'').toLowerCase();
+    return code.includes(q)||name.includes(q)||phone.includes(q);
+  });
+  // Sort: active first, then low hours, then expired
+  list=list.sort((a,b)=>{
+    const remA=(+(a['Total Hours']||a.totalHours)||0)-(+(a['Used Hours']||a.usedHours)||0);
+    const remB=(+(b['Total Hours']||b.totalHours)||0)-(+(b['Used Hours']||b.usedHours)||0);
+    const expA=(a['Expiry']&&new Date(a['Expiry'])<new Date())||remA<=0;
+    const expB=(b['Expiry']&&new Date(b['Expiry'])<new Date())||remB<=0;
+    if(expA&&!expB)return 1;
+    if(!expA&&expB)return -1;
+    return 0;
+  });
+  const allList=liveMemberships;
+  const active=allList.filter(m=>{const rem=(+(m['Total Hours']||m.totalHours)||0)-(+(m['Used Hours']||m.usedHours)||0);return rem>0&&(!m['Expiry']||new Date(m['Expiry'])>=new Date());});
   document.getElementById('mem-metrics').innerHTML=`
-    <div class="metric"><div class="lbl">Total</div><div class="val" style="color:${BLUE}">${list.length}</div></div>
+    <div class="metric"><div class="lbl">Total</div><div class="val" style="color:${BLUE}">${allList.length}</div></div>
     <div class="metric"><div class="lbl">Active</div><div class="val" style="color:${TEAL}">${active.length}</div></div>
-    <div class="metric"><div class="lbl">Revenue</div><div class="val" style="color:${TEAL}">&#8377;${list.reduce((s,m)=>s+(+(m['Amount (Rs)']||m.amt)||0),0).toLocaleString('en-IN')}</div></div>
-    <div class="metric"><div class="lbl">Expired/Done</div><div class="val" style="color:${AMBER}">${list.length-active.length}</div></div>
+    <div class="metric"><div class="lbl">Revenue</div><div class="val" style="color:${TEAL}">&#8377;${allList.reduce((s,m)=>s+(+(m['Amount (Rs)']||m.amt)||0),0).toLocaleString('en-IN')}</div></div>
+    <div class="metric"><div class="lbl">Expired/Done</div><div class="val" style="color:${AMBER}">${allList.length-active.length}</div></div>
   `;
   const el=document.getElementById('mem-list');
-  if(!list.length){el.innerHTML='<div class="empty-state"><div class="empty-icon" style="font-size:28px">🎫</div><div class="empty-title">No memberships yet</div><div class="empty-sub">Tap + New to create a package membership</div></div>';return;}
+  if(!list.length){
+    el.innerHTML=q
+      ?'<div class="empty-state"><div class="empty-icon" style="font-size:28px">🔍</div><div class="empty-title">No results found</div><div class="empty-sub">Try searching by name, phone or code</div></div>'
+      :'<div class="empty-state"><div class="empty-icon" style="font-size:28px">🎫</div><div class="empty-title">No memberships yet</div><div class="empty-sub">Tap + New to create a package membership</div></div>';
+    return;
+  }
   el.innerHTML=list.map((m,idx)=>{
     const code=m['Code']||m.code||'';
     const name=m['Customer Name']||m.name||'';
@@ -935,24 +1069,182 @@ function renderMemberships(){
 }
 
 // ── SAVE VISIT ──
+// ── MEMBERSHIP TOGGLE IN VISIT FORM ──
+let visitMemberData = null; // holds found membership when toggle is ON
+
+function toggleMemberVisit(){
+  const cb = document.getElementById('c-is-member');
+  // If called from the div click, toggle the checkbox
+  if(document.activeElement !== cb) cb.checked = !cb.checked;
+  const on = cb.checked;
+  // Update toggle UI
+  document.getElementById('c-member-track').style.background = on ? '#1D9E75' : 'var(--bg3)';
+  document.getElementById('c-member-thumb').style.left = on ? '21px' : '3px';
+  // Show/hide sections
+  document.getElementById('member-lookup-section').classList.toggle('hidden', !on);
+  document.getElementById('regular-visit-fields').style.opacity = on ? '0.4' : '1';
+  document.getElementById('regular-visit-fields').style.pointerEvents = on ? 'none' : '';
+  // Reset amount/payment when toggling
+  if(on){
+    document.getElementById('c-amt').value = '0';
+    document.getElementById('c-pay').value = 'Package / Membership';
+    document.getElementById('member-hours-row').style.display = 'none';
+    document.getElementById('visit-member-info').classList.add('hidden');
+    document.getElementById('c-member-code').value = '';
+    visitMemberData = null;
+  } else {
+    document.getElementById('c-amt').value = '';
+    document.getElementById('c-pay').value = 'Cash';
+    visitMemberData = null;
+  }
+}
+
+function lookupMemberInVisit(){
+  const code = document.getElementById('c-member-code').value.trim().toUpperCase();
+  if(!code){ showToast('Please enter a membership code', false); return; }
+  // Search in liveMemberships
+  const mem = liveMemberships.find(m => (m['Code']||m.code||'') === code);
+  const infoBox = document.getElementById('visit-member-info');
+  const hoursRow = document.getElementById('member-hours-row');
+  if(!mem){
+    infoBox.style.cssText = 'background:var(--red-l);border:1px solid var(--red);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px';
+    infoBox.innerHTML = '<b style="color:var(--red)">❌ Code not found</b><br>Please check the membership code and try again.';
+    infoBox.classList.remove('hidden');
+    hoursRow.style.display = 'none';
+    visitMemberData = null;
+    return;
+  }
+  const total = +(mem['Total Hours']||mem.totalHours)||0;
+  const used = +(mem['Used Hours']||mem.usedHours)||0;
+  const remaining = total - used;
+  const isExpired = (mem['Expiry'] && new Date(mem['Expiry']) < new Date()) || remaining <= 0;
+  if(isExpired){
+    infoBox.style.cssText = 'background:var(--red-l);border:1px solid var(--red);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px';
+    infoBox.innerHTML = '<b style="color:var(--red)">⚠️ Membership expired or hours exhausted</b>';
+    infoBox.classList.remove('hidden');
+    hoursRow.style.display = 'none';
+    visitMemberData = null;
+    return;
+  }
+  // Found and valid!
+  visitMemberData = mem;
+  const name = mem['Customer Name']||mem.name||'';
+  const phone = mem['Phone']||mem.phone||'';
+  const memBranch = (mem['Branch']||mem.branch||'indiranagar').toLowerCase();
+  const crossBranch = memBranch !== ((branch==='both')?'indiranagar':branch);
+  infoBox.style.cssText = 'background:var(--teal-l);border:1px solid var(--teal);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px';
+  infoBox.innerHTML = `<b>${name}</b> · ${code}<br>
+    <span style="color:var(--text2)">${remaining.toFixed(1)} hrs remaining of ${total} hrs</span>
+    ${crossBranch ? '<br><span class="badge b-blue" style="font-size:11px;margin-top:4px">Cross-branch visit</span>' : ''}`;
+  infoBox.classList.remove('hidden');
+  // Auto-fill name and phone
+  document.getElementById('c-name').value = name;
+  document.getElementById('c-phone').value = phone;
+  // Show hours to deduct row
+  document.getElementById('c-mem-remaining').value = remaining.toFixed(1) + ' hrs';
+  hoursRow.style.display = 'grid';
+  // Set payment and amount
+  document.getElementById('c-pay').value = 'Package / Membership';
+  document.getElementById('c-amt').value = '0';
+  // Restore interactivity of name/phone
+  document.getElementById('regular-visit-fields').style.opacity = '1';
+  document.getElementById('regular-visit-fields').style.pointerEvents = '';
+}
+
 async function saveVisit(){
-  const name=document.getElementById('c-name').value.trim();
-  if(!name){alert('Please enter customer name');return;}
-  const therapists=getSelectedTherapists();
-  const br=(branch==='both')?'indiranagar':branch;
-  const record={name,phone:document.getElementById('c-phone').value.trim(),service:document.getElementById('c-service').value,therapists,therapist:therapists.join(' + '),time:document.getElementById('c-time').value,dur:document.getElementById('c-dur').value,pay:document.getElementById('c-pay').value,amt:document.getElementById('c-amt').value,status:document.getElementById('c-status').value,notes:document.getElementById('c-notes').value.trim()};
-  showLoading('Saving visit...');
-  try{
-    await sheetsPost({type:'visit',branch:br,date:dk(custDate),record});
-    showToast('Visit saved ✓');
-    closeVisitModal();
-    ['c-name','c-phone','c-time','c-dur','c-amt','c-notes'].forEach(id=>document.getElementById(id).value='');
-    const picker=document.getElementById('therapist-picker');
-    picker.querySelectorAll('.therapist-picker-row:not(:first-child)').forEach(r=>r.remove());
-    document.getElementById('c-therapist-1').value='';
-    document.getElementById('add-therapist-btn').classList.remove('hidden');
-    await loadVisitsForDate();renderVisits();
-  }finally{hideLoading();}
+  const name = document.getElementById('c-name').value.trim();
+  if(!name){ alert('Please enter customer name'); return; }
+  const isMemberVisit = document.getElementById('c-is-member').checked && visitMemberData;
+  const therapists = getSelectedTherapists();
+  const br = (branch==='both') ? 'indiranagar' : branch;
+
+  if(isMemberVisit){
+    // Validate hours to deduct
+    const hrs = parseFloat(document.getElementById('c-mem-hours').value);
+    if(!hrs || hrs <= 0){ alert('Please enter hours to deduct from membership'); return; }
+    const total = +(visitMemberData['Total Hours']||visitMemberData.totalHours)||0;
+    const used = +(visitMemberData['Used Hours']||visitMemberData.usedHours)||0;
+    const remaining = total - used;
+    if(hrs > remaining){ alert('Only '+remaining.toFixed(1)+' hrs remaining. Cannot deduct '+hrs+' hrs.'); return; }
+    const code = visitMemberData['Code']||visitMemberData.code;
+    const memBranch = (visitMemberData['Branch']||visitMemberData.branch||'indiranagar').toLowerCase();
+    const newUsed = parseFloat((used+hrs).toFixed(2));
+    const record = {
+      name, phone: document.getElementById('c-phone').value.trim(),
+      service: document.getElementById('c-service').value,
+      therapists, therapist: therapists.join(' + '),
+      time: document.getElementById('c-time').value,
+      dur: document.getElementById('c-dur').value || Math.round(hrs*60),
+      pay: 'Package / Membership', amt: 0,
+      status: document.getElementById('c-status').value,
+      notes: 'Member: '+code+(document.getElementById('c-notes').value?' | '+document.getElementById('c-notes').value:''),
+      memberCode: code
+    };
+    showLoading('Saving membership visit...');
+    try{
+      await sheetsPost({type:'visit', branch:br, date:dk(custDate), record});
+      await sheetsPost({type:'updateMembership', branch:memBranch, date:dk(custDate), record:{code, branch:memBranch, usedHours:newUsed}});
+      showToast(hrs+' hrs deducted from '+code+'. '+(total-newUsed).toFixed(1)+' remaining ✓');
+      closeVisitModal();
+      resetVisitForm();
+      await loadVisitsForDate(); renderVisits();
+    }finally{ hideLoading(); }
+  } else {
+    // Regular visit
+    const amt = parseFloat(document.getElementById('c-amt').value);
+    const dur = document.getElementById('c-dur').value;
+    if(isNaN(amt) || amt < 0){ alert('Please enter a valid amount (must be 0 or more)'); return; }
+    if(dur && parseFloat(dur) < 0){ alert('Duration cannot be negative'); return; }
+    const record = {
+      name, phone: document.getElementById('c-phone').value.trim(),
+      service: document.getElementById('c-service').value,
+      therapists, therapist: therapists.join(' + '),
+      time: document.getElementById('c-time').value,
+      dur, pay: document.getElementById('c-pay').value,
+      amt, status: document.getElementById('c-status').value,
+      notes: document.getElementById('c-notes').value.trim()
+    };
+    showLoading(_editingVisitIdx>=0?'Updating visit...':'Saving visit...');
+    try{
+      // If editing, delete the old row first
+      if(_editingVisitIdx>=0){
+        const editBr=(branch==='both')?(liveVisits[_editingVisitIdx]._br||'indiranagar'):branch;
+        await sheetsPost({type:'deleteVisit', branch:editBr, rowIndex:_editingVisitIdx});
+      }
+      await sheetsPost({type:'visit', branch:br, date:dk(custDate), record});
+      showToast(_editingVisitIdx>=0?'Visit updated ✓':'Visit saved ✓');
+      closeVisitModal();
+      resetVisitForm();
+      await loadVisitsForDate(); renderVisits();
+    }finally{ hideLoading(); }
+  }
+}
+
+function resetVisitForm(){
+  ['c-name','c-phone','c-time','c-dur','c-amt','c-notes','c-mem-hours','c-member-code'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  // Reset membership toggle
+  const cb = document.getElementById('c-is-member');
+  cb.checked = false;
+  document.getElementById('c-member-track').style.background = 'var(--bg3)';
+  document.getElementById('c-member-thumb').style.left = '3px';
+  document.getElementById('member-lookup-section').classList.add('hidden');
+  document.getElementById('regular-visit-fields').style.opacity = '1';
+  document.getElementById('regular-visit-fields').style.pointerEvents = '';
+  document.getElementById('visit-member-info').classList.add('hidden');
+  document.getElementById('member-hours-row').style.display = 'none';
+  document.getElementById('c-pay').value = 'Cash';
+  visitMemberData = null;
+  // Reset therapist picker
+  const picker = document.getElementById('therapist-picker');
+  picker.querySelectorAll('.therapist-picker-row:not(:first-child)').forEach(r=>r.remove());
+  document.getElementById('c-therapist-1').value = '';
+  document.getElementById('add-therapist-btn').classList.remove('hidden');
+  // Reset edit state
+  _editingVisitIdx = -1;
+  const header = document.querySelector('#modal-visit .sheet-header h3');
+  if(header) header.textContent = 'Add customer visit';
 }
 
 // ── SAVE EXPENSE ──
@@ -965,18 +1257,26 @@ function openExpModal(){
 
 async function saveExpense(){
   const desc=document.getElementById('e-desc').value.trim();
-  const amt=document.getElementById('e-amt').value;
-  if(!desc||!amt){alert('Please enter description and amount');return;}
+  const amt=parseFloat(document.getElementById('e-amt').value);
+  if(!desc){alert('Please enter description');return;}
+  if(isNaN(amt) || amt < 0){alert('Please enter a valid amount (must be 0 or more)');return;}
   const isOwner=role==='owner';
   const targetBranch=isOwner?document.getElementById('e-branch').value:branch;
   const record={desc,cat:document.getElementById('e-cat').value,vendor:document.getElementById('e-vendor').value.trim(),amt,paid:document.getElementById('e-paid').value,receipt:document.getElementById('e-receipt').value.trim(),addedBy:isOwner?'owner':'receptionist'};
-  showLoading('Saving expense...');
+  showLoading(_editingExpenseIdx>=0?'Updating expense...':'Saving expense...');
   try{
+    // If editing, delete old row first
+    if(_editingExpenseIdx>=0){
+      const editBr=(branch==='both')?(liveExpenses[_editingExpenseIdx]._br||'indiranagar'):branch;
+      await sheetsPost({type:'deleteExpense', branch:editBr, rowIndex:_editingExpenseIdx});
+    }
     const branches=targetBranch==='both'?['indiranagar','koramangala']:[targetBranch];
     for(const br of branches)await sheetsPost({type:'expense',branch:br,date:dk(expDate),record:{...record,shared:targetBranch==='both'}});
-    showToast('Expense saved ✓');
+    showToast(_editingExpenseIdx>=0?'Expense updated ✓':'Expense saved ✓');
     closeExpModal();
     ['e-desc','e-vendor','e-amt','e-receipt'].forEach(id=>document.getElementById(id).value='');
+    _editingExpenseIdx=-1;
+    const header=document.querySelector('#modal-exp .sheet-header h3');if(header)header.textContent='Add expense';
     await loadExpensesForDate();renderExpenses();
   }finally{hideLoading();}
 }
@@ -997,7 +1297,9 @@ async function saveMembership(){
   const phone=document.getElementById('m-phone').value.trim();
   const hours=parseFloat(document.getElementById('m-hours').value);
   const amt=parseFloat(document.getElementById('m-amt').value);
-  if(!name||!phone||!hours||!amt){alert('Please fill in all required fields');return;}
+  if(!name||!phone){alert('Please enter name and phone');return;}
+  if(isNaN(hours)||hours<=0){alert('Please enter valid total hours (greater than 0)');return;}
+  if(isNaN(amt)||amt<=0){alert('Please enter valid amount (greater than 0)');return;}
   const br=(branch==='both')?'indiranagar':branch;
   const code=genCode(br);
   const record={code,name,phone,totalHours:hours,usedHours:0,amt,pay:document.getElementById('m-pay').value,expiry:document.getElementById('m-expiry').value,notes:document.getElementById('m-notes').value.trim(),branch:br,createdAt:new Date().toISOString()};
