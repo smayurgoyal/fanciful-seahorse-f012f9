@@ -826,6 +826,7 @@ function localDateStr(d){
 
 async function loadVisitsForDate(){
   showLoading('Loading visits...');
+  liveVisits=[]; // Always clear first before loading new date
   try{
     const br=(branch==='both')?'indiranagar':branch;
     const res=await sheetsGet({action:'getData',branch:br,date:dk(custDate)});
@@ -840,7 +841,7 @@ async function loadVisitsForDate(){
       }
       if(res.data.attendance&&res.data.attendance.length>0) liveAttendance=res.data.attendance;
     } else {
-      // JSONP failed — use cache
+      // JSONP failed — visits stay empty for this date, use cached therapists
       const cached=getCachedTherapists();
       if(cached.length>0) liveTherapists=cached;
     }
@@ -852,6 +853,7 @@ async function loadVisitsForDate(){
 }
 
 async function loadExpensesForDate(){
+  liveExpenses=[]; // Always clear first
   showLoading('Loading expenses...');
   try{
     const br=(branch==='both')?'indiranagar':branch;
@@ -936,7 +938,12 @@ const bdg=(t,c)=>`<span class="badge ${c||'b-gray'}">${t}</span>`;
 // ── RENDER VISITS ──
 function renderVisits(){
   document.getElementById('cust-date-lbl').textContent=fmt(custDate);
-  const list=liveVisits;
+  // Safety filter — only show visits matching current date (guards against stale data)
+  const todayStr=dk(custDate);
+  const list=liveVisits.filter(r=>{
+    const d=r['Date']||r.date||'';
+    return !d || d===todayStr; // show if no date (locally added) or date matches
+  });
   const rev=list.filter(r=>r['Status']!=='Cancelled'&&r['Status']!=='No-Show').reduce((s,r)=>s+(+r['Amount (Rs)']||0),0);
   const done=list.filter(r=>r['Status']==='Completed').length;
   const avg=done>0?Math.round(rev/done):0;
@@ -974,7 +981,11 @@ function renderVisits(){
 // ── RENDER EXPENSES ──
 function renderExpenses(){
   document.getElementById('exp-date-lbl').textContent=fmt(expDate);
-  const list=liveExpenses;
+  const todayExpStr=dk(expDate);
+  const list=liveExpenses.filter(r=>{
+    const d=r['Date']||r.date||'';
+    return !d || d===todayExpStr;
+  });
   const total=list.reduce((s,r)=>s+(+(r['Amount (Rs)']||r.amt)||0),0);
   document.getElementById('exp-metrics').innerHTML=`
     <div class="metric"><div class="lbl">Entries</div><div class="val" style="color:${BLUE}">${list.length}</div></div>
