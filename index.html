@@ -364,7 +364,13 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
       </div>
 
       <div class="form-row"><label>Service *</label>
-        <select id="c-service"><option>Swedish Massage</option><option>Deep Tissue Massage</option><option>Aromatherapy</option><option>Hot Stone Therapy</option><option>Body Scrub</option><option>Body Wrap</option><option>Classic Facial</option><option>Gold Facial</option><option>Pedicure</option><option>Manicure</option><option>Mani-Pedi Combo</option><option>Head Massage</option><option>Couple Spa Package</option><option>Day Spa Package</option><option>Other</option></select>
+        <select id="c-service">
+          <option>Aroma</option>
+          <option>Swedish</option>
+          <option>Deep Tissue</option>
+          <option>Thai (Dry)</option>
+          <option>Other</option>
+        </select>
       </div>
       <div class="form-row">
         <label>Therapist(s)</label>
@@ -375,13 +381,21 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
       </div>
       <div class="form-row"><label>Time slot</label><input id="c-time" type="time"/></div>
       <div class="two-col">
-        <div class="form-row"><label>Duration (min)</label><input id="c-dur" type="number" inputmode="numeric" placeholder="60"/></div>
+        <div class="form-row"><label>Duration</label>
+          <select id="c-dur">
+            <option value="45">45 min</option>
+            <option value="60" selected>60 min</option>
+            <option value="90">90 min</option>
+            <option value="120">120 min</option>
+          </select>
+        </div>
         <div class="form-row" id="amt-row"><label>Amount (&#8377;) *</label><input id="c-amt" type="number" inputmode="numeric" placeholder="1500"/></div>
       </div>
-      <div class="two-col" id="payment-row">
-        <div class="form-row"><label>Payment</label><select id="c-pay"><option>Cash</option><option>UPI</option><option>Card</option><option>Online</option><option>Voucher</option></select></div>
-        <div class="form-row"><label>Status</label><select id="c-status"><option>Confirmed</option><option>Completed</option><option>Cancelled</option><option>No-Show</option></select></div>
+      <div class="form-row" id="payment-row">
+        <label>Payment</label>
+        <select id="c-pay"><option>Cash</option><option>UPI</option><option>Card</option><option>Online</option><option>Voucher</option></select>
       </div>
+      <input type="hidden" id="c-status" value="Confirmed"/>
       <div class="form-row"><label>Notes</label><input id="c-notes" placeholder="e.g. Allergic to lavender"/></div>
     </div>
     <div class="sheet-footer">
@@ -453,15 +467,21 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
       </div>
       <div id="member-info-box" class="hidden"></div>
       <div id="use-hours-fields" class="hidden">
-        <div class="form-row"><label>Service *</label><select id="u-service"><option>Swedish Massage</option><option>Deep Tissue Massage</option><option>Aromatherapy</option><option>Hot Stone Therapy</option><option>Body Scrub</option><option>Body Wrap</option><option>Classic Facial</option><option>Gold Facial</option><option>Pedicure</option><option>Manicure</option><option>Mani-Pedi Combo</option><option>Head Massage</option><option>Other</option></select></div>
+        <div class="form-row"><label>Service *</label>
+          <select id="u-service">
+            <option>Aroma</option>
+            <option>Swedish</option>
+            <option>Deep Tissue</option>
+            <option>Thai (Dry)</option>
+            <option>Other</option>
+          </select>
+        </div>
         <div class="two-col">
           <div class="form-row"><label>Therapist</label><input id="u-therapist" placeholder="e.g. Kavya"/></div>
           <div class="form-row"><label>Time slot</label><input id="u-time" type="time"/></div>
         </div>
-        <div class="two-col">
-          <div class="form-row"><label>Hours to deduct *</label><input id="u-hours" type="number" inputmode="decimal" placeholder="1.5" step="0.5"/></div>
-          <div class="form-row"><label>Status</label><select id="u-status"><option>Completed</option><option>Confirmed</option><option>Cancelled</option></select></div>
-        </div>
+        <div class="form-row"><label>Hours to deduct *</label><input id="u-hours" type="number" inputmode="decimal" placeholder="1.5" step="0.5"/></div>
+        <input type="hidden" id="u-status" value="Confirmed"/>
         <div class="form-row"><label>Notes</label><input id="u-notes" placeholder="Any notes..."/></div>
       </div>
     </div>
@@ -885,12 +905,14 @@ function editVisit(i){
   // Populate the visit modal with this visit's data
   document.getElementById('c-name').value = r['Customer Name']||r.name||'';
   document.getElementById('c-phone').value = r['Phone']||r.phone||'';
-  document.getElementById('c-service').value = r['Service']||r.service||'Swedish Massage';
+  document.getElementById('c-service').value = r['Service']||r.service||'Aroma';
   document.getElementById('c-time').value = r['Time']||r.time||'';
-  document.getElementById('c-dur').value = r['Duration (min)']||r.dur||'';
+  // Set duration select — match closest option
+  const durVal = String(r['Duration (min)']||r.dur||'60');
+  const durSelect = document.getElementById('c-dur');
+  durSelect.value = ['45','60','90','120'].includes(durVal) ? durVal : '60';
   document.getElementById('c-amt').value = r['Amount (Rs)']||r.amt||'';
   document.getElementById('c-pay').value = r['Payment Mode']||r.pay||'Cash';
-  document.getElementById('c-status').value = r['Status']||r.status||'Confirmed';
   document.getElementById('c-notes').value = r['Notes']||r.notes||'';
   // Set therapist if exists
   const ther = (r['Therapist']||r.therapist||'').split(' + ').filter(t=>t);
@@ -1227,7 +1249,6 @@ async function saveVisit(){
     const amt = parseFloat(document.getElementById('c-amt').value);
     const dur = document.getElementById('c-dur').value;
     if(isNaN(amt) || amt < 0){ alert('Please enter a valid amount (must be 0 or more)'); return; }
-    if(dur && parseFloat(dur) < 0){ alert('Duration cannot be negative'); return; }
     const record = {
       name, phone: document.getElementById('c-phone').value.trim(),
       service: document.getElementById('c-service').value,
@@ -1257,9 +1278,10 @@ async function saveVisit(){
 }
 
 function resetVisitForm(){
-  ['c-name','c-phone','c-time','c-dur','c-amt','c-notes','c-mem-hours','c-member-code'].forEach(id=>{
+  ['c-name','c-phone','c-time','c-amt','c-notes','c-mem-hours','c-member-code'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
+  document.getElementById('c-dur').value='60'; // reset duration to default
   // Reset membership toggle
   const cb = document.getElementById('c-is-member');
   cb.checked = false;
