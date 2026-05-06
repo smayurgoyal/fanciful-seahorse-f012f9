@@ -878,9 +878,10 @@ let _editingVisitIdx = -1;
 let _editingExpenseIdx = -1;
 
 function editVisit(i){
-  const r = liveVisits[i];
+  const filtered=liveVisits.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(custDate);});
+  const r=filtered[i];
   if(!r) return;
-  _editingVisitIdx = i;
+  _editingVisitIdx=i;
   // Populate the visit modal with this visit's data
   document.getElementById('c-name').value = r['Customer Name']||r.name||'';
   document.getElementById('c-phone').value = r['Phone']||r.phone||'';
@@ -905,9 +906,10 @@ function editVisit(i){
 }
 
 function editExpense(i){
-  const r = liveExpenses[i];
+  const filtered=liveExpenses.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(expDate);});
+  const r=filtered[i];
   if(!r) return;
-  _editingExpenseIdx = i;
+  _editingExpenseIdx=i;
   // For receptionists, hide branch row; for owner, show
   const isOwner = role==='owner';
   document.getElementById('exp-branch-row').classList.toggle('hidden', !isOwner);
@@ -1237,23 +1239,20 @@ async function saveVisit(){
     };
     showLoading(_editingVisitIdx>=0?'Updating visit...':'Saving visit...');
     try{
-      // If editing, delete the old row first
       if(_editingVisitIdx>=0){
-        const editBr=(branch==='both')?(liveVisits[_editingVisitIdx]._br||'indiranagar'):branch;
-        await sheetsPost({type:'deleteVisit', branch:editBr, rowIndex:_editingVisitIdx});
+        // Edit: delete old row from sheet using timestamp for accuracy
+        const oldVisit=liveVisits.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(custDate);})[_editingVisitIdx];
+        const editBr=(branch==='both')?((oldVisit&&oldVisit._br)||'indiranagar'):branch;
+        await sheetsPost({type:'deleteVisit',branch:editBr,timestamp:oldVisit&&oldVisit['Timestamp']||'',rowIndex:_editingVisitIdx});
       }
-      await sheetsPost({type:'visit', branch:br, date:dk(custDate), record});
+      await sheetsPost({type:'visit',branch:br,date:dk(custDate),record});
       showToast(_editingVisitIdx>=0?'Visit updated ✓':'Visit saved ✓');
-      // Immediately add to local list so it shows without waiting for JSONP
-      if(_editingVisitIdx>=0){
-        liveVisits.splice(_editingVisitIdx, 1);
-      }
-      liveVisits.push({'Customer Name':record.name,'Phone':record.phone,'Service':record.service,'Therapist':record.therapist,'Time':record.time,'Duration (min)':record.dur,'Payment Mode':record.pay,'Amount (Rs)':record.amt,'Status':record.status,'Notes':record.notes,'Date':dk(custDate),'Branch':br});
       closeVisitModal();
       resetVisitForm();
-      renderVisits(); // Show immediately
-      loadVisitsForDate().then(()=>renderVisits()); // Then refresh from sheet in background
-    }finally{ hideLoading(); }
+      // Always reload from sheet to get accurate data (avoids duplicates/stale state)
+      await loadVisitsForDate();
+      renderVisits();
+    }finally{hideLoading();}
   }
 }
 
@@ -1420,21 +1419,28 @@ async function useHours(){
 // ── DELETE ──
 async function deleteVisit(i){
   if(!confirm('Remove this visit?'))return;
-  const br=(branch==='both')?(liveVisits[i]._br||'indiranagar'):branch;
+  const v=liveVisits.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(custDate);})[i];
+  if(!v){showToast('Could not find visit to remove',false);return;}
+  const br=(branch==='both')?(v._br||'indiranagar'):branch;
   showLoading('Removing...');
   try{
-    await sheetsPost({type:'deleteVisit',branch:br,rowIndex:i});
+    // Pass timestamp so Apps Script can find exact row
+    await sheetsPost({type:'deleteVisit',branch:br,timestamp:v['Timestamp']||'',rowIndex:i});
     await loadVisitsForDate();renderVisits();
+    showToast('Visit removed ✓');
   }finally{hideLoading();}
 }
 
 async function deleteExpense(i){
   if(!confirm('Remove this expense?'))return;
-  const br=(branch==='both')?(liveExpenses[i]._br||'indiranagar'):branch;
+  const e=liveExpenses.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(expDate);})[i];
+  if(!e){showToast('Could not find expense to remove',false);return;}
+  const br=(branch==='both')?(e._br||'indiranagar'):branch;
   showLoading('Removing...');
   try{
-    await sheetsPost({type:'deleteExpense',branch:br,rowIndex:i});
+    await sheetsPost({type:'deleteExpense',branch:br,timestamp:e['Timestamp']||'',rowIndex:i});
     await loadExpensesForDate();renderExpenses();
+    showToast('Expense removed ✓');
   }finally{hideLoading();}
 }
 
