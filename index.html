@@ -1,69 +1,1741 @@
-US Study Tour – Report 
-On the outset I would like you thank the management for giving me an opportunity to visit to the US and take up the study tour along with Nikhil sir
-Following are the details about by study tour along with some of my observations and learnings:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Retreat Spa"/>
+<title>Retreat Spa — Dashboard</title>
+<style>
+:root{--teal:#1D9E75;--teal-d:#0F6E56;--teal-l:#E1F5EE;--blue:#185FA5;--blue-l:#E6F1FB;--blue-d:#0C447C;--red:#A32D2D;--red-l:#FCEBEB;--amber:#BA7517;--amber-l:#FAEEDA;--bg:#fff;--bg2:#f5f5f4;--bg3:#eeece8;--text:#1a1a1a;--text2:#6b6b6b;--text3:#9a9a9a;--border:rgba(0,0,0,.12);--border2:rgba(0,0,0,.22);--radius:8px;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+@media(prefers-color-scheme:dark){:root{--bg:#1c1c1e;--bg2:#2c2c2e;--bg3:#3a3a3c;--text:#f2f2f7;--text2:#aeaeb2;--text3:#636366;--border:rgba(255,255,255,.12);--border2:rgba(255,255,255,.22);--teal-l:#0a3d2b;--blue-l:#0a2540;--red-l:#3d1010;--amber-l:#3d2a00}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:var(--font);font-size:15px;color:var(--text);background:var(--bg)}
+body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height:100vh}
+.hidden{display:none!important}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 16px;height:44px;font-size:15px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg);color:var(--text);cursor:pointer;font-family:var(--font);touch-action:manipulation;-webkit-appearance:none}
+.btn:active{opacity:.7}.btn.primary{background:var(--teal);color:#fff;border-color:var(--teal)}.btn.primary:active{background:var(--teal-d)}
+.btn.sm{height:36px;font-size:13px;padding:0 12px}.btn.icon{width:44px;padding:0;font-size:20px}.btn.icon.sm{width:36px;height:36px;font-size:16px}.btn.full{width:100%}
+.btn.danger{background:var(--red-l);color:var(--red);border-color:var(--red);height:34px;font-size:13px;padding:0 12px}
+.form-row{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.form-row label{font-size:12px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.form-row input,.form-row select{height:48px;font-size:16px;padding:0 14px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg);color:var(--text);width:100%;font-family:var(--font);-webkit-appearance:none;appearance:none}
+.form-row input:focus,.form-row select:focus{outline:2px solid var(--teal);border-color:var(--teal)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#login-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--bg2)}
+.login-box{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;box-shadow:0 2px 16px rgba(0,0,0,.08)}
+.brand-logo{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.logo-icon{width:44px;height:44px;border-radius:14px;background:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-name{font-size:22px;font-weight:700;letter-spacing:-.5px}.brand-name span{color:var(--teal)}
+.login-sub{font-size:14px;color:var(--text2);margin:4px 0 22px}
+.seg{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.seg-btn{text-align:left;padding:14px 16px;font-size:15px;border-radius:12px;cursor:pointer;color:var(--text2);font-family:var(--font);border:1.5px solid var(--border);background:var(--bg2);touch-action:manipulation;display:flex;align-items:center;justify-content:space-between}
+.seg-btn.active{background:var(--bg);color:var(--text);border-color:var(--teal)}
+.seg-btn .seg-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.seg-btn.active .seg-check{background:var(--teal);border-color:var(--teal)}
+.seg-btn.active .seg-check::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff;display:block}
+.seg-meta{font-size:13px;color:var(--text3);margin-top:2px}
+.err-box{font-size:14px;color:var(--red);margin-top:10px;padding:12px 14px;background:var(--red-l);border-radius:var(--radius);border:1px solid var(--red)}
+#app{flex:1;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:10}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.topbar-brand{font-size:17px;font-weight:700}.topbar-brand span{color:var(--teal)}
+.branch-pill{font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--teal-l);color:var(--teal-d)}
+.branch-pill.k{background:var(--blue-l);color:var(--blue-d)}.branch-pill.all{background:var(--bg3);color:var(--text2)}
+.branch-bar{display:flex;overflow-x:auto;padding:10px 16px 0;border-bottom:1px solid var(--border);background:var(--bg);gap:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.branch-bar::-webkit-scrollbar{display:none}
+.br-tab{padding:8px 18px;font-size:14px;cursor:pointer;border-radius:8px 8px 0 0;color:var(--text2);border:1px solid transparent;border-bottom:none;white-space:nowrap;font-family:var(--font);background:transparent;touch-action:manipulation}
+.br-tab.active{background:var(--bg);border-color:var(--border);border-bottom-color:var(--bg);color:var(--text);font-weight:600;margin-bottom:-1px}
+.owner-tabs{display:flex;overflow-x:auto;padding:10px 16px 0;border-bottom:1px solid var(--border);background:var(--bg);gap:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.owner-tabs::-webkit-scrollbar{display:none}
+.o-tab{padding:8px 18px;font-size:14px;cursor:pointer;border-radius:8px 8px 0 0;color:var(--text2);border:1px solid transparent;border-bottom:none;white-space:nowrap;font-family:var(--font);background:transparent;touch-action:manipulation}
+.o-tab.active{background:var(--bg);border-color:var(--border);border-bottom-color:var(--bg);color:var(--text);font-weight:600;margin-bottom:-1px}
+.content{flex:1;padding:16px;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:90px}
+.section{display:none}.section.active{display:block}
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px}
+.date-nav{display:flex;align-items:center;gap:6px;flex:1}
+.date-lbl{flex:1;font-size:14px;font-weight:600;text-align:center;color:var(--text)}
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:16px}
+.metric{background:var(--bg2);border-radius:12px;padding:14px 12px}
+.metric .lbl{font-size:11px;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+.metric .val{font-size:22px;font-weight:700}
+.visit-list,.exp-list{display:flex;flex-direction:column;gap:10px}
+.visit-card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.visit-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.visit-name{font-size:16px;font-weight:600}.visit-phone{font-size:13px;color:var(--text2);margin-top:2px}
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.visit-field .f-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;font-weight:600;margin-bottom:2px}
+.visit-field .f-val{font-size:14px;color:var(--text)}
+.visit-notes{font-size:13px;color:var(--text2);background:var(--bg2);border-radius:8px;padding:10px 12px}
+.visit-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:4px;border-top:1px solid var(--border)}
+.visit-amount{font-size:20px;font-weight:700;color:var(--teal)}
+.exp-card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:14px}
+.exp-icon{width:44px;height:44px;border-radius:12px;background:var(--amber-l);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.exp-body{flex:1;min-width:0}.exp-desc{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exp-meta{font-size:12px;color:var(--text2);margin-top:3px}
+.exp-right{text-align:right;flex-shrink:0}.exp-amt{font-size:17px;font-weight:700;color:var(--red)}.exp-paid{font-size:12px;color:var(--text2);margin-top:2px}
+.mem-card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+.mem-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--teal);border-radius:4px 0 0 4px}
+.mem-card.expired::before{background:var(--red)}.mem-card.low::before{background:var(--amber)}
+.mem-code{font-size:22px;font-weight:800;letter-spacing:2px;color:var(--teal)}
+.mem-card.expired .mem-code{color:var(--red)}.mem-card.low .mem-code{color:var(--amber)}
+.mem-name{font-size:16px;font-weight:600}.mem-phone{font-size:13px;color:var(--text2)}
+.mem-hours-bar{height:8px;background:var(--bg2);border-radius:4px;overflow:hidden}
+.mem-hours-fill{height:100%;border-radius:4px;background:var(--teal)}
+.mem-card.low .mem-hours-fill{background:var(--amber)}.mem-card.expired .mem-hours-fill{background:var(--red)}
+.mem-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.mem-stat .ms-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;font-weight:600;margin-bottom:2px}
+.mem-stat .ms-val{font-size:15px;font-weight:700}
+.mem-actions{display:flex;gap:8px}
+.code-lookup{display:flex;gap:8px;margin-bottom:16px}
+.code-lookup input{flex:1;height:48px;font-size:18px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:0 14px;border-radius:var(--radius);border:2px solid var(--teal);background:var(--bg);color:var(--text);font-family:var(--font)}
+.member-info-box{background:var(--teal-l);border:1px solid var(--teal);border-radius:12px;padding:14px;margin-bottom:14px}
+.therapist-list{display:flex;flex-direction:column;gap:8px}
+.therapist-card{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.therapist-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0}
+.therapist-body{flex:1;min-width:0}.therapist-name{font-size:15px;font-weight:600}
+.therapist-meta{font-size:12px;color:var(--text2);margin-top:3px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.therapist-picker{display:flex;flex-direction:column;gap:6px}
+.therapist-picker-row{display:flex;gap:8px;align-items:center}
+.therapist-picker select{flex:1;height:44px;font-size:15px;padding:0 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg);color:var(--text);font-family:var(--font);-webkit-appearance:none}
+.rank-list{display:flex;flex-direction:column;gap:8px}
+.rank-item{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.rank-num{font-size:16px;font-weight:800;color:var(--text3);min-width:24px}
+.rank-body{flex:1;min-width:0}.rank-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.rank-val{font-size:18px;font-weight:700;color:var(--teal);text-align:right;flex-shrink:0}
+.att-card{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.att-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
+.att-body{flex:1;min-width:0}.att-name{font-size:15px;font-weight:600}.att-meta{font-size:12px;color:var(--text2);margin-top:2px}
+.att-btns{display:flex;gap:4px;flex-shrink:0}
+.att-btn{padding:0 9px;height:34px;font-size:12px;font-weight:600;border-radius:8px;border:1.5px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;font-family:var(--font);touch-action:manipulation;white-space:nowrap}
+.att-btn.sel-P{background:#EAF3DE;color:#27500A;border-color:#6BAF2A}
+.att-btn.sel-H{background:#FAEEDA;color:#633806;border-color:#E0941A}
+.att-btn.sel-A{background:#FCEBEB;color:#791F1F;border-color:#C43A3A}
+.att-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.att-sum-card{background:var(--bg2);border-radius:10px;padding:10px 12px;text-align:center}
+.att-sum-val{font-size:22px;font-weight:700}.att-sum-lbl{font-size:11px;color:var(--text2);margin-top:2px;text-transform:uppercase;letter-spacing:.3px;font-weight:600}
+.badge{display:inline-block;padding:4px 10px;border-radius:99px;font-size:12px;font-weight:600}
+.b-green{background:#EAF3DE;color:#27500A}.b-amber{background:#FAEEDA;color:#633806}
+.b-red{background:#FCEBEB;color:#791F1F}.b-blue{background:#E6F1FB;color:#0C447C}
+.b-teal{background:#E1F5EE;color:#085041}.b-gray{background:#F1EFE8;color:#5F5E5A}
+.b-purple{background:#EEEDFE;color:#3C3489}
+@media(prefers-color-scheme:dark){
+.b-green{background:#173404;color:#C0DD97}.b-amber{background:#412402;color:#FAC775}
+.b-red{background:#501313;color:#F09595}.b-blue{background:#042C53;color:#85B7EB}
+.b-teal{background:#04342C;color:#5DCAA5}.b-gray{background:#2C2C2A;color:#B4B2A9}
+.b-purple{background:#26215C;color:#AFA9EC}}
+.empty-state{text-align:center;padding:48px 16px;color:var(--text2);display:flex;flex-direction:column;align-items:center;gap:12px}
+.empty-icon{width:56px;height:56px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center}
+.empty-title{font-size:16px;font-weight:600;color:var(--text)}.empty-sub{font-size:14px}
+.sheet-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:flex-end;justify-content:center}
+.sheet-overlay.open{display:flex}
+.sheet{background:var(--bg);border-radius:24px 24px 0 0;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.sheet-handle{width:40px;height:5px;background:var(--border2);border-radius:3px;margin:14px auto 0}
+.sheet-header{padding:16px 18px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sheet-header h3{font-size:17px;font-weight:700}
+.sheet-body{padding:18px}.sheet-footer{padding:14px 18px 28px;border-top:1px solid var(--border);display:flex;gap:10px}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;border-top:1px solid var(--border);background:var(--bg);padding:8px 0 20px;z-index:10}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px 0;touch-action:manipulation}
+.nav-icon{width:26px;height:26px;display:flex;align-items:center;justify-content:center}
+.nav-label{font-size:11px;color:var(--text2);font-weight:500}
+.nav-item.active .nav-label{color:var(--teal);font-weight:700}
+.nav-item.active svg{stroke:var(--teal)!important}
+.kpi-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.kpi{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:14px;border-left-width:4px}
+.kpi-lbl{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-bottom:5px}
+.kpi-val{font-size:21px;font-weight:700}.kpi-sub{font-size:12px;color:var(--text2);margin-top:3px}
+.a-card{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px}
+.a-card h4{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:14px;text-transform:uppercase;letter-spacing:.4px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.bar-label{font-size:13px;color:var(--text2);min-width:90px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{flex:1;height:7px;background:var(--bg2);border-radius:4px}
+.bar-fill{height:7px;border-radius:4px}
+.bar-val{font-size:12px;color:var(--text2);min-width:48px;text-align:right;font-weight:600}
+.day-chart{display:flex;align-items:flex-end;gap:4px;height:80px;margin-bottom:6px}
+.dbar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.dbar{width:100%;border-radius:3px 3px 0 0;min-height:2px}
+.dbar-lbl{font-size:10px;color:var(--text3);text-align:center}
+.range-row{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none}
+.range-row::-webkit-scrollbar{display:none}
+.range-btn{padding:8px 16px;font-size:14px;border-radius:10px;border:1px solid var(--border2);background:var(--bg);color:var(--text);cursor:pointer;white-space:nowrap;font-family:var(--font);font-weight:500;touch-action:manipulation}
+.range-btn.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+.a-section{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin:18px 0 10px}
+.no-data{font-size:14px;color:var(--text3);padding:6px 0}
+.compare-row{margin-bottom:14px}
+.compare-top{display:flex;justify-content:space-between;margin-bottom:5px}
+.compare-name{font-size:14px;font-weight:700}
+.compare-bars{display:flex;flex-direction:column;gap:4px}
+.cbar{height:8px;border-radius:4px;min-width:2px}
+/* LOADING OVERLAY */
+.loading-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.loading-spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+.loading-text{color:#fff;font-size:15px;font-weight:500}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
 
-Day 1: 23rd April 2026 – Thursday 
-I reached San Franciso, and spent the evening just exploring the neighborhood nearby hotel i.e. Holiday Inn, SFO 
-Day 2: 24th April 2026 – Friday 
-We visited Google office, we got to see a unique work culture and wellness of staff members 
-We visited Computer History Museum; it had lot of information on how Computer started and which all companies and persons were responsible for various inventio and breakthrough in this field 
-Day 3: 25th April 2026 – Saturday
-We had a free day and explored SFO 
-Day 4: 26th April 2026 – Sunday 
-We moved from SFO to Sunnyvale and spent 2nd of day in Apple Experience Centre and took a glimpse of Apple Warship Office campus, an virtual view through the technology 
-Day 5: 27th April 2026 – Monday 
-We had a free day and explored SFO along with our team members 
-Day 6: 28th April 2026 – Tuesday 
-We first visited Argonaut Elementary school (Pre KG to Grade 5) 
-Met Principal and District Superintendent who took us around the campus and explained their system in which we saw students are given lot of exposure to become self-learners, they are exposed to all types of fields like gardening, projects which can give them real time idea on its working, fund raising, etc
-Importance is given to Physical Education and Music as well to a great extend 
-We met some of the students of Grade 4 and 5 who ever very good in expressing themselves and confidently, emphasis is given on overall growth rather than marks and rote learning 
-The same day we visited Redwood middle school (Grade 6-8), the principal took us through a presentation and explained. Learning here was to see the types of electives they use to allow students to take and explore themselves, class timings were unique and kids had a few minutes in between every class for shifting from one classroom to other 
-Another good thought what we observed was, late comers were given a unique punishment is not to socialize during break and to sit separately and eat, this type of imposition can motivate them to be on time to school as they would not like to miss their socializing time with their peers.
-The quality of food at the campus was very good and we had opportunity to have our lunch here 
-Followed by this we had an interactive session with the district leadership team where we had a good round of Q & A with each other to under both our systems better and take the good practices 
-Overall, our learning from elementary and middle school was to make kids self-learners and independent. Create an environment where in they learn more things with hands on experience
-Also, unique thing here is the breaks given by teacher in the class in between teaching so that students can discuss then work on the concepts taught before going further to the next topic, this also helps to keep students concentration span intact in the class 
-Session with Neru Khosla and team at CK12 
-CK12 is an online platform available for teachers and students, which will surely increasing the efficiency of the way in which lesson plans is made and micro level analysis of the student learning and activity which will in turn help the teacher to help the student accordingly 
-This platform is totally free as of now and has lot of features better than many paid platforms as well
-We would like to deep dive into this platform as a pilot of some our teachers and students 
-Day 7: 29th April 2026 – Wednesday 
-We started our day with visit to Oracle Design Tech High School (Grade 9 – 12), met the co-founder of the school, who took us through a presentation and also connected us to some of their students. 
-Here much concentration is given on project based learning along with their regular school learning process, students are exposed to various fields of Design Thinking almost in all fields some or the other student is working on, they also have classes from employees of Oracle who would guide and train them in their ideas of Design Thinking, unique thing to see is no one spoon fed here but only guided and given freedom to take it forward 
-Students here also much involved in making their good profile for their desired admissions in the Universities.
-We then visited Stanford University; we got chance to visit the School of Education and to the AI team to understand who they implement it in university learning 
-We could overall go around the entire campus and get a feel of the legacy of this university 
-Day 8: 30th April 2026 – Thursday 
-Our entire day was planned to be spent in Saratoga High School (Grade 9-12), we here met the Principal and his team 
-Students here are also allowed to choose from a wide range of electives, major concentration was on application based learning, its more student centric and parents are consciously involved and not casually in the school activities. 
-Music and Physical education is given good importance, engineering lab with all types of facilities like 3D printers also available 
-Students get to choose STEM branch wise subject wise and standard of testing can vary and also credits can continue upto University as well 
-Highlight here was the environment created in Wellness room of the students and career counselling room for the students, in these way every student in campus is given importance and no one will feel left out or inferior
-We had lunch with students here and some of them are already doing some very good projects which shows their care and empathy towards the society and its issues. 
-Students’ confidence reflected their learning happening in the right manner
-Our day concluded with an insightful session with Barry Groves, President of WASC (Western Association of Schools and Colleges), it was very insightful and also learnt its importance across globe for school which follows international curriculum like IB or IGCSE 
-Day 9: 1st May 2026 – Friday 
-Free day, we explored Mystery Spot and 17th Mile Drive 
+<div id="login-screen">
+  <div class="login-box">
+    <div class="brand-logo">
+      <div class="logo-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <div><div class="brand-name"><span>Retreat</span> Spa</div><div style="font-size:13px;color:var(--text2)">Bangalore</div></div>
+    </div>
+    <p class="login-sub">Sign in to your dashboard</p>
+    <div style="font-size:12px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Select your role</div>
+    <div class="seg" id="role-seg">
+      <button class="seg-btn active" onclick="setRole('receptionist-indiranagar')">
+        <div><div>Receptionist · Indiranagar</div><div class="seg-meta">Indiranagar branch staff</div></div>
+        <div class="seg-check"></div>
+      </button>
+      <button class="seg-btn" onclick="setRole('receptionist-koramangala')">
+        <div><div>Receptionist · Koramangala</div><div class="seg-meta">Koramangala branch staff</div></div>
+        <div class="seg-check"></div>
+      </button>
+      <button class="seg-btn" onclick="setRole('owner')">
+        <div><div>Owner · All branches</div><div class="seg-meta">Full access</div></div>
+        <div class="seg-check"></div>
+      </button>
+    </div>
+    <div class="form-row">
+      <label>PIN</label>
+      <input type="password" id="pin-input" maxlength="6" placeholder="Enter PIN" inputmode="numeric" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <span style="font-size:12px;color:var(--text3);margin-top:2px">Forgot your PIN? Contact the spa manager.</span>
+    </div>
+    <div id="login-err" class="err-box hidden"></div>
+    <button class="btn primary full" style="margin-top:6px;font-size:16px;font-weight:600" onclick="doLogin()">Sign in</button>
+  </div>
+</div>
 
-Few of the points which I look forward in implementing here: 
-1.	Project based learning for students 
-2.	Exposure to activities like Music, Physical education
-3.	Creating similar wellness and counselling facilities 
-4.	Working on CK13 platform 
-5.	Implementing a more student centric lesson plan structures which will in turn improve the understanding and performance of students 
-6.	Bringing in practical teaching in class with lot of experiments for better understanding 
-7.	Better usage of AI by staff both teaching and nonteaching 
-8.	Working on a school project in Bengaluru with National and International curriculum 
+<div id="app" class="hidden">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-brand"><span>Retreat</span> Spa</div>
+      <span id="branch-pill" class="branch-pill"></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="btn sm" onclick="refreshData()" title="Refresh">&#8635;</button>
+      <button class="btn sm" onclick="logout()">Sign out</button>
+    </div>
+  </div>
+  <div id="branch-bar" class="branch-bar hidden">
+    <button class="br-tab active" id="brtab-indiranagar" onclick="switchBranch('indiranagar')">Indiranagar</button>
+    <button class="br-tab" id="brtab-koramangala" onclick="switchBranch('koramangala')">Koramangala</button>
+    <button class="br-tab" id="brtab-both" onclick="switchBranch('both')">Combined</button>
+  </div>
+  <div id="owner-tabs" class="owner-tabs hidden">
+    <button class="o-tab active" id="otab-customers" onclick="showTab('customers')">Visits</button>
+    <button class="o-tab" id="otab-attendance" onclick="showTab('attendance')">Attendance</button>
+    <button class="o-tab" id="otab-memberships" onclick="showTab('memberships')">Members</button>
+    <button class="o-tab" id="otab-expenses" onclick="showTab('expenses')">Expenses</button>
+    <button class="o-tab" id="otab-therapists" onclick="showTab('therapists')">Therapists</button>
+    <button class="o-tab" id="otab-analytics" onclick="showTab('analytics')">Analytics</button>
+  </div>
+  <div class="content">
+    <div class="section active" id="tab-customers">
+      <div class="toolbar">
+        <div class="date-nav">
+          <button class="btn icon sm" onclick="changeDate(-1)">&#8592;</button>
+          <span class="date-lbl" id="cust-date-lbl"></span>
+          <button class="btn icon sm" onclick="changeDate(1)">&#8594;</button>
+        </div>
+        <button class="btn primary sm" onclick="openVisitModal()" style="font-weight:600">+ Add</button>
+      </div>
+      <div class="metrics" id="cust-metrics"></div>
+      <div class="visit-list" id="visit-list"></div>
+    </div>
+    <div class="section" id="tab-expenses">
+      <div class="toolbar">
+        <div class="date-nav">
+          <button class="btn icon sm" onclick="changeExpDate(-1)">&#8592;</button>
+          <span class="date-lbl" id="exp-date-lbl"></span>
+          <button class="btn icon sm" onclick="changeExpDate(1)">&#8594;</button>
+        </div>
+        <button class="btn primary sm" onclick="openExpModal()" style="font-weight:600">+ Add</button>
+      </div>
+      <div class="metrics" id="exp-metrics"></div>
+      <div class="exp-list" id="exp-list"></div>
+    </div>
+    <div class="section" id="tab-memberships">
+      <div class="toolbar">
+        <span style="font-size:15px;font-weight:700">Memberships</span>
+        <button class="btn primary sm" onclick="openMemModal()" style="font-weight:600">+ New</button>
+      </div>
+      <div class="form-row" style="margin-bottom:12px">
+        <input id="mem-search" placeholder="🔍 Search by name, phone or code..." style="height:44px;font-size:15px;padding:0 14px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg);color:var(--text);width:100%;font-family:var(--font)" oninput="debouncedRenderMemberships()"/>
+      </div>
+      <div class="metrics" id="mem-metrics"></div>
+      <div id="mem-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+    <div class="section" id="tab-attendance">
+      <div class="toolbar">
+        <div class="date-nav">
+          <button class="btn icon sm" onclick="changeAttDate(-1)">&#8592;</button>
+          <span class="date-lbl" id="att-date-lbl"></span>
+          <button class="btn icon sm" onclick="changeAttDate(1)">&#8594;</button>
+        </div>
+        <button class="btn primary sm" onclick="saveAttendance()" style="font-weight:600">Save</button>
+      </div>
+      <div class="att-summary" id="att-summary"></div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px;font-weight:500">Tap to mark: <span style="color:#27500A;font-weight:700">P</span> = Present &nbsp; <span style="color:#633806;font-weight:700">H</span> = Half day &nbsp; <span style="color:#791F1F;font-weight:700">A</span> = Absent</div>
+      <div id="att-list"></div>
+    </div>
+    <div class="section" id="tab-therapists">
+      <div class="toolbar">
+        <span style="font-size:15px;font-weight:700">Therapists</span>
+        <button class="btn primary sm" onclick="openTherapistModal()" style="font-weight:600">+ Add</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none">
+        <button class="range-btn active" id="tbr-both" onclick="setTherapistBranch('both',this)">All</button>
+        <button class="range-btn" id="tbr-indiranagar" onclick="setTherapistBranch('indiranagar',this)">Indiranagar</button>
+        <button class="range-btn" id="tbr-koramangala" onclick="setTherapistBranch('koramangala',this)">Koramangala</button>
+      </div>
+      <div class="therapist-list" id="therapist-list"></div>
+    </div>
+    <div class="section" id="tab-analytics">
+      <div class="range-row">
+        <button class="range-btn active" onclick="setRange(7,this)">7 days</button>
+        <button class="range-btn" onclick="setRange(14,this)">14 days</button>
+        <button class="range-btn" onclick="setRange(30,this)">30 days</button>
+      </div>
+      <div id="analytics-content"></div>
+    </div>
+  </div>
+  <div id="bottom-nav" class="bottom-nav hidden">
+    <div class="nav-item active" id="nav-customers" onclick="navTo('customers')">
+      <div class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <span class="nav-label">Visits</span>
+    </div>
+    <div class="nav-item" id="nav-attendance" onclick="navTo('attendance')">
+      <div class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+      <span class="nav-label">Attendance</span>
+    </div>
+    <div class="nav-item" id="nav-memberships" onclick="navTo('memberships')">
+      <div class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/><line x1="7" y1="15" x2="10" y2="15"/><line x1="13" y1="15" x2="17" y2="15"/></svg></div>
+      <span class="nav-label">Members</span>
+    </div>
+    <div class="nav-item" id="nav-expenses" onclick="navTo('expenses')">
+      <div class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+      <span class="nav-label">Expenses</span>
+    </div>
+  </div>
+</div>
 
+<!-- MODALS -->
+<div class="sheet-overlay" id="modal-visit">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3>Add customer visit</h3><button class="btn icon sm" onclick="closeVisitModal()">&#10005;</button></div>
+    <div class="sheet-body">
 
+      <!-- MEMBERSHIP TOGGLE -->
+      <div style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius);background:var(--bg2);cursor:pointer" onclick="toggleMemberVisit()">
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text)">🎫 Membership visit</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:2px">Toggle on if customer has a membership</div>
+          </div>
+          <div style="position:relative;width:44px;height:26px;flex-shrink:0">
+            <input type="checkbox" id="c-is-member" style="opacity:0;width:0;height:0;position:absolute" onchange="toggleMemberVisit()"/>
+            <div id="c-member-track" style="position:absolute;inset:0;border-radius:13px;background:var(--bg3);border:1px solid var(--border2);transition:background .2s"></div>
+            <div id="c-member-thumb" style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .2s"></div>
+          </div>
+        </div>
+      </div>
 
+      <!-- MEMBERSHIP LOOKUP (shown when toggle ON) -->
+      <div id="member-lookup-section" class="hidden">
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <input id="c-member-code" placeholder="Enter membership code e.g. IND-427" style="flex:1;height:48px;font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:0 14px;border-radius:var(--radius);border:2px solid var(--teal);background:var(--bg);color:var(--text);font-family:var(--font)" oninput="this.value=this.value.toUpperCase()" autocomplete="off"/>
+          <button class="btn primary" onclick="lookupMemberInVisit()" style="font-weight:600;height:48px">Find</button>
+        </div>
+        <div id="visit-member-info" class="hidden" style="background:var(--teal-l);border:1px solid var(--teal);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px"></div>
+        <div class="two-col" id="member-hours-row" style="display:none">
+          <div class="form-row"><label>Hours to deduct *</label><input id="c-mem-hours" type="number" inputmode="decimal" placeholder="1.5" step="0.5"/></div>
+          <div class="form-row"><label>Remaining hrs</label><input id="c-mem-remaining" readonly style="background:var(--bg2);color:var(--text2)"/></div>
+        </div>
+      </div>
 
+      <!-- REGULAR FIELDS -->
+      <div id="regular-visit-fields">
+        <div class="form-row"><label>Customer name *</label><input id="c-name" placeholder="e.g. Priya Sharma" autocomplete="off"/></div>
+        <div class="form-row"><label>Phone</label><input id="c-phone" placeholder="9876543210" type="tel" inputmode="numeric"/></div>
+      </div>
 
+      <div class="form-row"><label>Service *</label>
+        <select id="c-service">
+          <option>Classical</option>
+          <option>Aroma</option>
+          <option>Swedish</option>
+          <option>Deep Tissue</option>
+          <option>Balanese</option>
+          <option>Signature</option>
+          <option>Lumi Lumi</option>
+          <option>Thai</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Therapist(s)</label>
+        <div class="therapist-picker" id="therapist-picker">
+          <div class="therapist-picker-row"><select id="c-therapist-1"><option value="">Select therapist...</option></select></div>
+        </div>
+        <button type="button" class="btn sm" id="add-therapist-btn" onclick="addTherapistSlot()" style="margin-top:6px;font-size:12px;align-self:flex-start">+ Add 2nd therapist</button>
+      </div>
+      <div class="form-row"><label>Time slot</label><input id="c-time" type="time"/></div>
+      <div class="two-col">
+        <div class="form-row"><label>Duration</label>
+          <select id="c-dur">
+            <option value="45">45 min</option>
+            <option value="60" selected>60 min</option>
+            <option value="90">90 min</option>
+            <option value="120">120 min</option>
+          </select>
+        </div>
+        <div class="form-row" id="amt-row"><label>Amount (&#8377;) *</label><input id="c-amt" type="number" inputmode="numeric" placeholder="1500"/></div>
+      </div>
+      <div class="form-row" id="payment-row">
+        <label>Payment</label>
+        <select id="c-pay"><option>Cash</option><option>UPI</option><option>Card</option><option>Online</option><option>Voucher</option></select>
+      </div>
+      <input type="hidden" id="c-status" value="Confirmed"/>
+      <div class="form-row"><label>Notes</label><input id="c-notes" placeholder="e.g. Allergic to lavender"/></div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn full" onclick="closeVisitModal()">Cancel</button>
+      <button class="btn primary full" onclick="saveVisit()" style="font-weight:600">Save visit</button>
+    </div>
+  </div>
+</div>
 
+<div class="sheet-overlay" id="modal-exp">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3>Add expense</h3><button class="btn icon sm" onclick="closeExpModal()">&#10005;</button></div>
+    <div class="sheet-body">
+      <div class="form-row hidden" id="exp-branch-row"><label>Branch *</label>
+        <select id="e-branch"><option value="indiranagar">Indiranagar</option><option value="koramangala">Koramangala</option><option value="both">Both branches (shared)</option></select>
+      </div>
+      <div class="form-row"><label>Description *</label><input id="e-desc" placeholder="e.g. Lavender essential oil"/></div>
+      <div class="two-col">
+        <div class="form-row"><label>Category</label><select id="e-cat"><option>Supplies &amp; Products</option><option>Utilities</option><option>Therapist Salary</option><option>Staff Salary</option><option>Rent</option><option>Marketing</option><option>Maintenance</option><option>Food &amp; Refreshments</option><option>Other</option></select></div>
+        <div class="form-row"><label>Amount (&#8377;) *</label><input id="e-amt" type="number" inputmode="numeric" placeholder="800"/></div>
+      </div>
+      <div class="two-col">
+        <div class="form-row"><label>Vendor</label><input id="e-vendor" placeholder="e.g. Forest Essentials"/></div>
+        <div class="form-row"><label>Paid by</label><select id="e-paid"><option>Cash</option><option>UPI</option><option>Bank Transfer</option><option>Card</option></select></div>
+      </div>
+      <div class="form-row"><label>Receipt / Bill no.</label><input id="e-receipt" placeholder="e.g. INV-051"/></div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn full" onclick="closeExpModal()">Cancel</button>
+      <button class="btn primary full" onclick="saveExpense()" style="font-weight:600">Save expense</button>
+    </div>
+  </div>
+</div>
 
+<div class="sheet-overlay" id="modal-mem">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3>Create membership</h3><button class="btn icon sm" onclick="closeMemModal()">&#10005;</button></div>
+    <div class="sheet-body">
+      <div class="form-row"><label>Customer name *</label><input id="m-name" placeholder="e.g. Priya Sharma" autocomplete="off"/></div>
+      <div class="form-row"><label>Phone *</label><input id="m-phone" placeholder="9876543210" type="tel" inputmode="numeric"/></div>
+      <div class="two-col">
+        <div class="form-row"><label>Total hours *</label><input id="m-hours" type="number" inputmode="numeric" placeholder="10"/></div>
+        <div class="form-row"><label>Amount (&#8377;) *</label><input id="m-amt" type="number" inputmode="numeric" placeholder="5000"/></div>
+      </div>
+      <div class="two-col">
+        <div class="form-row"><label>Payment mode</label><select id="m-pay"><option>Cash</option><option>UPI</option><option>Card</option><option>Online</option></select></div>
+        <div class="form-row"><label>Valid till</label><input id="m-expiry" type="date"/></div>
+      </div>
+      <div class="form-row"><label>Notes</label><input id="m-notes" placeholder="e.g. Corporate package"/></div>
+      <div style="background:var(--teal-l);border:1px solid var(--teal);border-radius:12px;padding:12px;font-size:13px;color:var(--text2)">Unique membership code will be auto-generated.</div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn full" onclick="closeMemModal()">Cancel</button>
+      <button class="btn primary full" onclick="saveMembership()" style="font-weight:600">Create membership</button>
+    </div>
+  </div>
+</div>
 
+<div class="sheet-overlay" id="modal-use-hours">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3>Record member visit</h3><button class="btn icon sm" onclick="closeUseModal()">&#10005;</button></div>
+    <div class="sheet-body">
+      <div class="code-lookup">
+        <input id="lookup-code" placeholder="e.g. IND-427" maxlength="8" oninput="this.value=this.value.toUpperCase()" autocomplete="off"/>
+        <button class="btn primary" onclick="lookupMember()" style="font-weight:600">Find</button>
+      </div>
+      <div id="member-info-box" class="hidden"></div>
+      <div id="use-hours-fields" class="hidden">
+        <div class="form-row"><label>Service *</label>
+          <select id="u-service">
+            <option>Classical</option>
+            <option>Aroma</option>
+            <option>Swedish</option>
+            <option>Deep Tissue</option>
+            <option>Balanese</option>
+            <option>Signature</option>
+            <option>Lumi Lumi</option>
+            <option>Thai</option>
+          </select>
+        </div>
+        <div class="two-col">
+          <div class="form-row"><label>Therapist</label><input id="u-therapist" placeholder="e.g. Kavya"/></div>
+          <div class="form-row"><label>Time slot</label><input id="u-time" type="time"/></div>
+        </div>
+        <div class="form-row"><label>Hours to deduct *</label><input id="u-hours" type="number" inputmode="decimal" placeholder="1.5" step="0.5"/></div>
+        <input type="hidden" id="u-status" value="Confirmed"/>
+        <div class="form-row"><label>Notes</label><input id="u-notes" placeholder="Any notes..."/></div>
+      </div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn full" onclick="closeUseModal()">Cancel</button>
+      <button class="btn primary full" id="use-hours-btn" onclick="useHours()" style="font-weight:600;display:none">Record visit</button>
+    </div>
+  </div>
+</div>
 
+<div class="sheet-overlay" id="modal-therapist">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3>Add therapist</h3><button class="btn icon sm" onclick="closeTherapistModal()">&#10005;</button></div>
+    <div class="sheet-body">
+      <div class="form-row"><label>Full name *</label><input id="t-name" placeholder="e.g. Kavya Reddy" autocomplete="off"/></div>
+      <div class="form-row"><label>Specialisation</label><input id="t-spec" placeholder="e.g. Swedish, Facial"/></div>
+      <div class="form-row"><label>Home branch *</label><select id="t-branch" onchange="previewTherapistId()"><option value="indiranagar">Indiranagar</option><option value="koramangala">Koramangala</option></select></div>
+      <div style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:1.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);cursor:pointer" onclick="document.getElementById('t-interbranch').click()">
+          <div><div style="font-size:15px;font-weight:500;color:var(--text)">Can work at both branches</div><div style="font-size:12px;color:var(--text2);margin-top:2px">Inter-branch therapist</div></div>
+          <div style="position:relative;width:48px;height:28px;flex-shrink:0">
+            <input type="checkbox" id="t-interbranch" style="opacity:0;width:0;height:0;position:absolute" onchange="updateToggle()"/>
+            <div id="t-interbranch-track" style="position:absolute;inset:0;border-radius:14px;background:var(--bg3);border:1px solid var(--border2);transition:background .2s"></div>
+            <div id="t-interbranch-thumb" style="position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);transition:left .2s"></div>
+          </div>
+        </div>
+      </div>
+      <div class="form-row"><label>Phone</label><input id="t-phone" type="tel" inputmode="numeric" placeholder="9876543210"/></div>
+      <div id="t-id-preview" style="background:var(--teal-l);border:1px solid var(--teal);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--text2)">Therapist ID will be auto-generated on save.</div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn full" onclick="closeTherapistModal()">Cancel</button>
+      <button class="btn primary full" onclick="saveTherapist()" style="font-weight:600">Add therapist</button>
+    </div>
+  </div>
+</div>
 
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay hidden" id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loading-text">Loading...</div>
+</div>
 
+<script>
+const SHEET_URL='https://script.google.com/macros/s/AKfycbzVw2RyExfCYotE60UiQDBcJR6_hBngAiCmIsdSR6eI5Fian7e0QM6CibS5qkLQHjpk/exec';
+const PINS={'receptionist-indiranagar':'4729','receptionist-koramangala':'8163','owner':'5501'};
+const BRANCH_LABELS={indiranagar:'Indiranagar',koramangala:'Koramangala'};
+const BRANCH_COLOR={indiranagar:'#1D9E75',koramangala:'#185FA5'};
+const TEAL='#1D9E75',BLUE='#185FA5',RED='#A32D2D',AMBER='#BA7517';
+const CAT_ICONS={'Supplies & Products':'📦','Utilities':'💡','Therapist Salary':'👤','Staff Salary':'👥','Rent':'🏠','Marketing':'📢','Maintenance':'🔧','Food & Refreshments':'☕','Other':'📄'};
 
+// ── IN-MEMORY DATA STORE (populated from Sheets) ──
+let role='',branch='indiranagar',loginRole='receptionist-indiranagar',analyticsRange=7,currentTab='customers';
+let custDate=new Date(),expDate=new Date(),attDate=new Date();
+let therapistFilterBranch='both';
+// Live data from Sheets
+let liveVisits=[],liveExpenses=[],liveMemberships=[],liveTherapists=[],liveAttendance=[];
+let _useCode=null,_useBranch=null;
+
+// ── LOADING ──
+function showLoading(msg){
+  document.getElementById('loading-overlay').classList.remove('hidden');
+  document.getElementById('loading-text').textContent=msg||'Loading...';
+}
+function hideLoading(){document.getElementById('loading-overlay').classList.add('hidden');}
+
+function showToast(msg,ok=true){
+  let t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:99px;font-size:14px;font-weight:600;color:#fff;z-index:999;transition:opacity .4s;white-space:nowrap;max-width:90vw;text-align:center';document.body.appendChild(t);}
+  t.textContent=msg;t.style.background=ok?'#1D9E75':'#A32D2D';t.style.opacity='1';
+  clearTimeout(t._timer);t._timer=setTimeout(()=>{t.style.opacity='0';},2800);
+}
+
+// ── SHEETS API ──
+const SHEET_ID_KEY='1w4xgLMIcvA70_WkCMudey63gf-irB3SfxuldVjnJj5w';
+const CACHE_KEY='retreat_spa_cache_v1';
+
+function saveCache(key,data){try{const c=JSON.parse(localStorage.getItem(CACHE_KEY)||'{}');c[key]=data;localStorage.setItem(CACHE_KEY,JSON.stringify(c));}catch(e){}}
+function loadCache(key){try{const c=JSON.parse(localStorage.getItem(CACHE_KEY)||'{}');return c[key]||null;}catch(e){return null;}}
+function cacheTherapists(t){try{localStorage.setItem('retreat_therapists_shared',JSON.stringify(t));}catch(e){}}
+function getCachedTherapists(){try{const t=localStorage.getItem('retreat_therapists_shared');return t?JSON.parse(t):[];}catch(e){return[];}}
+
+// Parse CSV text into array of objects using first row as headers
+function csvToObjects(csv){
+  if(!csv||!csv.trim())return[];
+  const lines=csv.trim().split('\n');
+  if(lines.length<2)return[];
+  const headers=parseCSVLine(lines[0]);
+  return lines.slice(1).map(line=>{
+    const vals=parseCSVLine(line);
+    const obj={};
+    headers.forEach((h,i)=>{obj[h.trim()]=vals[i]!==undefined?String(vals[i]).trim():'';});
+    return obj;
+  }).filter(r=>Object.values(r).some(v=>v));
+}
+
+function parseCSVLine(line){
+  const result=[];let cur='';let inQ=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else{inQ=!inQ;}}
+    else if(c===','&&!inQ){result.push(cur);cur='';}
+    else{cur+=c;}
+  }
+  result.push(cur);return result;
+}
+
+// Read a sheet tab via the public CSV export URL — works with CORS, no auth needed
+async function readSheet(sheetName){
+  try{
+    const url='https://docs.google.com/spreadsheets/d/'+SHEET_ID_KEY+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(sheetName);
+    const res=await Promise.race([
+      fetch(url,{mode:'cors'}),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),10000))
+    ]);
+    if(!res.ok)return[];
+    const text=await res.text();
+    return csvToObjects(text);
+  }catch(e){console.warn('readSheet failed for',sheetName,e);return[];}
+}
+
+// Main data fetcher — reads directly from Google Sheets CSV (CORS-enabled, reliable)
+async function sheetsGet(params){
+  const branch=params.branch||'';
+  const date=params.date||'';
+  const brLabel=branch?branch.charAt(0).toUpperCase()+branch.slice(1):'';
+  const cacheKey=JSON.stringify(params);
+
+  try{
+    const data={};
+    // Read all needed sheets in parallel for speed
+    const [visits,expenses,memberships,therapists,attendance]=await Promise.all([
+      brLabel?readSheet(brLabel+' Visits'):Promise.resolve([]),
+      brLabel?readSheet(brLabel+' Expenses'):Promise.resolve([]),
+      brLabel?readSheet(brLabel+' Memberships'):Promise.resolve([]),
+      readSheet('Therapists'),
+      brLabel?readSheet(brLabel+' Attendance'):Promise.resolve([])
+    ]);
+    // Filter by date if provided
+    data.visits=date?visits.filter(r=>r['Date']===date):visits;
+    data.expenses=date?expenses.filter(r=>r['Date']===date):expenses;
+    data.memberships=memberships;
+    data.therapists=therapists;
+    data.attendance=date?attendance.filter(r=>r['Date']===date):attendance;
+    const result={success:true,data};
+    saveCache(cacheKey,result);
+    return result;
+  }catch(e){
+    console.warn('sheetsGet failed:',e);
+    const cached=loadCache(cacheKey);
+    if(cached){showToast('Showing cached data — tap ⟳ to refresh',true);return cached;}
+    return null;
+  }
+}
+
+async function sheetsPost(payload){
+  try{
+    const form=new FormData();
+    form.append('data',JSON.stringify(payload));
+    await fetch(SHEET_URL,{method:'POST',mode:'no-cors',body:form});
+    return true;
+  }catch(e){console.warn('POST failed:',e);return false;}
+}
+
+// ── LOAD DATA FROM SHEETS ──
+async function loadFromSheets(br,date){
+  const dateStr=dk(date||custDate);
+  const res=await sheetsGet({action:'getData',branch:br==='both'?'':br,date:dateStr});
+  if(!res||!res.success)return null;
+  return res.data;
+}
+
+async function loadAllData(showSpinner=true){
+  if(showSpinner)showLoading('Syncing data...');
+  try{
+    const br=(branch==='both')?'indiranagar':branch;
+    const dateStr=dk(custDate);
+    // Load visits/expenses/attendance for today, memberships for ALL dates
+    const visitRes=await sheetsGet({action:'getData',branch:br,date:dateStr});
+    if(visitRes&&visitRes.success){
+      liveVisits=visitRes.data.visits||[];
+      liveExpenses=visitRes.data.expenses||[];
+      liveAttendance=visitRes.data.attendance||[];
+      if(visitRes.data.therapists&&visitRes.data.therapists.length>0){
+        liveTherapists=visitRes.data.therapists;
+        cacheTherapists(liveTherapists);
+      } else {
+        const cached=getCachedTherapists();
+        if(cached.length>0) liveTherapists=cached;
+      }
+    } else {
+      const cached=getCachedTherapists();
+      if(cached.length>0) liveTherapists=cached;
+    }
+    // Load ALL memberships (no date filter)
+    const memRes=await sheetsGet({action:'getData',branch:br,date:''});
+    if(memRes&&memRes.success) liveMemberships=memRes.data.memberships||[];
+
+    if(branch==='both'){
+      const korRes=await sheetsGet({action:'getData',branch:'koramangala',date:dateStr});
+      if(korRes&&korRes.success){
+        liveVisits=[...liveVisits,...(korRes.data.visits||[])];
+        liveExpenses=[...liveExpenses,...(korRes.data.expenses||[])];
+        liveAttendance=[...liveAttendance,...(korRes.data.attendance||[])];
+      }
+      const korMem=await sheetsGet({action:'getData',branch:'koramangala',date:''});
+      if(korMem&&korMem.success) liveMemberships=[...liveMemberships,...(korMem.data.memberships||[]).map(m=>({...m,_br:'koramangala'}))];
+    }
+  }finally{if(showSpinner)hideLoading();}
+}
+
+async function loadTherapists(){
+  const res=await sheetsGet({action:'getData',branch:'indiranagar',date:dk(new Date())});
+  if(res&&res.success)liveTherapists=res.data.therapists||[];
+}
+
+async function loadMemberships(){
+  const br=(branch==='both')?'indiranagar':branch;
+  showLoading('Loading memberships...');
+  try{
+    // Pass date as empty string so Apps Script returns ALL memberships (no date filter)
+    const res=await sheetsGet({action:'getData',branch:br,date:''});
+    if(res&&res.success){
+      liveMemberships=res.data.memberships||[];
+      if(branch==='both'){
+        const k=await sheetsGet({action:'getData',branch:'koramangala',date:''});
+        if(k&&k.success)liveMemberships=[...liveMemberships,...(k.data.memberships||[]).map(m=>({...m,_br:'koramangala'}))];
+      }
+    }
+  }finally{hideLoading();}
+}
+
+async function loadAttendance(){
+  const br=(branch==='both')?'indiranagar':branch;
+  showLoading('Loading attendance...');
+  try{
+    const res=await sheetsGet({action:'getData',branch:br,date:dk(attDate)});
+    if(res&&res.success){
+      liveAttendance=res.data.attendance||[];
+      if(res.data.therapists&&res.data.therapists.length>0){
+        liveTherapists=res.data.therapists;
+        cacheTherapists(liveTherapists);
+      } else {
+        // JSONP worked but therapists empty — try cache
+        const cached=getCachedTherapists();
+        if(cached.length>0) liveTherapists=cached;
+      }
+    } else {
+      // JSONP failed — use cached therapists
+      const cached=getCachedTherapists();
+      if(cached.length>0){ liveTherapists=cached; showToast('Using cached therapists — refresh for latest',true); }
+    }
+  }finally{hideLoading();}
+}
+
+async function refreshData(){
+  showToast('Refreshing...',true);
+  await loadAllData(false);
+  renderCurrentTab();
+  showToast('Data refreshed ✓',true);
+}
+
+function renderCurrentTab(){
+  if(currentTab==='customers')renderVisits();
+  else if(currentTab==='expenses')renderExpenses();
+  else if(currentTab==='memberships')renderMemberships();
+  else if(currentTab==='attendance')renderAttendance();
+  else if(currentTab==='therapists')renderTherapists();
+  else renderAnalytics();
+}
+
+// ── AUTH ──
+function setRole(r){
+  loginRole=r;
+  document.querySelectorAll('.seg-btn').forEach((b,i)=>b.classList.toggle('active',['receptionist-indiranagar','receptionist-koramangala','owner'][i]===r));
+}
+
+async function doLogin(){
+  const pin=document.getElementById('pin-input').value;
+  const err=document.getElementById('login-err');
+  if(pin===PINS[loginRole]){
+    err.classList.add('hidden');
+    role=loginRole;
+    branch=role==='owner'?'indiranagar':role.replace('receptionist-','');
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    await setupApp();
+  }else{err.textContent='Incorrect PIN — please try again.';err.classList.remove('hidden');}
+}
+
+function logout(){
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('pin-input').value='';
+  document.getElementById('login-err').classList.add('hidden');
+  loginRole='receptionist-indiranagar';
+  document.querySelectorAll('.seg-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  liveVisits=[];liveExpenses=[];liveMemberships=[];liveTherapists=[];liveAttendance=[];
+}
+
+async function setupApp(){
+  const isOwner=role==='owner';
+  const pill=document.getElementById('branch-pill');
+  if(isOwner){pill.textContent='All branches';pill.className='branch-pill all';}
+  else{pill.textContent=BRANCH_LABELS[branch];pill.className='branch-pill'+(branch==='koramangala'?' k':'');}
+  document.getElementById('branch-bar').classList.toggle('hidden',!isOwner);
+  document.getElementById('owner-tabs').classList.toggle('hidden',!isOwner);
+  document.getElementById('bottom-nav').classList.toggle('hidden',isOwner);
+  await loadAllData(true);
+  if(isOwner)showTab('customers');
+  else navTo('customers');
+}
+
+function switchBranch(b){
+  branch=b;
+  ['indiranagar','koramangala','both'].forEach(br=>{const el=document.getElementById('brtab-'+br);if(el)el.classList.toggle('active',br===b);});
+  if(b==='both')showTab('analytics');
+  else showTab(currentTab==='analytics'?'customers':currentTab);
+}
+
+async function showTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.querySelectorAll('.o-tab').forEach(t=>t.classList.remove('active'));
+  const ot=document.getElementById('otab-'+tab);if(ot)ot.classList.add('active');
+  // Reload data for this tab
+  if(tab==='customers'){await loadVisitsForDate();renderVisits();}
+  else if(tab==='expenses'){await loadExpensesForDate();renderExpenses();}
+  else if(tab==='memberships'){await loadMemberships();renderMemberships();}
+  else if(tab==='attendance'){await loadAttendance();renderAttendance();}
+  else if(tab==='therapists'){await loadTherapists();renderTherapists();}
+  else renderAnalytics();
+}
+
+async function navTo(tab){
+  currentTab=tab;
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('nav-'+tab).classList.add('active');
+  if(tab==='customers'){await loadVisitsForDate();renderVisits();}
+  else if(tab==='attendance'){await loadAttendance();renderAttendance();}
+  else if(tab==='memberships'){await loadMemberships();renderMemberships();}
+  else{await loadExpensesForDate();renderExpenses();}
+}
+
+// Date helpers — always use LOCAL date (IST), never UTC
+function dk(d){
+  // Use local year/month/day to avoid UTC offset shifting the date
+  const yr=d.getFullYear();
+  const mo=String(d.getMonth()+1).padStart(2,'0');
+  const dy=String(d.getDate()).padStart(2,'0');
+  return yr+'-'+mo+'-'+dy;
+}
+function fmt(d){return d.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'2-digit'});}
+function localDateStr(d){
+  // Same as dk but for any date — used for memberships expiry default
+  const yr=d.getFullYear();
+  const mo=String(d.getMonth()+1).padStart(2,'0');
+  const dy=String(d.getDate()).padStart(2,'0');
+  return yr+'-'+mo+'-'+dy;
+}
+
+async function loadVisitsForDate(){
+  showLoading('Loading visits...');
+  liveVisits=[]; // Always clear first before loading new date
+  try{
+    const br=(branch==='both')?'indiranagar':branch;
+    const res=await sheetsGet({action:'getData',branch:br,date:dk(custDate)});
+    if(res&&res.success){
+      liveVisits=res.data.visits||[];
+      if(res.data.therapists&&res.data.therapists.length>0){
+        liveTherapists=res.data.therapists;
+        cacheTherapists(liveTherapists);
+      } else {
+        const cached=getCachedTherapists();
+        if(cached.length>0) liveTherapists=cached;
+      }
+      if(res.data.attendance&&res.data.attendance.length>0) liveAttendance=res.data.attendance;
+    } else {
+      // JSONP failed — visits stay empty for this date, use cached therapists
+      const cached=getCachedTherapists();
+      if(cached.length>0) liveTherapists=cached;
+    }
+    if(branch==='both'){
+      const k=await sheetsGet({action:'getData',branch:'koramangala',date:dk(custDate)});
+      if(k&&k.success)liveVisits=[...liveVisits,...(k.data.visits||[]).map(v=>({...v,_br:'koramangala'}))];
+    }
+  }finally{hideLoading();}
+}
+
+async function loadExpensesForDate(){
+  liveExpenses=[]; // Always clear first
+  showLoading('Loading expenses...');
+  try{
+    const br=(branch==='both')?'indiranagar':branch;
+    const res=await sheetsGet({action:'getData',branch:br,date:dk(expDate)});
+    if(res&&res.success)liveExpenses=res.data.expenses||[];
+    if(branch==='both'){
+      const k=await sheetsGet({action:'getData',branch:'koramangala',date:dk(expDate)});
+      if(k&&k.success)liveExpenses=[...liveExpenses,...(k.data.expenses||[]).map(e=>({...e,_br:'koramangala'}))];
+    }
+  }finally{hideLoading();}
+}
+
+async function changeDate(dir){custDate.setDate(custDate.getDate()+dir);await loadVisitsForDate();renderVisits();}
+async function changeExpDate(dir){expDate.setDate(expDate.getDate()+dir);await loadExpensesForDate();renderExpenses();}
+async function changeAttDate(dir){attDate.setDate(attDate.getDate()+dir);await loadAttendance();renderAttendance();}
+
+// ── EDIT STATE ──
+let _editingVisitIdx = -1;
+let _editingExpenseIdx = -1;
+
+function editVisit(i){
+  const filtered=liveVisits.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(custDate);});
+  const r=filtered[i];
+  if(!r) return;
+  _editingVisitIdx=i;
+  // Populate the visit modal with this visit's data
+  document.getElementById('c-name').value = r['Customer Name']||r.name||'';
+  document.getElementById('c-phone').value = r['Phone']||r.phone||'';
+  document.getElementById('c-service').value = r['Service']||r.service||'Aroma';
+  document.getElementById('c-time').value = r['Time']||r.time||'';
+  // Set duration select — match closest option
+  const durVal = String(r['Duration (min)']||r.dur||'60');
+  const durSelect = document.getElementById('c-dur');
+  durSelect.value = ['45','60','90','120'].includes(durVal) ? durVal : '60';
+  document.getElementById('c-amt').value = r['Amount (Rs)']||r.amt||'';
+  document.getElementById('c-pay').value = r['Payment Mode']||r.pay||'Cash';
+  document.getElementById('c-notes').value = r['Notes']||r.notes||'';
+  // Set therapist if exists
+  const ther = (r['Therapist']||r.therapist||'').split(' + ').filter(t=>t);
+  refreshTherapistPicker();
+  setTimeout(()=>{
+    if(ther[0]) document.getElementById('c-therapist-1').value = ther[0];
+    if(ther[1]){ addTherapistSlot(); setTimeout(()=>{ const sec=document.getElementById('c-therapist-2'); if(sec) sec.value=ther[1]; },50); }
+  },50);
+  // Update modal title
+  const header = document.querySelector('#modal-visit .sheet-header h3');
+  if(header) header.textContent = 'Edit visit';
+  document.getElementById('modal-visit').classList.add('open');
+}
+
+function editExpense(i){
+  const filtered=liveExpenses.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(expDate);});
+  const r=filtered[i];
+  if(!r) return;
+  _editingExpenseIdx=i;
+  // For receptionists, hide branch row; for owner, show
+  const isOwner = role==='owner';
+  document.getElementById('exp-branch-row').classList.toggle('hidden', !isOwner);
+  if(isOwner) document.getElementById('e-branch').value = r._br||((branch==='both')?'indiranagar':branch);
+  document.getElementById('e-desc').value = r['Description']||r.desc||'';
+  document.getElementById('e-cat').value = r['Category']||r.cat||'Supplies & Products';
+  document.getElementById('e-amt').value = r['Amount (Rs)']||r.amt||'';
+  document.getElementById('e-vendor').value = r['Vendor']||r.vendor||'';
+  document.getElementById('e-paid').value = r['Paid By']||r.paid||'Cash';
+  document.getElementById('e-receipt').value = r['Receipt No']||r.receipt||'';
+  const header = document.querySelector('#modal-exp .sheet-header h3');
+  if(header) header.textContent = 'Edit expense';
+  document.getElementById('modal-exp').classList.add('open');
+}
+
+// ── MODALS ──
+function openVisitModal(){refreshTherapistPicker();document.getElementById('modal-visit').classList.add('open');}
+function closeVisitModal(){document.getElementById('modal-visit').classList.remove('open');resetVisitForm();}
+function closeExpModal(){
+  document.getElementById('modal-exp').classList.remove('open');
+  _editingExpenseIdx = -1;
+  const header = document.querySelector('#modal-exp .sheet-header h3');
+  if(header) header.textContent = 'Add expense';
+}
+document.querySelectorAll('.sheet-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+const statusCls={Confirmed:'b-blue',Completed:'b-green',Cancelled:'b-red','No-Show':'b-amber'};
+const payCls={Cash:'b-green',UPI:'b-teal',Card:'b-blue',Online:'b-amber',Voucher:'b-gray','Bank Transfer':'b-purple','Package / Membership':'b-purple'};
+const bdg=(t,c)=>`<span class="badge ${c||'b-gray'}">${t}</span>`;
+
+// ── RENDER VISITS ──
+function renderVisits(){
+  document.getElementById('cust-date-lbl').textContent=fmt(custDate);
+  // Safety filter — only show visits matching current date (guards against stale data)
+  const todayStr=dk(custDate);
+  const list=liveVisits.filter(r=>{
+    const d=r['Date']||r.date||'';
+    return !d || d===todayStr; // show if no date (locally added) or date matches
+  });
+  const rev=list.filter(r=>r['Status']!=='Cancelled'&&r['Status']!=='No-Show').reduce((s,r)=>s+(+r['Amount (Rs)']||0),0);
+  const done=list.filter(r=>r['Status']==='Completed').length;
+  const avg=done>0?Math.round(rev/done):0;
+  document.getElementById('cust-metrics').innerHTML=`
+    <div class="metric"><div class="lbl">Visits</div><div class="val" style="color:${BLUE}">${list.length}</div></div>
+    <div class="metric"><div class="lbl">Revenue</div><div class="val" style="color:${TEAL}">&#8377;${rev.toLocaleString('en-IN')}</div></div>
+    <div class="metric"><div class="lbl">Completed</div><div class="val" style="color:${TEAL}">${done}</div></div>
+    <div class="metric"><div class="lbl">Avg ticket</div><div class="val" style="color:${AMBER}">&#8377;${avg.toLocaleString('en-IN')}</div></div>
+  `;
+  const el=document.getElementById('visit-list');
+  if(!list.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="empty-title">No visits today</div><div class="empty-sub">Tap + Add to log a customer visit</div></div>`;return;}
+  el.innerHTML=list.map((r,i)=>`
+    <div class="visit-card">
+      <div class="visit-card-top">
+        <div><div class="visit-name">${r['Customer Name']||r.name||''}</div>${r['Phone']||r.phone?`<div class="visit-phone">${r['Phone']||r.phone}</div>`:''}</div>
+        ${bdg(r['Status']||r.status,statusCls[r['Status']||r.status])}
+      </div>
+      <div class="visit-grid">
+        <div class="visit-field"><div class="f-label">Service</div><div class="f-val">${r['Service']||r.service||'—'}</div></div>
+        <div class="visit-field"><div class="f-label">Therapist</div><div class="f-val">${r['Therapist']||r.therapist||'—'}</div></div>
+        <div class="visit-field"><div class="f-label">Time</div><div class="f-val">${r['Time']||r.time||'—'}${(r['Duration (min)']||r.dur)?'·'+(r['Duration (min)']||r.dur)+'m':''}</div></div>
+        <div class="visit-field"><div class="f-label">Payment</div><div class="f-val">${bdg(r['Payment Mode']||r.pay,payCls[r['Payment Mode']||r.pay])}</div></div>
+      </div>
+      ${(r['Notes']||r.notes)?`<div class="visit-notes">${r['Notes']||r.notes}</div>`:''}
+      <div class="visit-bottom">
+        <div class="visit-amount">&#8377;${(+(r['Amount (Rs)']||r.amt)||0).toLocaleString('en-IN')}</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn sm" onclick="editVisit(${i})" style="font-size:13px">Edit</button>
+          ${role==='owner'?`<button class="btn danger" onclick="deleteVisit(${i})">Remove</button>`:''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── RENDER EXPENSES ──
+function renderExpenses(){
+  document.getElementById('exp-date-lbl').textContent=fmt(expDate);
+  const todayExpStr=dk(expDate);
+  const list=liveExpenses.filter(r=>{
+    const d=r['Date']||r.date||'';
+    return !d || d===todayExpStr;
+  });
+  const total=list.reduce((s,r)=>s+(+(r['Amount (Rs)']||r.amt)||0),0);
+  document.getElementById('exp-metrics').innerHTML=`
+    <div class="metric"><div class="lbl">Entries</div><div class="val" style="color:${BLUE}">${list.length}</div></div>
+    <div class="metric"><div class="lbl">Total spent</div><div class="val" style="color:${RED}">&#8377;${total.toLocaleString('en-IN')}</div></div>
+  `;
+  const el=document.getElementById('exp-list');
+  if(!list.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><div class="empty-title">No expenses today</div><div class="empty-sub">Tap + Add to record an expense</div></div>`;return;}
+  el.innerHTML=list.map((r,i)=>`
+    <div class="exp-card">
+      <div class="exp-icon">${CAT_ICONS[r['Category']||r.cat]||'📄'}</div>
+      <div class="exp-body">
+        <div class="exp-desc">${r['Description']||r.desc||''}</div>
+        <div class="exp-meta">${r['Category']||r.cat||''}${(r['Vendor']||r.vendor)?'·'+(r['Vendor']||r.vendor):''}${(r['Receipt No']||r.receipt)?'·'+(r['Receipt No']||r.receipt):''}</div>
+        <div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">
+          ${(r['Added By']||r.addedBy)==='owner'?'<span class="badge b-purple" style="font-size:10px">Owner entry</span>':''}
+          ${(r['Shared']||r.shared)==='Yes'||r.shared===true?'<span class="badge b-blue" style="font-size:10px">Both branches</span>':''}
+        </div>
+      </div>
+      <div class="exp-right">
+        <div class="exp-amt">&#8377;${(+(r['Amount (Rs)']||r.amt)||0).toLocaleString('en-IN')}</div>
+        <div class="exp-paid">${r['Paid By']||r.paid||''}</div>
+        <div style="display:flex;gap:4px;margin-top:8px;justify-content:flex-end">
+          <button class="btn sm" onclick="editExpense(${i})" style="font-size:11px;height:28px;padding:0 8px">Edit</button>
+          ${role==='owner'?`<button class="btn danger" style="height:28px;font-size:11px" onclick="deleteExpense(${i})">✕</button>`:''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── RENDER MEMBERSHIPS ──
+let _memSearchTimer=null;
+function debouncedRenderMemberships(){
+  clearTimeout(_memSearchTimer);
+  _memSearchTimer=setTimeout(renderMemberships,200);
+}
+function renderMemberships(){
+  const searchEl=document.getElementById('mem-search');
+  const q=(searchEl?searchEl.value:'').toLowerCase().trim();
+  // Filter by search query
+  let list=liveMemberships.filter(m=>{
+    if(!q)return true;
+    const code=(m['Code']||m.code||'').toLowerCase();
+    const name=(m['Customer Name']||m.name||'').toLowerCase();
+    const phone=(m['Phone']||m.phone||'').toLowerCase();
+    return code.includes(q)||name.includes(q)||phone.includes(q);
+  });
+  // Sort: active first, then low hours, then expired
+  list=list.sort((a,b)=>{
+    const remA=(+(a['Total Hours']||a.totalHours)||0)-(+(a['Used Hours']||a.usedHours)||0);
+    const remB=(+(b['Total Hours']||b.totalHours)||0)-(+(b['Used Hours']||b.usedHours)||0);
+    const expA=(a['Expiry']&&new Date(a['Expiry'])<new Date())||remA<=0;
+    const expB=(b['Expiry']&&new Date(b['Expiry'])<new Date())||remB<=0;
+    if(expA&&!expB)return 1;
+    if(!expA&&expB)return -1;
+    return 0;
+  });
+  const allList=liveMemberships;
+  const active=allList.filter(m=>{const rem=(+(m['Total Hours']||m.totalHours)||0)-(+(m['Used Hours']||m.usedHours)||0);return rem>0&&(!m['Expiry']||new Date(m['Expiry'])>=new Date());});
+  document.getElementById('mem-metrics').innerHTML=`
+    <div class="metric"><div class="lbl">Total</div><div class="val" style="color:${BLUE}">${allList.length}</div></div>
+    <div class="metric"><div class="lbl">Active</div><div class="val" style="color:${TEAL}">${active.length}</div></div>
+    <div class="metric"><div class="lbl">Revenue</div><div class="val" style="color:${TEAL}">&#8377;${allList.reduce((s,m)=>s+(+(m['Amount (Rs)']||m.amt)||0),0).toLocaleString('en-IN')}</div></div>
+    <div class="metric"><div class="lbl">Expired/Done</div><div class="val" style="color:${AMBER}">${allList.length-active.length}</div></div>
+  `;
+  const el=document.getElementById('mem-list');
+  if(!list.length){
+    el.innerHTML=q
+      ?'<div class="empty-state"><div class="empty-icon" style="font-size:28px">🔍</div><div class="empty-title">No results found</div><div class="empty-sub">Try searching by name, phone or code</div></div>'
+      :'<div class="empty-state"><div class="empty-icon" style="font-size:28px">🎫</div><div class="empty-title">No memberships yet</div><div class="empty-sub">Tap + New to create a package membership</div></div>';
+    return;
+  }
+  el.innerHTML=list.map((m,idx)=>{
+    const code=m['Code']||m.code||'';
+    const name=m['Customer Name']||m.name||'';
+    const phone=m['Phone']||m.phone||'';
+    const total=+(m['Total Hours']||m.totalHours)||0;
+    const used=+(m['Used Hours']||m.usedHours)||0;
+    const remaining=total-used;
+    const pct=total>0?Math.max(0,Math.round((remaining/total)*100)):0;
+    const expiry=m['Expiry']||m.expiry||'';
+    const isExpired=(expiry&&new Date(expiry)<new Date())||remaining<=0;
+    const isLow=!isExpired&&pct<=25;
+    const cardClass=isExpired?'expired':isLow?'low':'';
+    const statusBadge=isExpired?'<span class="badge b-red">Expired / Done</span>':isLow?'<span class="badge b-amber">Low hours</span>':'<span class="badge b-green">Active</span>';
+    const expiryFmt=expiry?new Date(expiry).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'No expiry';
+    const memBr=m['Branch']?m['Branch'].toLowerCase():(m.branch||branch);
+    return `<div class="mem-card ${cardClass}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div><div class="mem-code">${code}</div><div class="mem-name">${name}</div><div class="mem-phone">${phone}</div></div>
+        ${statusBadge}
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px"><span>${remaining.toFixed(1)} hrs remaining of ${total} hrs</span><span>${pct}%</span></div>
+        <div class="mem-hours-bar"><div class="mem-hours-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="mem-stats">
+        <div class="mem-stat"><div class="ms-lbl">Paid</div><div class="ms-val">&#8377;${(+(m['Amount (Rs)']||m.amt)||0).toLocaleString('en-IN')}</div></div>
+        <div class="mem-stat"><div class="ms-lbl">Used</div><div class="ms-val">${used.toFixed(1)} hrs</div></div>
+        <div class="mem-stat"><div class="ms-lbl">Valid till</div><div class="ms-val" style="font-size:12px">${expiryFmt}</div></div>
+      </div>
+      <div class="mem-actions">
+        ${!isExpired?`<button class="btn primary sm" onclick="openUseModal('${code}','${memBr}')" style="flex:1;font-weight:600">🕐 Record visit</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── SAVE VISIT ──
+// ── MEMBERSHIP TOGGLE IN VISIT FORM ──
+let visitMemberData = null; // holds found membership when toggle is ON
+
+function toggleMemberVisit(){
+  const cb = document.getElementById('c-is-member');
+  // If called from the div click, toggle the checkbox
+  if(document.activeElement !== cb) cb.checked = !cb.checked;
+  const on = cb.checked;
+  // Update toggle UI
+  document.getElementById('c-member-track').style.background = on ? '#1D9E75' : 'var(--bg3)';
+  document.getElementById('c-member-thumb').style.left = on ? '21px' : '3px';
+  // Show/hide sections
+  document.getElementById('member-lookup-section').classList.toggle('hidden', !on);
+  document.getElementById('regular-visit-fields').style.opacity = on ? '0.4' : '1';
+  document.getElementById('regular-visit-fields').style.pointerEvents = on ? 'none' : '';
+  // Reset amount/payment when toggling
+  if(on){
+    document.getElementById('c-amt').value = '0';
+    document.getElementById('c-pay').value = 'Package / Membership';
+    document.getElementById('member-hours-row').style.display = 'none';
+    document.getElementById('visit-member-info').classList.add('hidden');
+    document.getElementById('c-member-code').value = '';
+    visitMemberData = null;
+  } else {
+    document.getElementById('c-amt').value = '';
+    document.getElementById('c-pay').value = 'Cash';
+    visitMemberData = null;
+  }
+}
+
+function lookupMemberInVisit(){
+  const code = document.getElementById('c-member-code').value.trim().toUpperCase();
+  if(!code){ showToast('Please enter a membership code', false); return; }
+  // Search in liveMemberships
+  const mem = liveMemberships.find(m => (m['Code']||m.code||'') === code);
+  const infoBox = document.getElementById('visit-member-info');
+  const hoursRow = document.getElementById('member-hours-row');
+  if(!mem){
+    infoBox.style.cssText = 'background:var(--red-l);border:1px solid var(--red);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px';
+    infoBox.innerHTML = '<b style="color:var(--red)">❌ Code not found</b><br>Please check the membership code and try again.';
+    infoBox.classList.remove('hidden');
+    hoursRow.style.display = 'none';
+    visitMemberData = null;
+    return;
+  }
+  const total = +(mem['Total Hours']||mem.totalHours)||0;
+  const used = +(mem['Used Hours']||mem.usedHours)||0;
+  const remaining = total - used;
+  const isExpired = (mem['Expiry'] && new Date(mem['Expiry']) < new Date()) || remaining <= 0;
+  if(isExpired){
+    infoBox.style.cssText = 'background:var(--red-l);border:1px solid var(--red);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px';
+    infoBox.innerHTML = '<b style="color:var(--red)">⚠️ Membership expired or hours exhausted</b>';
+    infoBox.classList.remove('hidden');
+    hoursRow.style.display = 'none';
+    visitMemberData = null;
+    return;
+  }
+  // Found and valid!
+  visitMemberData = mem;
+  const name = mem['Customer Name']||mem.name||'';
+  const phone = mem['Phone']||mem.phone||'';
+  const memBranch = (mem['Branch']||mem.branch||'indiranagar').toLowerCase();
+  const crossBranch = memBranch !== ((branch==='both')?'indiranagar':branch);
+  infoBox.style.cssText = 'background:var(--teal-l);border:1px solid var(--teal);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px';
+  infoBox.innerHTML = `<b>${name}</b> · ${code}<br>
+    <span style="color:var(--text2)">${remaining.toFixed(1)} hrs remaining of ${total} hrs</span>
+    ${crossBranch ? '<br><span class="badge b-blue" style="font-size:11px;margin-top:4px">Cross-branch visit</span>' : ''}`;
+  infoBox.classList.remove('hidden');
+  // Auto-fill name and phone
+  document.getElementById('c-name').value = name;
+  document.getElementById('c-phone').value = phone;
+  // Show hours to deduct row
+  document.getElementById('c-mem-remaining').value = remaining.toFixed(1) + ' hrs';
+  hoursRow.style.display = 'grid';
+  // Set payment and amount
+  document.getElementById('c-pay').value = 'Package / Membership';
+  document.getElementById('c-amt').value = '0';
+  // Restore interactivity of name/phone
+  document.getElementById('regular-visit-fields').style.opacity = '1';
+  document.getElementById('regular-visit-fields').style.pointerEvents = '';
+}
+
+async function saveVisit(){
+  const name = document.getElementById('c-name').value.trim();
+  if(!name){ alert('Please enter customer name'); return; }
+  const isMemberVisit = document.getElementById('c-is-member').checked && visitMemberData;
+  const therapists = getSelectedTherapists();
+  const br = (branch==='both') ? 'indiranagar' : branch;
+
+  if(isMemberVisit){
+    // Validate hours to deduct
+    const hrs = parseFloat(document.getElementById('c-mem-hours').value);
+    if(!hrs || hrs <= 0){ alert('Please enter hours to deduct from membership'); return; }
+    const total = +(visitMemberData['Total Hours']||visitMemberData.totalHours)||0;
+    const used = +(visitMemberData['Used Hours']||visitMemberData.usedHours)||0;
+    const remaining = total - used;
+    if(hrs > remaining){ alert('Only '+remaining.toFixed(1)+' hrs remaining. Cannot deduct '+hrs+' hrs.'); return; }
+    const code = visitMemberData['Code']||visitMemberData.code;
+    const memBranch = (visitMemberData['Branch']||visitMemberData.branch||'indiranagar').toLowerCase();
+    const newUsed = parseFloat((used+hrs).toFixed(2));
+    const record = {
+      name, phone: document.getElementById('c-phone').value.trim(),
+      service: document.getElementById('c-service').value,
+      therapists, therapist: therapists.join(' + '),
+      time: document.getElementById('c-time').value,
+      dur: document.getElementById('c-dur').value || Math.round(hrs*60),
+      pay: 'Package / Membership', amt: 0,
+      status: document.getElementById('c-status').value,
+      notes: 'Member: '+code+(document.getElementById('c-notes').value?' | '+document.getElementById('c-notes').value:''),
+      memberCode: code
+    };
+    showLoading('Saving membership visit...');
+    try{
+      await sheetsPost({type:'visit', branch:br, date:dk(custDate), record});
+      await sheetsPost({type:'updateMembership', branch:memBranch, date:dk(custDate), record:{code, branch:memBranch, usedHours:newUsed}});
+      showToast(hrs+' hrs deducted from '+code+'. '+(total-newUsed).toFixed(1)+' remaining ✓');
+      // Add to local list immediately so it shows without waiting for JSONP
+      liveVisits.push({'Customer Name':record.name,'Phone':record.phone,'Service':record.service,'Therapist':record.therapist||'','Time':record.time||'','Duration (min)':record.dur,'Payment Mode':'Package / Membership','Amount (Rs)':0,'Status':record.status,'Notes':record.notes,'Date':dk(custDate),'Branch':br,'Member Code':code});
+      closeVisitModal();
+      resetVisitForm();
+      renderVisits();
+      loadVisitsForDate().then(()=>renderVisits());
+    }finally{ hideLoading(); }
+  } else {
+    // Regular visit
+    const amt = parseFloat(document.getElementById('c-amt').value);
+    const dur = document.getElementById('c-dur').value;
+    if(isNaN(amt) || amt < 0){ alert('Please enter a valid amount (must be 0 or more)'); return; }
+    const record = {
+      name, phone: document.getElementById('c-phone').value.trim(),
+      service: document.getElementById('c-service').value,
+      therapists, therapist: therapists.join(' + '),
+      time: document.getElementById('c-time').value,
+      dur, pay: document.getElementById('c-pay').value,
+      amt, status: document.getElementById('c-status').value,
+      notes: document.getElementById('c-notes').value.trim()
+    };
+    showLoading(_editingVisitIdx>=0?'Updating visit...':'Saving visit...');
+    try{
+      if(_editingVisitIdx>=0){
+        // Edit: delete old row from sheet using timestamp for accuracy
+        const oldVisit=liveVisits.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(custDate);})[_editingVisitIdx];
+        const editBr=(branch==='both')?((oldVisit&&oldVisit._br)||'indiranagar'):branch;
+        await sheetsPost({type:'deleteVisit',branch:editBr,timestamp:oldVisit&&oldVisit['Timestamp']||'',rowIndex:_editingVisitIdx});
+      }
+      await sheetsPost({type:'visit',branch:br,date:dk(custDate),record});
+      showToast(_editingVisitIdx>=0?'Visit updated ✓':'Visit saved ✓');
+      closeVisitModal();
+      resetVisitForm();
+      // Always reload from sheet to get accurate data (avoids duplicates/stale state)
+      await loadVisitsForDate();
+      renderVisits();
+    }finally{hideLoading();}
+  }
+}
+
+function resetVisitForm(){
+  ['c-name','c-phone','c-time','c-amt','c-notes','c-mem-hours','c-member-code'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('c-dur').value='60'; // reset duration to default
+  // Reset membership toggle
+  const cb = document.getElementById('c-is-member');
+  cb.checked = false;
+  document.getElementById('c-member-track').style.background = 'var(--bg3)';
+  document.getElementById('c-member-thumb').style.left = '3px';
+  document.getElementById('member-lookup-section').classList.add('hidden');
+  document.getElementById('regular-visit-fields').style.opacity = '1';
+  document.getElementById('regular-visit-fields').style.pointerEvents = '';
+  document.getElementById('visit-member-info').classList.add('hidden');
+  document.getElementById('member-hours-row').style.display = 'none';
+  document.getElementById('c-pay').value = 'Cash';
+  visitMemberData = null;
+  // Reset therapist picker
+  const picker = document.getElementById('therapist-picker');
+  picker.querySelectorAll('.therapist-picker-row:not(:first-child)').forEach(r=>r.remove());
+  document.getElementById('c-therapist-1').value = '';
+  document.getElementById('add-therapist-btn').classList.remove('hidden');
+  // Reset edit state
+  _editingVisitIdx = -1;
+  const header = document.querySelector('#modal-visit .sheet-header h3');
+  if(header) header.textContent = 'Add customer visit';
+}
+
+// ── SAVE EXPENSE ──
+function openExpModal(){
+  const isOwner=role==='owner';
+  document.getElementById('exp-branch-row').classList.toggle('hidden',!isOwner);
+  if(isOwner)document.getElementById('e-branch').value=(branch==='both')?'indiranagar':branch;
+  document.getElementById('modal-exp').classList.add('open');
+}
+
+async function saveExpense(){
+  const desc=document.getElementById('e-desc').value.trim();
+  const amt=parseFloat(document.getElementById('e-amt').value);
+  if(!desc){alert('Please enter description');return;}
+  if(isNaN(amt) || amt < 0){alert('Please enter a valid amount (must be 0 or more)');return;}
+  const isOwner=role==='owner';
+  const targetBranch=isOwner?document.getElementById('e-branch').value:branch;
+  const record={desc,cat:document.getElementById('e-cat').value,vendor:document.getElementById('e-vendor').value.trim(),amt,paid:document.getElementById('e-paid').value,receipt:document.getElementById('e-receipt').value.trim(),addedBy:isOwner?'owner':'receptionist'};
+  showLoading(_editingExpenseIdx>=0?'Updating expense...':'Saving expense...');
+  try{
+    // If editing, delete old row first
+    if(_editingExpenseIdx>=0){
+      const editBr=(branch==='both')?(liveExpenses[_editingExpenseIdx]._br||'indiranagar'):branch;
+      await sheetsPost({type:'deleteExpense', branch:editBr, rowIndex:_editingExpenseIdx});
+    }
+    const branches=targetBranch==='both'?['indiranagar','koramangala']:[targetBranch];
+    for(const br of branches)await sheetsPost({type:'expense',branch:br,date:dk(expDate),record:{...record,shared:targetBranch==='both'}});
+    showToast(_editingExpenseIdx>=0?'Expense updated ✓':'Expense saved ✓');
+    // Add to local list immediately
+    if(_editingExpenseIdx>=0){ liveExpenses.splice(_editingExpenseIdx,1); }
+    liveExpenses.push({'Description':record.desc,'Category':record.cat,'Vendor':record.vendor,'Amount (Rs)':record.amt,'Paid By':record.paid,'Receipt No':record.receipt,'Date':dk(expDate),'Branch':targetBranch==='both'?'Both':targetBranch,'Shared':targetBranch==='both'?'Yes':'No','Added By':record.addedBy});
+    closeExpModal();
+    ['e-desc','e-vendor','e-amt','e-receipt'].forEach(id=>document.getElementById(id).value='');
+    _editingExpenseIdx=-1;
+    const header=document.querySelector('#modal-exp .sheet-header h3');if(header)header.textContent='Add expense';
+    renderExpenses(); // Show immediately
+    loadExpensesForDate().then(()=>renderExpenses()); // Refresh from sheet in background
+  }finally{hideLoading();}
+}
+
+// ── MEMBERSHIPS ──
+function genCode(br){
+  const prefix=br==='indiranagar'?'IND':'KOR';
+  const existing=liveMemberships.filter(m=>(m['Code']||m.code||'').startsWith(prefix)).map(m=>parseInt((m['Code']||m.code||'').split('-')[1])||0);
+  let num;do{num=Math.floor(100+Math.random()*900);}while(existing.includes(num));
+  return prefix+'-'+num;
+}
+
+function openMemModal(){
+  document.getElementById('modal-mem').classList.add('open');
+  const d=new Date();
+  d.setMonth(d.getMonth()+6);
+  document.getElementById('m-expiry').value=localDateStr(d);
+}
+function closeMemModal(){document.getElementById('modal-mem').classList.remove('open');}
+
+async function saveMembership(){
+  const name=document.getElementById('m-name').value.trim();
+  const phone=document.getElementById('m-phone').value.trim();
+  const hours=parseFloat(document.getElementById('m-hours').value);
+  const amt=parseFloat(document.getElementById('m-amt').value);
+  if(!name||!phone){alert('Please enter name and phone');return;}
+  if(isNaN(hours)||hours<=0){alert('Please enter valid total hours (greater than 0)');return;}
+  if(isNaN(amt)||amt<=0){alert('Please enter valid amount (greater than 0)');return;}
+  const br=(branch==='both')?'indiranagar':branch;
+  const code=genCode(br);
+  const record={code,name,phone,totalHours:hours,usedHours:0,amt,pay:document.getElementById('m-pay').value,expiry:document.getElementById('m-expiry').value,notes:document.getElementById('m-notes').value.trim(),branch:br,createdAt:localDateStr(new Date())};
+  showLoading('Creating membership...');
+  try{
+    await sheetsPost({type:'membership',branch:br,date:localDateStr(new Date()),record});
+    showToast('Membership '+code+' created ✓');
+    closeMemModal();
+    ['m-name','m-phone','m-hours','m-amt','m-notes'].forEach(id=>document.getElementById(id).value='');
+    await loadMemberships();renderMemberships();
+  }finally{hideLoading();}
+}
+
+function openUseModal(code,br){
+  _useCode=code;_useBranch=br;
+  document.getElementById('lookup-code').value=code||'';
+  document.getElementById('member-info-box').classList.add('hidden');
+  document.getElementById('use-hours-fields').classList.add('hidden');
+  document.getElementById('use-hours-btn').style.display='none';
+  document.getElementById('modal-use-hours').classList.add('open');
+  if(code)lookupMember();
+}
+function closeUseModal(){document.getElementById('modal-use-hours').classList.remove('open');_useCode=null;_useBranch=null;['u-therapist','u-time','u-hours','u-notes'].forEach(id=>document.getElementById(id).value='');}
+
+function lookupMember(){
+  const code=document.getElementById('lookup-code').value.trim().toUpperCase();
+  const found=liveMemberships.find(m=>(m['Code']||m.code||'')=== code);
+  const infoBox=document.getElementById('member-info-box');
+  const fields=document.getElementById('use-hours-fields');
+  const btn=document.getElementById('use-hours-btn');
+  if(!found){infoBox.style.cssText='background:var(--red-l);border:1px solid var(--red);border-radius:12px;padding:14px;margin-bottom:14px';infoBox.innerHTML='<div style="font-weight:700;color:var(--red)">Code not found</div><div style="font-size:13px;color:var(--text2);margin-top:4px">Please check the membership code.</div>';infoBox.classList.remove('hidden');fields.classList.add('hidden');btn.style.display='none';return;}
+  _useCode=code;
+  const foundBr=(found['Branch']||found.branch||branch).toLowerCase();
+  _useBranch=foundBr;
+  const total=+(found['Total Hours']||found.totalHours)||0;
+  const used=+(found['Used Hours']||found.usedHours)||0;
+  const remaining=total-used;
+  const isExpired=(found['Expiry']&&new Date(found['Expiry'])<new Date())||remaining<=0;
+  const visitingBranch=(branch==='both')?foundBr:branch;
+  const crossBranch=visitingBranch!==foundBr;
+  infoBox.style.cssText=(isExpired?'background:var(--red-l);border:1px solid var(--red)':'background:var(--teal-l);border:1px solid var(--teal)')+';border-radius:12px;padding:14px;margin-bottom:14px';
+  infoBox.classList.remove('hidden');
+  infoBox.innerHTML=`<div style="font-size:16px;font-weight:700">${found['Customer Name']||found.name||''} — ${code}</div><div style="font-size:13px;color:var(--text2);margin-top:4px">${isExpired?'⚠️ Expired or hours exhausted':'<b>'+remaining.toFixed(1)+' hrs remaining</b> of '+total+' hrs'}</div><div style="font-size:12px;color:var(--text2);margin-top:6px">Home branch: <b>${BRANCH_LABELS[foundBr]||foundBr}</b>${crossBranch?' → Visiting: <b>'+BRANCH_LABELS[visitingBranch]+'</b> <span class="badge b-blue" style="font-size:10px">Cross-branch</span>':''}</div>`;
+  if(!isExpired){fields.classList.remove('hidden');btn.style.display='';}
+}
+
+async function useHours(){
+  if(!_useCode||!_useBranch)return;
+  const hrs=parseFloat(document.getElementById('u-hours').value);
+  if(!hrs||hrs<=0){alert('Please enter hours to deduct');return;}
+  const mem=liveMemberships.find(m=>(m['Code']||m.code||'')=== _useCode);
+  if(!mem){alert('Membership not found');return;}
+  const total=+(mem['Total Hours']||mem.totalHours)||0;
+  const used=+(mem['Used Hours']||mem.usedHours)||0;
+  const remaining=total-used;
+  if(hrs>remaining){alert('Only '+remaining.toFixed(1)+' hours remaining');return;}
+  const visitBranch=(branch==='both')?_useBranch:branch;
+  const crossBranch=visitBranch!==_useBranch;
+  const visitRecord={name:mem['Customer Name']||mem.name||'',phone:mem['Phone']||mem.phone||'',service:document.getElementById('u-service').value,therapist:document.getElementById('u-therapist').value.trim(),time:document.getElementById('u-time').value,dur:Math.round(hrs*60),pay:'Package / Membership',amt:0,status:document.getElementById('u-status').value,notes:'Member: '+_useCode+(crossBranch?' (Home: '+BRANCH_LABELS[_useBranch]+')':'')+(document.getElementById('u-notes').value?' | '+document.getElementById('u-notes').value:''),memberCode:_useCode};
+  const newUsed=parseFloat((used+hrs).toFixed(2));
+  showLoading('Recording visit...');
+  try{
+    await sheetsPost({type:'visit',branch:visitBranch,date:dk(custDate),record:visitRecord});
+    await sheetsPost({type:'updateMembership',branch:_useBranch,date:dk(custDate),record:{code:_useCode,branch:_useBranch,usedHours:newUsed}});
+    showToast(hrs+' hrs deducted from '+_useCode+'. '+(total-newUsed).toFixed(1)+' remaining'+(crossBranch?' (cross-branch ✓)':' ✓'));
+    closeUseModal();
+    await loadMemberships();renderMemberships();
+    if(currentTab==='customers'){await loadVisitsForDate();renderVisits();}
+  }finally{hideLoading();}
+}
+
+// ── DELETE ──
+async function deleteVisit(i){
+  if(!confirm('Remove this visit?'))return;
+  const v=liveVisits.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(custDate);})[i];
+  if(!v){showToast('Could not find visit to remove',false);return;}
+  const br=(branch==='both')?(v._br||'indiranagar'):branch;
+  showLoading('Removing...');
+  try{
+    // Pass timestamp so Apps Script can find exact row
+    await sheetsPost({type:'deleteVisit',branch:br,timestamp:v['Timestamp']||'',rowIndex:i});
+    await loadVisitsForDate();renderVisits();
+    showToast('Visit removed ✓');
+  }finally{hideLoading();}
+}
+
+async function deleteExpense(i){
+  if(!confirm('Remove this expense?'))return;
+  const e=liveExpenses.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(expDate);})[i];
+  if(!e){showToast('Could not find expense to remove',false);return;}
+  const br=(branch==='both')?(e._br||'indiranagar'):branch;
+  showLoading('Removing...');
+  try{
+    await sheetsPost({type:'deleteExpense',branch:br,timestamp:e['Timestamp']||'',rowIndex:i});
+    await loadExpensesForDate();renderExpenses();
+    showToast('Expense removed ✓');
+  }finally{hideLoading();}
+}
+
+// ── THERAPISTS ──
+function updateToggle(){const checked=document.getElementById('t-interbranch').checked;const track=document.getElementById('t-interbranch-track');const thumb=document.getElementById('t-interbranch-thumb');if(track)track.style.background=checked?'#1D9E75':'var(--bg3)';if(thumb)thumb.style.left=checked?'23px':'3px';}
+
+function openTherapistModal(){previewTherapistId();const cb=document.getElementById('t-interbranch');if(cb){cb.checked=false;updateToggle();}document.getElementById('modal-therapist').classList.add('open');}
+function closeTherapistModal(){document.getElementById('modal-therapist').classList.remove('open');}
+
+function genTherapistId(br){
+  const prefix=br==='indiranagar'?'IND-T':'KOR-T';
+  const existing=liveTherapists.filter(t=>(t['ID']||t.id||'').startsWith(prefix)).map(t=>parseInt((t['ID']||t.id||'').replace(prefix,''))||0);
+  const next=existing.length?Math.max(...existing)+1:1;
+  return prefix+String(next).padStart(3,'0');
+}
+
+function previewTherapistId(){const br=document.getElementById('t-branch')?.value||'indiranagar';const id=genTherapistId(br);const el=document.getElementById('t-id-preview');if(el)el.innerHTML='Auto-generated ID: <b style="color:var(--teal);font-size:15px;letter-spacing:1px">'+id+'</b>';}
+
+async function saveTherapist(){
+  const name=document.getElementById('t-name').value.trim();
+  if(!name){alert('Please enter therapist name');return;}
+  const br=document.getElementById('t-branch').value;
+  const id=genTherapistId(br);
+  const newTherapist={id,name,spec:document.getElementById('t-spec').value.trim(),branch:br,interbranch:document.getElementById('t-interbranch').checked,phone:document.getElementById('t-phone').value.trim()};
+  liveTherapists.push(newTherapist);
+  showLoading('Saving therapist...');
+  try{
+    await sheetsPost({type:'saveTherapists',therapists:liveTherapists});
+    cacheTherapists(liveTherapists); // Cache so all devices can read
+    showToast('Therapist '+name+' added — '+id+' ✓');
+    closeTherapistModal();
+    ['t-name','t-spec','t-phone'].forEach(i=>document.getElementById(i).value='');
+    const cb=document.getElementById('t-interbranch');if(cb){cb.checked=false;updateToggle();}
+    renderTherapists();
+  }catch(e){
+    showToast('Failed to save — please try again',false);
+    liveTherapists.pop();
+  }finally{hideLoading();}
+}
+
+function setTherapistBranch(br,btn){therapistFilterBranch=br;document.querySelectorAll('[id^="tbr-"]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTherapists();}
+
+function renderTherapists(){
+  const all=liveTherapists;
+  const list=therapistFilterBranch==='both'?all:all.filter(t=>(t['Branch']||t.branch||'')=== therapistFilterBranch||(t['Inter-branch']||t.interbranch)==='true'||t.interbranch===true);
+  const el=document.getElementById('therapist-list');
+  if(!el)return;
+  if(!list.length){el.innerHTML='<div class="empty-state"><div class="empty-icon" style="font-size:28px">💆</div><div class="empty-title">No therapists added yet</div><div class="empty-sub">Tap + Add to register a therapist</div></div>';return;}
+  el.innerHTML=list.map(t=>{
+    const id=t['ID']||t.id||'';const name=t['Name']||t.name||'';const tbr=(t['Branch']||t.branch||'indiranagar').toLowerCase();
+    const ib=(t['Inter-branch']||t.interbranch)==='true'||t.interbranch===true;
+    const spec=t['Specialisation']||t.spec||'';
+    const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const brColor=tbr==='indiranagar'?TEAL:BLUE;
+    const origIdx=liveTherapists.findIndex(x=>(x['ID']||x.id)===id);
+    return '<div class="therapist-card">'
+      +'<div class="therapist-avatar" style="background:'+brColor+'22;color:'+brColor+'">'+initials+'</div>'
+      +'<div class="therapist-body"><div class="therapist-name">'+name+'</div>'
+      +'<div class="therapist-meta"><span style="font-size:13px;font-weight:700;letter-spacing:1px;color:var(--teal)">'+id+'</span>'
+      +' · <span class="badge '+(tbr==='indiranagar'?'b-teal':'b-blue')+'" style="font-size:11px">'+BRANCH_LABELS[tbr]+'</span>'
+      +(ib?' <span class="badge b-purple" style="font-size:11px">Inter-branch ✦</span>':'')
+      +(spec?' · '+spec:'')+'</div></div>'
+      +'<button class="btn danger" onclick="deleteTherapist('+origIdx+')">✕</button></div>';
+  }).join('');
+}
+
+async function deleteTherapist(idx){
+  if(!confirm('Remove this therapist?'))return;
+  liveTherapists.splice(idx,1);
+  showLoading('Removing...');
+  try{
+    await sheetsPost({type:'saveTherapists',therapists:liveTherapists});
+    cacheTherapists(liveTherapists); // Update cache
+    renderTherapists();
+  }finally{hideLoading();}
+}
+
+// ── ATTENDANCE ──
+let localAttStatus={};
+
+function renderAttendance(){
+  const br=(branch==='both')?'indiranagar':branch;
+  document.getElementById('att-date-lbl').textContent=fmt(attDate);
+  const therapists=liveTherapists.filter(t=>(t['Branch']||t.branch||'').toLowerCase()===br||(t['Inter-branch']||t.interbranch)==='true'||t.interbranch===true);
+  // Build status map from loaded attendance
+  localAttStatus={};
+  liveAttendance.forEach(a=>{if(a['Therapist ID']||a.id)localAttStatus[a['Therapist ID']||a.id]=a['Status']||a.status||'';});
+  const present=Object.values(localAttStatus).filter(s=>s==='P').length;
+  const half=Object.values(localAttStatus).filter(s=>s==='H').length;
+  const absent=Object.values(localAttStatus).filter(s=>s==='A').length;
+  document.getElementById('att-summary').innerHTML=
+    '<div class="att-sum-card"><div class="att-sum-val" style="color:'+TEAL+'">'+present+'</div><div class="att-sum-lbl">Present</div></div>'
+    +'<div class="att-sum-card"><div class="att-sum-val" style="color:'+AMBER+'">'+half+'</div><div class="att-sum-lbl">Half day</div></div>'
+    +'<div class="att-sum-card"><div class="att-sum-val" style="color:'+RED+'">'+absent+'</div><div class="att-sum-lbl">Absent</div></div>';
+  const el=document.getElementById('att-list');
+  if(!el)return;
+  if(!therapists.length){el.innerHTML='<div class="empty-state"><div class="empty-icon" style="font-size:28px">💆</div><div class="empty-title">No therapists registered</div><div class="empty-sub">Ask the owner to add therapists first</div></div>';return;}
+  el.innerHTML=therapists.map(t=>{
+    const id=t['ID']||t.id||'';const name=t['Name']||t.name||'';const spec=t['Specialisation']||t.spec||'';
+    const ib=(t['Inter-branch']||t.interbranch)==='true'||t.interbranch===true;
+    const tbr=(t['Branch']||t.branch||'indiranagar').toLowerCase();
+    const status=localAttStatus[id]||'';
+    const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const brColor=tbr==='indiranagar'?TEAL:BLUE;
+    return '<div class="att-card">'
+      +'<div class="att-avatar" style="background:'+brColor+'22;color:'+brColor+'">'+initials+'</div>'
+      +'<div class="att-body"><div class="att-name">'+name+'</div>'
+      +'<div class="att-meta">'+id+(ib?' · <span class="badge b-purple" style="font-size:10px">Inter-branch</span>':'')+(spec?' · '+spec:'')+'</div></div>'
+      +'<div class="att-btns">'
+      +'<button class="att-btn'+(status==='P'?' sel-P':'')+'" data-tid="'+id+'" data-status="P" onclick="markAtt(\''+id+'\',\'P\')">P</button>'
+      +'<button class="att-btn'+(status==='H'?' sel-H':'')+'" data-tid="'+id+'" data-status="H" onclick="markAtt(\''+id+'\',\'H\')">H</button>'
+      +'<button class="att-btn'+(status==='A'?' sel-A':'')+'" data-tid="'+id+'" data-status="A" onclick="markAtt(\''+id+'\',\'A\')">A</button>'
+      +'</div></div>';
+  }).join('');
+}
+
+function markAtt(tid,status){
+  localAttStatus[tid]=status;
+  document.querySelectorAll('.att-btn[data-tid="'+tid+'"]').forEach(btn=>{
+    const s=btn.dataset.status;btn.className='att-btn'+(status===s?' sel-'+s:'');
+  });
+  // Update summary
+  const present=Object.values(localAttStatus).filter(s=>s==='P').length;
+  const half=Object.values(localAttStatus).filter(s=>s==='H').length;
+  const absent=Object.values(localAttStatus).filter(s=>s==='A').length;
+  document.getElementById('att-summary').innerHTML=
+    '<div class="att-sum-card"><div class="att-sum-val" style="color:'+TEAL+'">'+present+'</div><div class="att-sum-lbl">Present</div></div>'
+    +'<div class="att-sum-card"><div class="att-sum-val" style="color:'+AMBER+'">'+half+'</div><div class="att-sum-lbl">Half day</div></div>'
+    +'<div class="att-sum-card"><div class="att-sum-val" style="color:'+RED+'">'+absent+'</div><div class="att-sum-lbl">Absent</div></div>';
+  refreshTherapistPicker();
+}
+
+async function saveAttendance(){
+  const br=(branch==='both')?'indiranagar':branch;
+  const records=liveTherapists.filter(t=>(t['Branch']||t.branch||'').toLowerCase()===br||(t['Inter-branch']||t.interbranch)==='true'||t.interbranch===true).map(t=>({id:t['ID']||t.id,name:t['Name']||t.name,status:localAttStatus[t['ID']||t.id]||''})).filter(r=>r.status);
+  showLoading('Saving attendance...');
+  try{
+    await sheetsPost({type:'attendance',branch:br,date:dk(attDate),records});
+    showToast('Attendance saved ✓');
+  }finally{hideLoading();}
+}
+
+// ── THERAPIST PICKER ──
+function getPresentTherapists(br){
+  const all=liveTherapists.filter(t=>(t['Branch']||t.branch||'').toLowerCase()===br||(t['Inter-branch']||t.interbranch)==='true'||t.interbranch===true);
+  const attForToday=liveAttendance;
+  const statusMap={};attForToday.forEach(a=>{statusMap[a['Therapist ID']||a.id]=a['Status']||a.status;});
+  // Also include localAttStatus (just marked but not yet saved)
+  Object.assign(statusMap,localAttStatus);
+  const present=all.filter(t=>statusMap[t['ID']||t.id]==='P'||statusMap[t['ID']||t.id]==='H');
+  return present.length>0?present:all;// fallback to all if no attendance marked
+}
+
+function buildTherapistOptions(br){
+  const present=getPresentTherapists(br);
+  if(!liveTherapists.length)return '<option value="">No therapists added yet</option>';
+  return '<option value="">Select therapist...</option>'+present.map(t=>{
+    const id=t['ID']||t.id||'';const name=t['Name']||t.name||'';
+    const tbr=(t['Branch']||t.branch||'indiranagar').toLowerCase();
+    const ib=(t['Inter-branch']||t.interbranch)==='true'||t.interbranch===true;
+    return '<option value="'+id+'">'+name+' ['+id+']'+(ib&&tbr!==br?' · '+BRANCH_LABELS[tbr]:'')+' </option>';
+  }).join('');
+}
+
+function refreshTherapistPicker(){
+  const br=(branch==='both')?'indiranagar':branch;
+  const opts=buildTherapistOptions(br);
+  document.querySelectorAll('.therapist-picker select').forEach(s=>{const cur=s.value;s.innerHTML=opts;s.value=cur;});
+}
+
+function addTherapistSlot(){
+  const picker=document.getElementById('therapist-picker');
+  if(picker.querySelectorAll('.therapist-picker-row').length>=2){showToast('Max 2 therapists per visit',false);return;}
+  const br=(branch==='both')?'indiranagar':branch;
+  const row=document.createElement('div');row.className='therapist-picker-row';
+  row.innerHTML='<select id="c-therapist-2">'+buildTherapistOptions(br)+'</select><button type="button" class="btn danger" onclick="removeTherapistSlot(this)" style="height:44px;margin-left:4px">✕</button>';
+  picker.appendChild(row);document.getElementById('add-therapist-btn').classList.add('hidden');
+}
+
+function removeTherapistSlot(btn){btn.closest('.therapist-picker-row').remove();document.getElementById('add-therapist-btn').classList.remove('hidden');}
+function getSelectedTherapists(){const vals=[];document.querySelectorAll('.therapist-picker select').forEach(s=>{if(s.value)vals.push(s.value);});return[...new Set(vals)];}
+
+// ── ANALYTICS ──
+function setRange(n,btn){analyticsRange=n;document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderAnalytics();}
+
+function getDays(n){const days=[],today=new Date();for(let i=n-1;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);days.push(d);}return days;}
+
+async function renderAnalytics(){
+  showLoading('Loading analytics...');
+  const days=getDays(analyticsRange);
+  const isBoth=branch==='both';
+  const branches=isBoth?['indiranagar','koramangala']:[branch];
+  const stats={};
+  for(const br of branches){
+    let rev=0,exp=0,visits=0;
+    const svcMap={},expCatMap={},payMap={},dayRevMap={},customerMap={},therapistMap={};
+    for(const d of days){
+      const dstr=dk(d);
+      const res=await sheetsGet({action:'getData',branch:br,date:dstr});
+      if(!res||!res.success)continue;
+      const custs=res.data.visits||[];const exps=res.data.expenses||[];
+      const dRev=custs.filter(r=>(r['Status']||r.status)!=='Cancelled'&&(r['Status']||r.status)!=='No-Show').reduce((s,r)=>s+(+(r['Amount (Rs)']||r.amt)||0),0);
+      rev+=dRev;exp+=exps.reduce((s,r)=>s+(+(r['Amount (Rs)']||r.amt)||0),0);visits+=custs.length;dayRevMap[dstr]=dRev;
+      custs.forEach(c=>{
+        const svc=c['Service']||c.service;if(svc)svcMap[svc]=(svcMap[svc]||0)+1;
+        const pay=c['Payment Mode']||c.pay;if(pay)payMap[pay]=(payMap[pay]||0)+(+(c['Amount (Rs)']||c.amt)||0);
+        if((c['Status']||c.status)!=='Cancelled'&&(c['Status']||c.status)!=='No-Show'){
+          const key=(c['Member Code']||c.memberCode)||(c['Phone']||c.phone)||(c['Customer Name']||c.name);
+          const label=(c['Member Code']||c.memberCode)?((c['Member Code']||c.memberCode)+' ('+(c['Customer Name']||c.name)+')'):((c['Customer Name']||c.name)+((c['Phone']||c.phone)?' · '+(c['Phone']||c.phone):''));
+          if(!customerMap[key])customerMap[key]={label,visits:0,isMember:!!(c['Member Code']||c.memberCode)};
+          customerMap[key].visits++;
+        }
+        const th=c['Therapist']||c.therapist||'';const tIds=th?th.split(' + '):[];
+        tIds.forEach(tid=>{if(!tid)return;if(!therapistMap[tid])therapistMap[tid]={services:0,hrs:0};therapistMap[tid].services++;therapistMap[tid].hrs+=(c['Duration (min)']||c.dur)?(+(c['Duration (min)']||c.dur)/60):0;});
+      });
+      exps.forEach(e=>{const cat=e['Category']||e.cat;if(cat)expCatMap[cat]=(expCatMap[cat]||0)+(+(e['Amount (Rs)']||e.amt)||0);});
+    }
+    const topCustomers=Object.values(customerMap).sort((a,b)=>b.visits-a.visits).slice(0,7);
+    const topTherapists=Object.entries(therapistMap).sort((a,b)=>b[1].services-a[1].services);
+    const dayArr=days.map(d=>({d,rev:dayRevMap[dk(d)]||0}));
+    stats[br]={rev,exp,profit:rev-exp,visits,svcMap,expCatMap,payMap,dayData:dayArr,topCustomers,topTherapists};
+  }
+  hideLoading();
+
+  let html='';
+  const TEAL2='#1D9E75',RED2='#A32D2D',BLUE2='#185FA5';
+
+  if(isBoth){
+    const totalRev=branches.reduce((s,b)=>s+stats[b].rev,0);
+    const totalExp=branches.reduce((s,b)=>s+stats[b].exp,0);
+    const profit=totalRev-totalExp;const totalVisits=branches.reduce((s,b)=>s+stats[b].visits,0);
+    html+='<div class="kpi-grid"><div class="kpi" style="border-left-color:'+TEAL2+'"><div class="kpi-lbl">Revenue</div><div class="kpi-val" style="color:'+TEAL2+'">&#8377;'+totalRev.toLocaleString('en-IN')+'</div><div class="kpi-sub">Last '+analyticsRange+' days</div></div><div class="kpi" style="border-left-color:'+RED2+'"><div class="kpi-lbl">Expenses</div><div class="kpi-val" style="color:'+RED2+'">&#8377;'+totalExp.toLocaleString('en-IN')+'</div><div class="kpi-sub">Last '+analyticsRange+' days</div></div><div class="kpi" style="border-left-color:'+(profit>=0?TEAL2:RED2)+'"><div class="kpi-lbl">Net profit</div><div class="kpi-val" style="color:'+(profit>=0?TEAL2:RED2)+'">&#8377;'+profit.toLocaleString('en-IN')+'</div><div class="kpi-sub">'+(profit>=0?'Profit':'Loss')+'</div></div><div class="kpi" style="border-left-color:'+BLUE2+'"><div class="kpi-lbl">Visits</div><div class="kpi-val" style="color:'+BLUE2+'">'+totalVisits+'</div><div class="kpi-sub">Both branches</div></div></div>';
+    html+='<div class="a-section">Branch comparison</div><div class="a-card"><h4>Revenue vs expenses</h4>';
+    branches.forEach(b=>{const s=stats[b],mx=Math.max(s.rev,s.exp,1);html+='<div class="compare-row"><div class="compare-top"><span class="compare-name" style="color:'+BRANCH_COLOR[b]+'">'+BRANCH_LABELS[b]+'</span><span style="font-size:13px;font-weight:600;color:'+(s.profit>=0?TEAL2:RED2)+'">'+(s.profit>=0?'+':'')+'&#8377;'+s.profit.toLocaleString('en-IN')+'</span></div><div class="compare-bars"><div class="cbar" style="width:'+Math.round((s.rev/mx)*100)+'%;background:'+TEAL2+'"></div><div class="cbar" style="width:'+Math.round((s.exp/mx)*100)+'%;background:'+RED2+'"></div></div><div style="display:flex;gap:14px;margin-top:4px"><span style="font-size:12px;color:'+TEAL2+';font-weight:600">&#8377;'+s.rev.toLocaleString('en-IN')+'</span><span style="font-size:12px;color:'+RED2+';font-weight:600">&#8377;'+s.exp.toLocaleString('en-IN')+'</span></div></div>';});html+='</div>';
+    html+='<div class="a-section">Top customers</div>';
+    branches.forEach(b=>{html+='<div class="a-card"><h4 style="color:'+BRANCH_COLOR[b]+'">'+BRANCH_LABELS[b]+'</h4>'+renderRankList(stats[b].topCustomers,item=>'<span>'+item.visits+'</span><span style="font-size:11px">visit'+(item.visits>1?'s':'')+'</span>',item=>item.isMember?'🎫 Member':'Walk-in')+'</div>';});
+    const combTh={};branches.forEach(b=>stats[b].topTherapists.forEach(([tid,v])=>{if(!combTh[tid])combTh[tid]={services:0,hrs:0};combTh[tid].services+=v.services;combTh[tid].hrs+=v.hrs;}));
+    const combThArr=Object.entries(combTh).sort((a,b)=>b[1].services-a[1].services);
+    html+='<div class="a-section">Therapist performance</div><div class="a-card"><h4>Services completed</h4>';
+    if(combThArr.length){const mx=Math.max(...combThArr.map(([,v])=>v.services),1);html+=combThArr.map(([tid,v])=>{const t=liveTherapists.find(x=>(x['ID']||x.id)===tid);const nm=t?(t['Name']||t.name):tid;const tbr=t?((t['Branch']||t.branch||'indiranagar').toLowerCase()):'indiranagar';const ib=t&&((t['Inter-branch']||t.interbranch)==='true'||t.interbranch===true);return'<div class="bar-row"><div class="bar-label" title="'+nm+'">'+nm+'</div><div class="bar-track"><div class="bar-fill" style="width:'+Math.round((v.services/mx)*100)+'%;background:'+TEAL2+'"></div></div><div class="bar-val">'+v.services+' <span class="badge '+(tbr==='indiranagar'?'b-teal':'b-blue')+'" style="font-size:10px">'+BRANCH_LABELS[tbr]+(ib?' ✦':'')+'</span></div></div>';}).join('');}
+    else html+='<div class="no-data">No therapist data yet</div>';
+    html+='</div>';
+  } else {
+    const s=stats[branch];const col=BRANCH_COLOR[branch];
+    const maxRev=Math.max(...s.dayData.map(d=>d.rev),1);
+    const top=Object.entries(s.svcMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+    const topExp=Object.entries(s.expCatMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const maxSvc=Math.max(...Object.values(s.svcMap),1);const maxExp=Math.max(...Object.values(s.expCatMap),1);
+    html+='<div class="kpi-grid"><div class="kpi" style="border-left-color:'+TEAL2+'"><div class="kpi-lbl">Revenue</div><div class="kpi-val" style="color:'+TEAL2+'">&#8377;'+s.rev.toLocaleString('en-IN')+'</div><div class="kpi-sub">Last '+analyticsRange+' days</div></div><div class="kpi" style="border-left-color:'+RED2+'"><div class="kpi-lbl">Expenses</div><div class="kpi-val" style="color:'+RED2+'">&#8377;'+s.exp.toLocaleString('en-IN')+'</div><div class="kpi-sub">Last '+analyticsRange+' days</div></div><div class="kpi" style="border-left-color:'+(s.profit>=0?TEAL2:RED2)+'"><div class="kpi-lbl">Net profit</div><div class="kpi-val" style="color:'+(s.profit>=0?TEAL2:RED2)+'">&#8377;'+s.profit.toLocaleString('en-IN')+'</div><div class="kpi-sub">'+(s.profit>=0?'Profit':'Loss')+'</div></div><div class="kpi" style="border-left-color:'+BLUE2+'"><div class="kpi-lbl">Visits</div><div class="kpi-val" style="color:'+BLUE2+'">'+s.visits+'</div><div class="kpi-sub">Avg &#8377;'+(s.visits?Math.round(s.rev/s.visits).toLocaleString('en-IN'):0)+'/visit</div></div></div>';
+    html+='<div class="a-card"><h4>Daily revenue</h4><div class="day-chart">'+s.dayData.map(({d,rev})=>'<div class="dbar-wrap"><div class="dbar" style="height:'+Math.round((rev/maxRev)*72)+'px;background:'+(rev>0?col:'var(--bg2)')+'"></div><div class="dbar-lbl">'+d.getDate()+'</div></div>').join('')+'</div>'+(s.dayData.every(d=>d.rev===0)?'<div class="no-data" style="text-align:center;margin-top:8px">Enter visit data to see chart</div>':'')+'</div>';
+    html+='<div class="a-section">Top customers</div><div class="a-card"><h4>By visits</h4>'+renderRankList(s.topCustomers,item=>'<span>'+item.visits+'</span><span style="font-size:11px">visit'+(item.visits>1?'s':'')+'</span>',item=>item.isMember?'🎫 Member':'Walk-in')+'</div>';
+    html+='<div class="a-section">Therapist performance</div><div class="a-card"><h4>Services completed</h4>';
+    if(s.topTherapists.length){const mx=Math.max(...s.topTherapists.map(([,v])=>v.services),1);html+=s.topTherapists.map(([tid,v])=>{const t=liveTherapists.find(x=>(x['ID']||x.id)===tid);const nm=t?(t['Name']||t.name):tid;const hrs=v.hrs>0?' · '+v.hrs.toFixed(1)+' hrs':'';const ib=t&&((t['Inter-branch']||t.interbranch)==='true'||t.interbranch===true);return'<div class="bar-row"><div class="bar-label" title="'+nm+'">'+nm+'</div><div class="bar-track"><div class="bar-fill" style="width:'+Math.round((v.services/mx)*100)+'%;background:'+col+'"></div></div><div class="bar-val">'+v.services+(ib?' <span class="badge b-purple" style="font-size:10px">Inter-branch</span>':'')+'</div></div><div style="font-size:11px;color:var(--text3);text-align:right;margin:-5px 0 5px">'+nm+hrs+'</div>';}).join('');}
+    else html+='<div class="no-data">Select therapists when logging visits</div>';
+    html+='</div>';
+    html+='<div class="a-card"><h4>Top services</h4>'+(top.length?top.map(([n,c])=>'<div class="bar-row"><div class="bar-label" title="'+n+'">'+n+'</div><div class="bar-track"><div class="bar-fill" style="width:'+Math.round((c/maxSvc)*100)+'%;background:'+col+'"></div></div><div class="bar-val">'+c+'</div></div>').join(''):'<div class="no-data">No visit data yet</div>')+'</div>';
+    html+='<div class="a-card"><h4>Expenses by category</h4>'+(topExp.length?topExp.map(([cat,amt])=>'<div class="bar-row"><div class="bar-label" title="'+cat+'">'+cat+'</div><div class="bar-track"><div class="bar-fill" style="width:'+Math.round((amt/maxExp)*100)+'%;background:'+RED2+'"></div></div><div class="bar-val">&#8377;'+amt.toLocaleString('en-IN')+'</div></div>').join(''):'<div class="no-data">No expense data yet</div>')+'</div>';
+    html+='<div class="a-card"><h4>Payment mode</h4>'+(Object.keys(s.payMap).length?Object.entries(s.payMap).sort((a,b)=>b[1]-a[1]).map(([p,amt])=>'<div class="bar-row"><div class="bar-label">'+p+'</div><div class="bar-track"><div class="bar-fill" style="width:'+Math.round((amt/s.rev)*100)+'%;background:'+BLUE2+'"></div></div><div class="bar-val">&#8377;'+amt.toLocaleString('en-IN')+'</div></div>').join(''):'<div class="no-data">No payment data yet</div>')+'</div>';
+  }
+  document.getElementById('analytics-content').innerHTML=html;
+}
+
+function rankNumEmoji(i){return i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);}
+function renderRankList(items,valFn,subFn){
+  if(!items.length)return'<div class="no-data">No data for this period</div>';
+  return'<div class="rank-list">'+items.map((item,i)=>'<div class="rank-item"><div class="rank-num">'+rankNumEmoji(i)+'</div><div class="rank-body"><div class="rank-name">'+item.label+'</div>'+(subFn?'<div class="rank-sub">'+subFn(item)+'</div>':'')+'</div><div class="rank-val">'+valFn(item)+'</div></div>').join('')+'</div>';
+}
+</script>
+</body>
+</html>
