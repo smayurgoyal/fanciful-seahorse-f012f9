@@ -442,9 +442,44 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
       <div class="form-row"><label>Customer name *</label><input id="m-name" placeholder="e.g. Priya Sharma" autocomplete="off"/></div>
       <div class="form-row"><label>Phone *</label><input id="m-phone" placeholder="9876543210" type="tel" inputmode="numeric"/></div>
       <div class="two-col">
-        <div class="form-row"><label>Total hours *</label><input id="m-hours" type="number" inputmode="numeric" placeholder="10"/></div>
-        <div class="form-row"><label>Amount (&#8377;) *</label><input id="m-amt" type="number" inputmode="numeric" placeholder="5000"/></div>
+        <div class="form-row">
+          <label>Session duration</label>
+          <select id="m-session-dur" onchange="calcMemberHours()">
+            <option value="0.75">45 min</option>
+            <option value="1" selected>60 min</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>No. of sessions</label>
+          <select id="m-sessions" onchange="calcMemberHours()">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+            <option value="14">14</option>
+            <option value="15">15</option>
+            <option value="16">16</option>
+            <option value="17">17</option>
+            <option value="18">18</option>
+            <option value="19">19</option>
+            <option value="20">20</option>
+          </select>
+        </div>
       </div>
+      <div style="background:var(--teal-l);border:1px solid var(--teal);border-radius:10px;padding:10px 14px;font-size:14px;margin-bottom:14px">
+        Total hours: <b id="m-total-hrs-display" style="color:var(--teal)">1.0 hrs</b>
+        <input type="hidden" id="m-hours" value="1"/>
+      </div>
+      <div class="form-row"><label>Amount (&#8377;) *</label><input id="m-amt" type="number" inputmode="numeric" placeholder="5000"/></div>
       <div class="two-col">
         <div class="form-row"><label>Payment mode</label><select id="m-pay"><option>Cash</option><option>UPI</option><option>Card</option><option>Online</option></select></div>
         <div class="form-row"><label>Valid till</label><input id="m-expiry" type="date"/></div>
@@ -1015,9 +1050,15 @@ function renderVisits(){
 function renderExpenses(){
   document.getElementById('exp-date-lbl').textContent=fmt(expDate);
   const todayExpStr=dk(expDate);
-  const list=liveExpenses.filter(r=>{
+  let list=liveExpenses.filter(r=>{
     const d=r['Date']||r.date||'';
-    return !d || d===todayExpStr;
+    if(d && d!==todayExpStr) return false;
+    // Receptionists only see their own entries (not owner entries)
+    if(role!=='owner'){
+      const addedBy=(r['Added By']||r.addedBy||'').toLowerCase();
+      if(addedBy==='owner') return false;
+    }
+    return true;
   });
   const total=list.reduce((s,r)=>s+(+(r['Amount (Rs)']||r.amt)||0),0);
   document.getElementById('exp-metrics').innerHTML=`
@@ -1121,6 +1162,7 @@ function renderMemberships(){
       </div>
       <div class="mem-actions">
         ${!isExpired?`<button class="btn primary sm" onclick="openUseModal('${code}','${memBr}')" style="flex:1;font-weight:600">🕐 Record visit</button>`:''}
+        <button class="btn sm" onclick="openMemModal('${code}')" style="flex:1;font-weight:600">🔄 Renew</button>
       </div>
     </div>`;
   }).join('');
@@ -1267,16 +1309,21 @@ async function saveVisit(){
     showLoading(_editingVisitIdx>=0?'Updating visit...':'Saving visit...');
     try{
       if(_editingVisitIdx>=0){
-        // Edit: delete old row from sheet using timestamp for accuracy
-        const oldVisit=liveVisits.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(custDate);})[_editingVisitIdx];
+        const filtered=liveVisits.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(custDate);});
+        const oldVisit=filtered[_editingVisitIdx];
         const editBr=(branch==='both')?((oldVisit&&oldVisit._br)||'indiranagar'):branch;
-        await sheetsPost({type:'deleteVisit',branch:editBr,timestamp:oldVisit&&oldVisit['Timestamp']||'',rowIndex:_editingVisitIdx});
+        const ts=oldVisit&&oldVisit['Timestamp']||'';
+        const custName=oldVisit&&(oldVisit['Customer Name']||oldVisit.name)||'';
+        // Delete old row and wait 1.5s for Sheets to process before adding new
+        await sheetsPost({type:'deleteVisit',branch:editBr,timestamp:ts,custName:custName,date:dk(custDate),rowIndex:_editingVisitIdx});
+        await new Promise(r=>setTimeout(r,1500));
       }
       await sheetsPost({type:'visit',branch:br,date:dk(custDate),record});
       showToast(_editingVisitIdx>=0?'Visit updated ✓':'Visit saved ✓');
       closeVisitModal();
       resetVisitForm();
-      // Always reload from sheet to get accurate data (avoids duplicates/stale state)
+      // Wait a moment then reload to get clean data from sheet
+      await new Promise(r=>setTimeout(r,1000));
       await loadVisitsForDate();
       renderVisits();
     }finally{hideLoading();}
@@ -1357,13 +1404,39 @@ function genCode(br){
   return prefix+'-'+num;
 }
 
-function openMemModal(){
-  document.getElementById('modal-mem').classList.add('open');
-  const d=new Date();
-  d.setMonth(d.getMonth()+6);
-  document.getElementById('m-expiry').value=localDateStr(d);
+function calcMemberHours(){
+  const dur=parseFloat(document.getElementById('m-session-dur').value)||1;
+  const sessions=parseInt(document.getElementById('m-sessions').value)||1;
+  const total=parseFloat((dur*sessions).toFixed(2));
+  document.getElementById('m-hours').value=total;
+  document.getElementById('m-total-hrs-display').textContent=total.toFixed(2)+' hrs ('+sessions+' × '+(dur===0.75?'45min':'60min')+')';
 }
-function closeMemModal(){document.getElementById('modal-mem').classList.remove('open');}
+
+function openMemModal(renewCode){
+  document.getElementById('modal-mem').classList.add('open');
+  const d=new Date();d.setMonth(d.getMonth()+6);
+  document.getElementById('m-expiry').value=localDateStr(d);
+  calcMemberHours();
+  // Pre-fill name/phone if renewing
+  if(renewCode){
+    const mem=liveMemberships.find(m=>(m['Code']||m.code||'')===renewCode);
+    if(mem){
+      document.getElementById('m-name').value=mem['Customer Name']||mem.name||'';
+      document.getElementById('m-phone').value=mem['Phone']||mem.phone||'';
+      document.querySelector('#modal-mem .sheet-header h3').textContent='Renew membership';
+      document.getElementById('m-notes').value='Renewal of '+renewCode;
+    }
+  } else {
+    document.querySelector('#modal-mem .sheet-header h3').textContent='Create membership';
+  }
+}
+function closeMemModal(){
+  document.getElementById('modal-mem').classList.remove('open');
+  ['m-name','m-phone','m-amt','m-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('m-sessions').value='1';
+  document.getElementById('m-session-dur').value='1';
+  calcMemberHours();
+}
 
 async function saveMembership(){
   const name=document.getElementById('m-name').value.trim();
@@ -1447,27 +1520,35 @@ async function useHours(){
 // ── DELETE ──
 async function deleteVisit(i){
   if(!confirm('Remove this visit?'))return;
-  const v=liveVisits.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(custDate);})[i];
+  const filtered=liveVisits.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(custDate);});
+  const v=filtered[i];
   if(!v){showToast('Could not find visit to remove',false);return;}
   const br=(branch==='both')?(v._br||'indiranagar'):branch;
   showLoading('Removing...');
   try{
-    // Pass timestamp so Apps Script can find exact row
-    await sheetsPost({type:'deleteVisit',branch:br,timestamp:v['Timestamp']||'',rowIndex:i});
-    await loadVisitsForDate();renderVisits();
+    const ts=v['Timestamp']||v.timestamp||'';
+    const custName=v['Customer Name']||v.name||'';
+    const dateStr=v['Date']||dk(custDate);
+    await sheetsPost({type:'deleteVisit',branch:br,timestamp:ts,custName:custName,date:dateStr,rowIndex:i});
+    await loadVisitsForDate();
+    renderVisits();
     showToast('Visit removed ✓');
   }finally{hideLoading();}
 }
 
 async function deleteExpense(i){
   if(!confirm('Remove this expense?'))return;
-  const e=liveExpenses.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(expDate);})[i];
+  const filtered=liveExpenses.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(expDate);});
+  const e=filtered[i];
   if(!e){showToast('Could not find expense to remove',false);return;}
   const br=(branch==='both')?(e._br||'indiranagar'):branch;
   showLoading('Removing...');
   try{
-    await sheetsPost({type:'deleteExpense',branch:br,timestamp:e['Timestamp']||'',rowIndex:i});
-    await loadExpensesForDate();renderExpenses();
+    const ts=e['Timestamp']||e.timestamp||'';
+    const desc=e['Description']||e.desc||'';
+    await sheetsPost({type:'deleteExpense',branch:br,timestamp:ts,desc:desc,rowIndex:i});
+    await loadExpensesForDate();
+    renderExpenses();
     showToast('Expense removed ✓');
   }finally{hideLoading();}
 }
