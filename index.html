@@ -1303,26 +1303,25 @@ async function saveVisit(){
       therapists, therapist: therapists.join(' + '),
       time: document.getElementById('c-time').value,
       dur, pay: document.getElementById('c-pay').value,
-      amt, status: document.getElementById('c-status').value,
+      amt, status: 'Confirmed',
       notes: document.getElementById('c-notes').value.trim()
     };
     showLoading(_editingVisitIdx>=0?'Updating visit...':'Saving visit...');
     try{
       if(_editingVisitIdx>=0){
+        // UPDATE in place — single operation, no duplicate risk
         const filtered=liveVisits.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(custDate);});
         const oldVisit=filtered[_editingVisitIdx];
         const editBr=(branch==='both')?((oldVisit&&oldVisit._br)||'indiranagar'):branch;
-        const ts=oldVisit&&oldVisit['Timestamp']||'';
-        const custName=oldVisit&&(oldVisit['Customer Name']||oldVisit.name)||'';
-        // Delete old row and wait 1.5s for Sheets to process before adding new
-        await sheetsPost({type:'deleteVisit',branch:editBr,timestamp:ts,custName:custName,date:dk(custDate),rowIndex:_editingVisitIdx});
-        await new Promise(r=>setTimeout(r,1500));
+        const ts=(oldVisit&&oldVisit['Timestamp'])||'';
+        const custName=(oldVisit&&(oldVisit['Customer Name']||oldVisit.name))||'';
+        await sheetsPost({type:'updateVisit',branch:editBr,timestamp:ts,custName:custName,date:dk(custDate),record});
+      } else {
+        await sheetsPost({type:'visit',branch:br,date:dk(custDate),record});
       }
-      await sheetsPost({type:'visit',branch:br,date:dk(custDate),record});
       showToast(_editingVisitIdx>=0?'Visit updated ✓':'Visit saved ✓');
       closeVisitModal();
       resetVisitForm();
-      // Wait a moment then reload to get clean data from sheet
       await new Promise(r=>setTimeout(r,1000));
       await loadVisitsForDate();
       renderVisits();
