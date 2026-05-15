@@ -231,6 +231,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     <button class="o-tab" id="otab-expenses" onclick="showTab('expenses')">Expenses</button>
     <button class="o-tab" id="otab-therapists" onclick="showTab('therapists')">Therapists</button>
     <button class="o-tab" id="otab-analytics" onclick="showTab('analytics')">Analytics</button>
+    <button class="o-tab" id="otab-clients" onclick="showTab('clients')">Call List</button>
   </div>
   <div class="content">
     <div class="section active" id="tab-customers">
@@ -293,7 +294,41 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
       </div>
       <div class="therapist-list" id="therapist-list"></div>
     </div>
-    <div class="section" id="tab-analytics">
+    <div class="section" id="tab-clients">
+      <div class="toolbar">
+        <span style="font-size:15px;font-weight:700">📞 Call List</span>
+        <button class="btn sm" onclick="loadClients()" style="font-size:12px">⟳ Refresh</button>
+      </div>
+
+      <!-- MESSAGE TEMPLATE BOX -->
+      <div id="wa-template-box" style="background:var(--teal-l);border:1.5px solid var(--teal);border-radius:14px;padding:14px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:700;color:var(--teal-d)">💬 WhatsApp Message Template</div>
+          <button class="btn sm" onclick="toggleTemplateEdit()" id="template-edit-btn" style="font-size:12px;height:30px;padding:0 10px">Edit</button>
+        </div>
+        <div id="template-preview" style="font-size:13px;color:var(--text);line-height:1.6;white-space:pre-wrap;word-break:break-word"></div>
+        <div id="template-editor" class="hidden">
+          <textarea id="wa-template-input" style="width:100%;min-height:120px;font-size:13px;padding:10px;border-radius:8px;border:1px solid var(--teal);background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;resize:vertical;box-sizing:border-box"></textarea>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">Use <b>{name}</b> for client name, <b>{visits}</b> for visit count, <b>{lastvisit}</b> for last visit date, <b>{service}</b> for service taken</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn primary sm" onclick="saveTemplate()" style="flex:1;font-weight:600">Save</button>
+            <button class="btn sm" onclick="cancelTemplateEdit()" style="flex:1">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-bottom:10px">
+        <input id="client-search" placeholder="🔍 Search by name or number..." style="height:44px;font-size:15px;padding:0 14px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg);color:var(--text);width:100%;font-family:var(--font)" oninput="renderClients()"/>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none">
+        <button class="range-btn active" id="clf-all" onclick="setClientFilter('all',this)">All</button>
+        <button class="range-btn" id="clf-repeat" onclick="setClientFilter('repeat',this)">Repeat (2+)</button>
+        <button class="range-btn" id="clf-phone" onclick="setClientFilter('phone',this)">Has Number</button>
+        <button class="range-btn" id="clf-notcontacted" onclick="setClientFilter('notcontacted',this)">Not Contacted</button>
+      </div>
+      <div class="metrics" id="client-metrics"></div>
+      <div id="client-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
       <div class="range-row">
         <button class="range-btn active" onclick="setRange(7,this)">7 days</button>
         <button class="range-btn" onclick="setRange(14,this)">14 days</button>
@@ -315,9 +350,9 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
       <div class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/><line x1="7" y1="15" x2="10" y2="15"/><line x1="13" y1="15" x2="17" y2="15"/></svg></div>
       <span class="nav-label">Members</span>
     </div>
-    <div class="nav-item" id="nav-expenses" onclick="navTo('expenses')">
-      <div class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
-      <span class="nav-label">Expenses</span>
+    <div class="nav-item" id="nav-clients" onclick="navTo('clients')">
+      <div class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.35 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+      <span class="nav-label">Call List</span>
     </div>
   </div>
 </div>
@@ -856,6 +891,7 @@ async function showTab(tab){
   else if(tab==='memberships'){await loadMemberships();renderMemberships();}
   else if(tab==='attendance'){await loadAttendance();renderAttendance();}
   else if(tab==='therapists'){await loadTherapists();renderTherapists();}
+  else if(tab==='clients'){await loadClients();renderClients();}
   else renderAnalytics();
 }
 
@@ -868,6 +904,7 @@ async function navTo(tab){
   if(tab==='customers'){await loadVisitsForDate();renderVisits();}
   else if(tab==='attendance'){await loadAttendance();renderAttendance();}
   else if(tab==='memberships'){await loadMemberships();renderMemberships();}
+  else if(tab==='clients'){await loadClients();renderClients();}
   else{await loadExpensesForDate();renderExpenses();}
 }
 
@@ -1811,7 +1848,225 @@ async function renderAnalytics(){
   document.getElementById('analytics-content').innerHTML=html;
 }
 
-function rankNumEmoji(i){return i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);}
+// ── CLIENT CALL LIST ──
+let liveClientData = [];
+let clientFilter = 'all';
+
+// ── CLIENT CALL LIST ──────────────────────────────────────────────
+const DEFAULT_WA_TEMPLATE = `Hi {name} 🙏
+
+We hope you enjoyed your last session at *Retreat Spa Bangalore*! 🌿
+
+It's been a while since your visit and we'd love to welcome you back. We have some great therapists available this week.
+
+Would you like to book your next session? 
+
+📍 Indiranagar, Bangalore
+📞 Just reply to this message or call us!
+
+See you soon! 😊
+— Team Retreat Spa`;
+
+let waTemplate = '';
+let contactedClients = {};
+
+function getWATemplate(){
+  try{ return localStorage.getItem('retreat_wa_template')||DEFAULT_WA_TEMPLATE; }catch(e){ return DEFAULT_WA_TEMPLATE; }
+}
+function saveWATemplate(t){
+  try{ localStorage.setItem('retreat_wa_template', t); }catch(e){}
+}
+function getContactedClients(){
+  try{ return JSON.parse(localStorage.getItem('retreat_contacted')||'{}'); }catch(e){ return {}; }
+}
+function markContacted(phone){
+  const c = getContactedClients();
+  c[phone] = new Date().toISOString();
+  try{ localStorage.setItem('retreat_contacted', JSON.stringify(c)); }catch(e){}
+  contactedClients = c;
+  renderClients();
+}
+
+function initTemplatePreview(){
+  waTemplate = getWATemplate();
+  contactedClients = getContactedClients();
+  const preview = document.getElementById('template-preview');
+  if(preview) preview.textContent = waTemplate;
+  const input = document.getElementById('wa-template-input');
+  if(input) input.value = waTemplate;
+}
+
+function toggleTemplateEdit(){
+  const editor = document.getElementById('template-editor');
+  const preview = document.getElementById('template-preview');
+  const btn = document.getElementById('template-edit-btn');
+  const input = document.getElementById('wa-template-input');
+  if(editor.classList.contains('hidden')){
+    input.value = waTemplate;
+    editor.classList.remove('hidden');
+    preview.classList.add('hidden');
+    btn.textContent = 'Close';
+  } else {
+    cancelTemplateEdit();
+  }
+}
+
+function cancelTemplateEdit(){
+  document.getElementById('template-editor').classList.add('hidden');
+  document.getElementById('template-preview').classList.remove('hidden');
+  document.getElementById('template-edit-btn').textContent = 'Edit';
+}
+
+function saveTemplate(){
+  const val = document.getElementById('wa-template-input').value.trim();
+  if(!val){ showToast('Template cannot be empty', false); return; }
+  waTemplate = val;
+  saveWATemplate(val);
+  document.getElementById('template-preview').textContent = val;
+  cancelTemplateEdit();
+  showToast('Template saved ✓');
+}
+
+function buildWAMessage(c){
+  const lastDate = c.lastVisit ? new Date(c.lastVisit).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '';
+  return waTemplate
+    .replace(/{name}/gi, c.name)
+    .replace(/{visits}/gi, c.visits)
+    .replace(/{lastvisit}/gi, lastDate)
+    .replace(/{service}/gi, c.services||'massage');
+}
+
+function openWhatsApp(c){
+  const msg = buildWAMessage(c);
+  const phone = '91' + c.phone.replace(/\D/g,'').slice(-10);
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+  // Mark as contacted after a short delay
+  setTimeout(()=>markContacted(c.phone), 1500);
+}
+
+function setClientFilter(f, btn){
+  clientFilter = f;
+  document.querySelectorAll('[id^="clf-"]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderClients();
+}
+
+async function loadClients(){
+  showLoading('Building call list...');
+  try{
+    const br = (branch==='both')?'indiranagar':branch;
+    const res = await sheetsGet({action:'getData', branch:br, date:''});
+    const allVisits = res&&res.success ? (res.data.visits||[]) : [];
+    let allVisitsCombined = [...allVisits];
+    if(branch==='both'){
+      const k = await sheetsGet({action:'getData', branch:'koramangala', date:''});
+      if(k&&k.success) allVisitsCombined = [...allVisitsCombined, ...(k.data.visits||[])];
+    }
+    const map = {};
+    allVisitsCombined.forEach(v=>{
+      const name = (v['Customer Name']||v.name||'').trim();
+      const phone = (v['Phone']||v.phone||'').trim();
+      const date = v['Date']||v.date||'';
+      const service = v['Service']||v.service||'';
+      const key = name.toLowerCase();
+      if(!key) return;
+      if(!map[key]) map[key] = {name, phone:'', dates:[], services:new Set()};
+      if(phone && !map[key].phone) map[key].phone = phone;
+      if(date) map[key].dates.push(date);
+      if(service) map[key].services.add(service);
+    });
+    liveClientData = Object.values(map).map(c=>({
+      name: c.name,
+      phone: c.phone,
+      visits: c.dates.length,
+      lastVisit: c.dates.sort().slice(-1)[0]||'',
+      allDates: [...new Set(c.dates)].sort(),
+      services: [...c.services].join(', '),
+    })).sort((a,b)=> b.visits - a.visits || b.lastVisit.localeCompare(a.lastVisit));
+    initTemplatePreview();
+  }finally{hideLoading();}
+}
+
+function renderClients(){
+  const q = (document.getElementById('client-search')?.value||'').toLowerCase().trim();
+  contactedClients = getContactedClients();
+
+  let list = liveClientData.filter(c=>{
+    if(clientFilter==='repeat' && c.visits<2) return false;
+    if(clientFilter==='phone' && !c.phone) return false;
+    if(clientFilter==='notcontacted' && (contactedClients[c.phone]||!c.phone)) return false;
+    if(q) return c.name.toLowerCase().includes(q) || c.phone.includes(q);
+    return true;
+  });
+
+  const total = liveClientData.length;
+  const repeat = liveClientData.filter(c=>c.visits>=2).length;
+  const withPhone = liveClientData.filter(c=>c.phone).length;
+  const contacted = liveClientData.filter(c=>c.phone&&contactedClients[c.phone]).length;
+  document.getElementById('client-metrics').innerHTML=`
+    <div class="metric"><div class="lbl">Total</div><div class="val" style="color:${BLUE}">${total}</div></div>
+    <div class="metric"><div class="lbl">Repeat (2+)</div><div class="val" style="color:${TEAL}">${repeat}</div></div>
+    <div class="metric"><div class="lbl">Have Number</div><div class="val" style="color:${TEAL}">${withPhone}</div></div>
+    <div class="metric"><div class="lbl">Contacted</div><div class="val" style="color:${AMBER}">${contacted}</div></div>
+  `;
+
+  const el = document.getElementById('client-list');
+  if(!liveClientData.length){
+    el.innerHTML='<div class="empty-state"><div class="empty-icon" style="font-size:28px">📞</div><div class="empty-title">No client data yet</div><div class="empty-sub">Visit data will appear here as you log visits</div></div>';
+    return;
+  }
+  if(!list.length){
+    el.innerHTML='<div class="empty-state"><div class="empty-icon" style="font-size:28px">🔍</div><div class="empty-title">No results</div><div class="empty-sub">Try a different search or filter</div></div>';
+    return;
+  }
+
+  el.innerHTML = list.map((c,i)=>{
+    const isRepeat = c.visits >= 3;
+    const isTwice = c.visits === 2;
+    const borderColor = isRepeat ? 'var(--teal)' : isTwice ? 'var(--blue)' : 'var(--border)';
+    const badge = isRepeat
+      ? `<span class="badge b-green" style="font-size:11px">${c.visits} visits</span>`
+      : isTwice ? `<span class="badge b-blue" style="font-size:11px">2 visits</span>`
+      : `<span class="badge b-gray" style="font-size:11px">1 visit</span>`;
+    const daysSince = c.lastVisit ? Math.floor((new Date()-new Date(c.lastVisit))/(864e5)) : null;
+    const daysLabel = daysSince===null?'—':daysSince===0?'Today':daysSince===1?'Yesterday':`${daysSince}d ago`;
+    const wasContacted = c.phone && contactedClients[c.phone];
+    const contactedDate = wasContacted ? new Date(contactedClients[c.phone]).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) : '';
+
+    const avatarBg = isRepeat?'var(--teal-l)':isTwice?'var(--blue-l)':'var(--bg2)';
+    const avatarColor = isRepeat?'var(--teal-d)':isTwice?'var(--blue-d)':'var(--text2)';
+
+    return `<div style="background:var(--bg);border:1.5px solid ${wasContacted?'#ccc':borderColor};border-radius:16px;padding:14px 16px;opacity:${wasContacted?'0.75':'1'}">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:${c.phone?'12px':'0'}">
+        <div style="width:42px;height:42px;border-radius:50%;background:${avatarBg};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:${avatarColor};flex-shrink:0">${c.name.charAt(0).toUpperCase()}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span style="font-size:15px;font-weight:600">${c.name}</span>
+            ${wasContacted?`<span class="badge b-gray" style="font-size:10px">✓ Sent ${contactedDate}</span>`:''}
+          </div>
+          <div style="font-size:12px;color:var(--text2);margin-top:3px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+            ${badge}<span>Last: ${daysLabel}</span>${c.phone?`<span>· ${c.phone}</span>`:''}
+          </div>
+          ${c.services?`<div style="font-size:11px;color:var(--text3);margin-top:2px">${c.services}</div>`:''}
+        </div>
+      </div>
+      ${c.phone ? `
+      <div style="display:flex;gap:8px">
+        <a href="tel:${c.phone}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:10px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;touch-action:manipulation">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.35 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Call
+        </a>
+        <button onclick="openWhatsApp(liveClientData.find(x=>x.phone==='${c.phone}'&&x.name.charAt(0)==='${c.name.charAt(0)}'))" style="flex:2;display:flex;align-items:center;justify-content:center;gap:6px;background:#25D366;border:none;color:#fff;padding:10px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;touch-action:manipulation">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.135.561 4.14 1.535 5.873L.057 23.428a.5.5 0 0 0 .609.61l5.703-1.497A11.951 11.951 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.7-.505-5.25-1.385l-.372-.218-3.863 1.015 1.03-3.753-.238-.386A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          WhatsApp
+        </button>
+        ${wasContacted?`<button onclick="delete contactedClients['${c.phone}'];try{localStorage.setItem('retreat_contacted',JSON.stringify(contactedClients));}catch(e){}renderClients();" style="width:40px;display:flex;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;cursor:pointer;font-size:16px;touch-action:manipulation" title="Mark as not contacted">↩</button>`:''}
+      </div>` : `<div style="font-size:12px;color:var(--text3);text-align:center;padding:6px;background:var(--bg2);border-radius:8px">No mobile number — cannot contact</div>`}
+    </div>`;
+  }).join('');
+}
+
 function renderRankList(items,valFn,subFn){
   if(!items.length)return'<div class="no-data">No data for this period</div>';
   return'<div class="rank-list">'+items.map((item,i)=>'<div class="rank-item"><div class="rank-num">'+rankNumEmoji(i)+'</div><div class="rank-body"><div class="rank-name">'+item.label+'</div>'+(subFn?'<div class="rank-sub">'+subFn(item)+'</div>':'')+'</div><div class="rank-val">'+valFn(item)+'</div></div>').join('')+'</div>';
@@ -1819,5 +2074,3 @@ function renderRankList(items,valFn,subFn){
 </script>
 </body>
 </html>
-
-
