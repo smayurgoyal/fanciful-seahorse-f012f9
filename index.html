@@ -2273,35 +2273,37 @@ function bwaRefreshList(){
 function bwaRenderList(){
   const q = (document.getElementById('bwa-search')?.value||'').toLowerCase();
   const sent = bwaGetSent();
-
-  // Update sent status
   bwaContacts.forEach(c=>{ c.sent = !!sent[c.phone]; });
+
+  const listEl = document.getElementById('bwa-contact-list');
+  const countEl = document.getElementById('bwa-list-count');
+  if(countEl) countEl.textContent = `(${bwaContacts.length} total)`;
+  bwaUpdateSelectedCount();
 
   const filtered = bwaContacts.filter(c=>
     !q || c.name.toLowerCase().includes(q) || c.phone.includes(q)
   );
-  const countEl = document.getElementById('bwa-list-count');
-  const selected = bwaContacts.filter(c=>c.selected).length;
-  if(countEl) countEl.textContent = `(${bwaContacts.length} total)`;
-
-  bwaUpdateSelectedCount();
 
   if(!filtered.length){
     listEl.innerHTML = '<div style="text-align:center;color:var(--text3);padding:24px;font-size:13px">No contacts found</div>';
     return;
   }
 
-  listEl.innerHTML = filtered.map((c,i)=>{
-    const sentDate = sent[c.phone] ? new Date(sent[c.phone]).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) : '';
+  listEl.innerHTML = filtered.map(c=>{
+    const idx = bwaContacts.indexOf(c);
+    const sentDate = c.sent ? new Date(sent[c.phone]).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) : '';
     const srcBadge = c.source==='spa'
       ? `<span style="font-size:10px;background:var(--teal-l);color:var(--teal-d);padding:1px 6px;border-radius:99px">Spa</span>`
       : c.source==='import'
       ? `<span style="font-size:10px;background:var(--blue-l);color:var(--blue-d);padding:1px 6px;border-radius:99px">Imported</span>`
       : `<span style="font-size:10px;background:#f3f0ff;color:#6c4fcf;padding:1px 6px;border-radius:99px">Manual</span>`;
-    return `<div style="display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid ${c.sent?'#e0e0e0':c.selected?'var(--teal)':'var(--border)'};border-radius:12px;padding:10px 12px;opacity:${c.sent?'0.6':'1'};transition:.15s" onclick="bwaToggle(${bwaContacts.indexOf(c)})">
-      <div style="width:22px;height:22px;border-radius:6px;border:2px solid ${c.selected&&!c.sent?'var(--teal)':'var(--border2)'};background:${c.selected&&!c.sent?'var(--teal)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s">
-        ${c.selected&&!c.sent?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}
-      </div>
+    const isSelected = c.selected && !c.sent;
+    const borderColor = c.sent ? '#e0e0e0' : isSelected ? 'var(--teal)' : 'var(--border)';
+    const checkBg = isSelected ? 'var(--teal)' : 'var(--bg2)';
+    const checkBorder = isSelected ? 'var(--teal)' : 'var(--border2)';
+    const checkIcon = isSelected ? '✓' : '';
+    return `<div style="display:flex;align-items:center;gap:10px;background:var(--bg);border:1.5px solid ${borderColor};border-radius:12px;padding:10px 12px;opacity:${c.sent?'0.55':'1'}">
+      <button ontouchend="bwaToggle(${idx});event.preventDefault();" onclick="bwaToggle(${idx})" style="width:32px;height:32px;min-width:32px;border-radius:8px;border:2px solid ${checkBorder};background:${checkBg};color:#fff;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation">${checkIcon}</button>
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
           <span style="font-size:13px;font-weight:600">${c.name}</span>
@@ -2318,8 +2320,6 @@ function bwaToggle(idx){
   const c = bwaContacts[idx];
   if(!c || c.sent) return;
   c.selected = !c.selected;
-  bwaUpdateSelectedCount();
-  // Re-render just this card without full re-render to avoid flicker
   bwaRenderList();
 }
 
