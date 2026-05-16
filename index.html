@@ -345,17 +345,37 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
         <span id="bwa-branch-label" style="font-size:12px;color:var(--text3)"></span>
       </div>
 
-      <!-- MESSAGE COMPOSER -->
+      <!-- MESSAGE TEMPLATES POOL -->
       <div style="background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:14px;margin-bottom:14px">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">💬 Message</div>
-        <textarea id="bwa-message" rows="5" style="width:100%;font-size:13px;padding:10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;resize:vertical;box-sizing:border-box" placeholder="Type your message here...
-Use {name} to personalise each message"></textarea>
-        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
-          <button onclick="bwaInsert('{name}')" class="btn sm" style="font-size:11px;height:28px">{name}</button>
-          <button onclick="bwaInsert('{visits}')" class="btn sm" style="font-size:11px;height:28px">{visits}</button>
-          <button onclick="bwaInsert('{lastvisit}')" class="btn sm" style="font-size:11px;height:28px">{lastvisit}</button>
-          <button onclick="bwaInsert('{service}')" class="btn sm" style="font-size:11px;height:28px">{service}</button>
-          <button onclick="bwaLoadDefault()" class="btn sm" style="font-size:11px;height:28px">Load default</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:13px;font-weight:700;color:var(--text)">💬 Message Templates</div>
+          <button onclick="bwaShowAddTemplate()" class="btn sm" style="font-size:11px;height:28px;padding:0 10px">+ Add New</button>
+        </div>
+
+        <!-- Template cards - scrollable horizontal -->
+        <div id="bwa-template-pool" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;margin-bottom:10px"></div>
+
+        <!-- Add new template form (hidden by default) -->
+        <div id="bwa-add-template-form" class="hidden" style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px">
+          <input id="bwa-new-template-name" placeholder="Template name (e.g. Festival Offer)" style="width:100%;height:36px;font-size:13px;padding:0 10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg);color:var(--text);font-family:var(--font);box-sizing:border-box;margin-bottom:6px"/>
+          <textarea id="bwa-new-template-body" rows="4" style="width:100%;font-size:13px;padding:10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;resize:vertical;box-sizing:border-box" placeholder="Write your message...
+Use {name}, {visits}, {lastvisit}, {service}"></textarea>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button onclick="bwaSaveNewTemplate()" class="btn primary sm" style="flex:1;font-weight:600">Save Template</button>
+            <button onclick="bwaHideAddTemplate()" class="btn sm" style="flex:1">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Active message preview -->
+        <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">✏️ Editing selected template — changes apply to this send only:</div>
+          <textarea id="bwa-message" rows="4" style="width:100%;font-size:13px;padding:10px;border-radius:8px;border:1px solid var(--teal);background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;resize:vertical;box-sizing:border-box"></textarea>
+          <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+            <button onclick="bwaInsert('{name}')" class="btn sm" style="font-size:11px;height:26px">{name}</button>
+            <button onclick="bwaInsert('{visits}')" class="btn sm" style="font-size:11px;height:26px">{visits}</button>
+            <button onclick="bwaInsert('{lastvisit}')" class="btn sm" style="font-size:11px;height:26px">{lastvisit}</button>
+            <button onclick="bwaInsert('{service}')" class="btn sm" style="font-size:11px;height:26px">{service}</button>
+          </div>
         </div>
       </div>
 
@@ -2179,7 +2199,127 @@ let bwaContacts = [];       // {name, phone, source, visits, lastVisit, service,
 let bwaSendQueue = [];      // selected contacts not yet sent
 let bwaSendIndex = 0;
 
-const BWA_SENT_KEY = 'retreat_bwa_sent';
+const BWA_TEMPLATES_KEY = 'retreat_bwa_templates';
+const BWA_ACTIVE_TPL_KEY = 'retreat_bwa_active_tpl';
+
+const DEFAULT_TEMPLATES = [
+  {
+    id: 'tpl_welcome_back',
+    name: '🌿 Welcome Back',
+    body: `Hi {name} 🙏\n\nWe hope you enjoyed your last session at *Retreat Spa Bangalore*! It's been a while and we'd love to welcome you back. 🌿\n\nWe have some great therapists available this week. Would you like to book your next session?\n\n📍 Indiranagar, Bangalore\n\nSee you soon! 😊\n— Team Retreat Spa`
+  },
+  {
+    id: 'tpl_repeat_client',
+    name: '⭐ Repeat Client Special',
+    body: `Hi {name}! 😊\n\nThank you for being one of our valued guests at *Retreat Spa*! You've visited us {visits} times and we truly appreciate your loyalty. 🙏\n\nAs a special thank you, mention this message and get a complimentary head massage on your next visit!\n\nBook now — limited slots available this week.\n\n📍 Indiranagar, Bangalore\n— Team Retreat Spa`
+  },
+  {
+    id: 'tpl_weekend_offer',
+    name: '🎉 Weekend Offer',
+    body: `Hi {name}! 🌟\n\nThis weekend at *Retreat Spa*, we have special slots open just for you!\n\n✨ Aromatherapy\n✨ Swedish Massage\n✨ Deep Tissue\n\nAll therapists available Saturday & Sunday. Don't miss out — slots fill up fast!\n\nCall us or reply to book. 📞\n\n📍 Indiranagar, Bangalore\n— Team Retreat Spa`
+  },
+  {
+    id: 'tpl_been_a_while',
+    name: '⏰ Been a While',
+    body: `Hi {name} 👋\n\nIt's been some time since your last visit to *Retreat Spa* and we miss you!\n\nYour body deserves some care. Come in for a relaxing session with our expert therapists — you'll feel completely refreshed. 💆\n\nWalk-ins welcome or call us to reserve your slot.\n\n📍 Indiranagar, Bangalore\n— Team Retreat Spa`
+  },
+  {
+    id: 'tpl_festive',
+    name: '🪔 Festive Special',
+    body: `Hi {name}! 🎊\n\nWishing you and your family a wonderful festive season from all of us at *Retreat Spa Bangalore*! 🙏\n\nThis festive season, treat yourself to a rejuvenating massage session. Gift vouchers also available for your loved ones!\n\nCall us to book. Limited festive slots available.\n\n📍 Indiranagar, Bangalore\n— Team Retreat Spa`
+  },
+  {
+    id: 'tpl_membership',
+    name: '💳 Membership Offer',
+    body: `Hi {name}! 🌿\n\nDid you know *Retreat Spa* offers exclusive membership packages? Save more with every visit!\n\n✅ Priority booking\n✅ Discounted sessions\n✅ Flexible validity\n\nAsk us about our membership plans today — perfect for regular clients like you!\n\nCall or reply to know more. 😊\n\n📍 Indiranagar, Bangalore\n— Team Retreat Spa`
+  }
+];
+
+let bwaActiveTemplateId = '';
+
+function bwaGetTemplates(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(BWA_TEMPLATES_KEY)||'null');
+    return saved || DEFAULT_TEMPLATES;
+  }catch(e){ return DEFAULT_TEMPLATES; }
+}
+
+function bwaSaveTemplates(templates){
+  try{ localStorage.setItem(BWA_TEMPLATES_KEY, JSON.stringify(templates)); }catch(e){}
+}
+
+function bwaRenderTemplatePool(){
+  const templates = bwaGetTemplates();
+  const pool = document.getElementById('bwa-template-pool');
+  if(!pool) return;
+
+  bwaActiveTemplateId = bwaActiveTemplateId || (templates[0]?.id||'');
+
+  pool.innerHTML = templates.map(t=>{
+    const isActive = t.id === bwaActiveTemplateId;
+    return `<div style="border:2px solid ${isActive?'var(--teal)':'var(--border)'};border-radius:10px;padding:10px 12px;background:${isActive?'var(--teal-l)':'var(--bg)'};cursor:pointer;transition:.15s" onclick="bwaSelectTemplate('${t.id}')">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:8px">
+          ${isActive?'<div style="width:10px;height:10px;border-radius:50%;background:var(--teal);flex-shrink:0"></div>':'<div style="width:10px;height:10px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0"></div>'}
+          <span style="font-size:13px;font-weight:${isActive?'700':'600'};color:${isActive?'var(--teal-d)':'var(--text)'}">${t.name}</span>
+        </div>
+        ${!t.id.startsWith('tpl_')?`<button onclick="event.stopPropagation();bwaDeleteTemplate('${t.id}')" style="background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:0 4px;line-height:1">×</button>`:''}
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;margin-left:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.body.replace(/\n/g,' ').slice(0,80)}...</div>
+    </div>`;
+  }).join('');
+}
+
+function bwaSelectTemplate(id){
+  bwaActiveTemplateId = id;
+  const templates = bwaGetTemplates();
+  const t = templates.find(x=>x.id===id);
+  if(t){
+    const ta = document.getElementById('bwa-message');
+    if(ta) ta.value = t.body;
+  }
+  bwaRenderTemplatePool();
+  try{ localStorage.setItem(BWA_ACTIVE_TPL_KEY, id); }catch(e){}
+}
+
+function bwaShowAddTemplate(){
+  document.getElementById('bwa-add-template-form').classList.remove('hidden');
+  document.getElementById('bwa-new-template-name').focus();
+}
+function bwaHideAddTemplate(){
+  document.getElementById('bwa-add-template-form').classList.add('hidden');
+  document.getElementById('bwa-new-template-name').value = '';
+  document.getElementById('bwa-new-template-body').value = '';
+}
+
+function bwaSaveNewTemplate(){
+  const name = document.getElementById('bwa-new-template-name').value.trim();
+  const body = document.getElementById('bwa-new-template-body').value.trim();
+  if(!name){ showToast('Please enter a template name', false); return; }
+  if(!body){ showToast('Please enter the message', false); return; }
+  const templates = bwaGetTemplates();
+  const id = 'custom_'+Date.now();
+  templates.push({id, name, body});
+  bwaSaveTemplates(templates);
+  bwaHideAddTemplate();
+  bwaSelectTemplate(id);
+  showToast('Template saved ✓');
+}
+
+function bwaDeleteTemplate(id){
+  if(!confirm('Delete this template?')) return;
+  const templates = bwaGetTemplates().filter(t=>t.id!==id);
+  bwaSaveTemplates(templates);
+  if(bwaActiveTemplateId===id){
+    bwaActiveTemplateId = templates[0]?.id||'';
+    const ta = document.getElementById('bwa-message');
+    if(ta && templates[0]) ta.value = templates[0].body;
+  }
+  bwaRenderTemplatePool();
+  showToast('Template deleted');
+}
+
+
 
 function bwaGetSent(){ try{ return JSON.parse(localStorage.getItem(BWA_SENT_KEY)||'{}'); }catch(e){ return {}; } }
 function bwaMarkSent(phone){ const s=bwaGetSent(); s[phone]=new Date().toISOString(); try{localStorage.setItem(BWA_SENT_KEY,JSON.stringify(s));}catch(e){} }
@@ -2226,11 +2366,15 @@ async function bwaInit(){
   }finally{ hideLoading(); }
 
   bwaRefreshList();
-  // Update branch label in header
-  const lbl = document.getElementById('bwa-branch-label');
-  if(lbl) lbl.textContent = branch==='both'?'Both branches':branch.charAt(0).toUpperCase()+branch.slice(1)+' only';
+  // Render template pool
+  try{ bwaActiveTemplateId = localStorage.getItem(BWA_ACTIVE_TPL_KEY)||''; }catch(e){}
+  bwaRenderTemplatePool();
+  // Set active template in textarea
+  const templates = bwaGetTemplates();
+  const activeTpl = templates.find(t=>t.id===bwaActiveTemplateId)||templates[0];
   const ta = document.getElementById('bwa-message');
-  if(ta && !ta.value) ta.value = getWATemplate();
+  if(ta && activeTpl){ ta.value = activeTpl.body; bwaActiveTemplateId = activeTpl.id; }
+  if(lbl) lbl.textContent = branch==='both'?'Both branches':branch.charAt(0).toUpperCase()+branch.slice(1)+' only';
   bwaUpdateSelectedCount();
 }
 
@@ -2345,11 +2489,6 @@ function bwaInsert(token){
   ta.value = ta.value.slice(0,s) + token + ta.value.slice(e);
   ta.selectionStart = ta.selectionEnd = s + token.length;
   ta.focus();
-}
-
-function bwaLoadDefault(){
-  const ta = document.getElementById('bwa-message');
-  if(ta) ta.value = getWATemplate();
 }
 
 function bwaBuildMsg(c){
