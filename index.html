@@ -1446,11 +1446,24 @@ async function saveVisit(){
     };
     showLoading('Saving membership visit...');
     try{
-      await sheetsPost({type:'visit', branch:br, date:dk(custDate), record});
-      await sheetsPost({type:'updateMembership', branch:memBranch, date:dk(custDate), record:{code, branch:memBranch, usedHours:newUsed}});
-      showToast(hrs+' hrs deducted from '+code+'. '+(total-newUsed).toFixed(1)+' remaining ✓');
-      // Add to local list immediately so it shows without waiting for JSONP
-      liveVisits.push({'Customer Name':record.name,'Phone':record.phone,'Service':record.service,'Therapist':record.therapist||'','Time':record.time||'','Duration (min)':record.dur,'Payment Mode':'Package / Membership','Amount (Rs)':0,'Status':record.status,'Notes':record.notes,'Date':dk(custDate),'Branch':br,'Member Code':code});
+      if(_editingVisitIdx >= 0){
+        // EDIT existing membership visit — update in place
+        const filtered=liveVisits.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(custDate);});
+        const oldVisit=filtered[_editingVisitIdx];
+        const editBr=(branch==='both')?((oldVisit&&oldVisit._br)||'indiranagar'):branch;
+        const ts=(oldVisit&&oldVisit['Timestamp'])||'';
+        const custName=(oldVisit&&(oldVisit['Customer Name']||oldVisit.name))||'';
+        await sheetsPost({type:'updateVisit',branch:editBr,timestamp:ts,custName:custName,date:dk(custDate),record});
+      } else {
+        // NEW membership visit
+        await sheetsPost({type:'visit', branch:br, date:dk(custDate), record});
+        await sheetsPost({type:'updateMembership', branch:memBranch, date:dk(custDate), record:{code, branch:memBranch, usedHours:newUsed}});
+      }
+      showToast(_editingVisitIdx>=0 ? 'Visit updated ✓' : hrs+' hrs deducted from '+code+'. '+(total-newUsed).toFixed(1)+' remaining ✓');
+      if(_editingVisitIdx < 0){
+        // Only push to local list for NEW visits
+        liveVisits.push({'Customer Name':record.name,'Phone':record.phone,'Service':record.service,'Therapist':record.therapist||'','Time':record.time||'','Duration (min)':record.dur,'Payment Mode':'Package / Membership','Amount (Rs)':0,'Status':record.status,'Notes':record.notes,'Date':dk(custDate),'Branch':br,'Member Code':code});
+      }
       closeVisitModal();
       resetVisitForm();
       renderVisits();
