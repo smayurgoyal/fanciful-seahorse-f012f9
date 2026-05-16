@@ -232,6 +232,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     <button class="o-tab" id="otab-therapists" onclick="showTab('therapists')">Therapists</button>
     <button class="o-tab" id="otab-analytics" onclick="showTab('analytics')">Analytics</button>
     <button class="o-tab" id="otab-clients" onclick="showTab('clients')">Call List</button>
+    <button class="o-tab" id="otab-bulkwa" onclick="showTab('bulkwa')">📣 Bulk WA</button>
   </div>
   <div class="content">
     <div class="section active" id="tab-customers">
@@ -336,6 +337,106 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
       </div>
       <div id="analytics-content"></div>
     </div>
+
+    <!-- ═══ BULK WHATSAPP TAB ═══ -->
+    <div class="section" id="tab-bulkwa">
+      <div class="toolbar">
+        <span style="font-size:15px;font-weight:700">📣 Bulk WhatsApp</span>
+        <span id="bwa-branch-label" style="font-size:12px;color:var(--text3)"></span>
+      </div>
+
+      <!-- MESSAGE COMPOSER -->
+      <div style="background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:14px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">💬 Message</div>
+        <textarea id="bwa-message" rows="5" style="width:100%;font-size:13px;padding:10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;resize:vertical;box-sizing:border-box" placeholder="Type your message here...
+Use {name} to personalise each message"></textarea>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+          <button onclick="bwaInsert('{name}')" class="btn sm" style="font-size:11px;height:28px">{name}</button>
+          <button onclick="bwaInsert('{visits}')" class="btn sm" style="font-size:11px;height:28px">{visits}</button>
+          <button onclick="bwaInsert('{lastvisit}')" class="btn sm" style="font-size:11px;height:28px">{lastvisit}</button>
+          <button onclick="bwaInsert('{service}')" class="btn sm" style="font-size:11px;height:28px">{service}</button>
+          <button onclick="bwaLoadDefault()" class="btn sm" style="font-size:11px;height:28px">Load default</button>
+        </div>
+      </div>
+
+      <!-- CONTACT SOURCES -->
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">📋 Contact Sources</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+
+        <!-- Spa visitors -->
+        <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:13px;font-weight:600">🌿 Spa Visitors</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px">All clients from your visit log</div>
+            </div>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <span id="bwa-spa-count" style="font-size:12px;color:var(--text2)"></span>
+              <div style="position:relative;width:44px;height:26px">
+                <input type="checkbox" id="bwa-src-spa" checked onchange="bwaRefreshList()" style="opacity:0;width:0;height:0;position:absolute"/>
+                <div onclick="this.previousElementSibling.click()" style="position:absolute;inset:0;background:var(--teal);border-radius:99px;cursor:pointer;transition:.2s"></div>
+                <div style="position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.2s;pointer-events:none"></div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Manual contacts -->
+        <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div>
+              <div style="font-size:13px;font-weight:600">➕ Add Contacts Manually</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px">Paste numbers from any source</div>
+            </div>
+          </div>
+          <textarea id="bwa-manual-input" rows="3" style="width:100%;font-size:13px;padding:10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);font-family:var(--font);resize:vertical;box-sizing:border-box" placeholder="Paste numbers here — one per line or comma separated
+e.g. 9845012345, Rahul
+9980123456, Priya"></textarea>
+          <button class="btn primary sm" onclick="bwaAddManual()" style="margin-top:8px;width:100%;font-weight:600">Add to list</button>
+        </div>
+
+        <!-- CSV Upload -->
+        <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px">📁 Import from CSV / Excel</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Export contacts from Google Contacts, Justdial, Sulekha etc. and upload here</div>
+          <label style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--bg2);border:1.5px dashed var(--border2);border-radius:10px;padding:16px;cursor:pointer;font-size:13px;color:var(--text2)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload CSV / Excel file
+            <input type="file" accept=".csv,.xlsx,.xls,.txt" onchange="bwaImportFile(this)" style="display:none"/>
+          </label>
+          <div id="bwa-import-status" style="font-size:12px;color:var(--teal);margin-top:6px;text-align:center"></div>
+        </div>
+      </div>
+
+      <!-- CONTACT LIST -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:700;color:var(--text)">📱 Contact List <span id="bwa-list-count" style="color:var(--text3);font-weight:400"></span></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn sm" onclick="bwaSelectAll()" style="font-size:11px;height:30px">All</button>
+          <button class="btn sm" onclick="bwaSelectNone()" style="font-size:11px;height:30px">None</button>
+          <button class="btn sm" onclick="bwaClearContacted()" style="font-size:11px;height:30px;color:var(--red)">Clear sent</button>
+        </div>
+      </div>
+      <div style="margin-bottom:10px">
+        <input id="bwa-search" placeholder="🔍 Search name or number..." style="width:100%;height:40px;font-size:14px;padding:0 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg);color:var(--text);font-family:var(--font);box-sizing:border-box" oninput="bwaRenderList()"/>
+      </div>
+      <div id="bwa-contact-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:80px"></div>
+
+      <!-- STICKY SEND BAR -->
+      <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--bg);border-top:1px solid var(--border);padding:12px 16px 24px;z-index:20;box-sizing:border-box">
+        <div style="display:flex;gap:10px;align-items:center">
+          <div style="flex:1">
+            <div style="font-size:12px;color:var(--text3)">Selected</div>
+            <div style="font-size:16px;font-weight:700;color:var(--teal)" id="bwa-selected-count">0 contacts</div>
+          </div>
+          <button onclick="bwaSendNext()" id="bwa-send-btn" style="flex:2;display:flex;align-items:center;justify-content:center;gap:8px;background:#25D366;border:none;color:#fff;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.135.561 4.14 1.535 5.873L.057 23.428a.5.5 0 0 0 .609.61l5.703-1.497A11.951 11.951 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.7-.505-5.25-1.385l-.372-.218-3.863 1.015 1.03-3.753-.238-.386A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+            Send Next on WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
   <div id="bottom-nav" class="bottom-nav hidden">
     <div class="nav-item active" id="nav-customers" onclick="navTo('customers')">
@@ -353,6 +454,10 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     <div class="nav-item" id="nav-clients" onclick="navTo('clients')">
       <div class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.35 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
       <span class="nav-label">Call List</span>
+    </div>
+    <div class="nav-item" id="nav-bulkwa" onclick="navTo('bulkwa')">
+      <div class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text2)"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.135.561 4.14 1.535 5.873L.057 23.428a.5.5 0 0 0 .609.61l5.703-1.497A11.951 11.951 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.7-.505-5.25-1.385l-.372-.218-3.863 1.015 1.03-3.753-.238-.386A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg></div>
+      <span class="nav-label">Bulk WA</span>
     </div>
   </div>
 </div>
@@ -892,6 +997,7 @@ async function showTab(tab){
   else if(tab==='attendance'){await loadAttendance();renderAttendance();}
   else if(tab==='therapists'){await loadTherapists();renderTherapists();}
   else if(tab==='clients'){await loadClients();renderClients();}
+  else if(tab==='bulkwa'){await bwaInit();}
   else renderAnalytics();
 }
 
@@ -905,6 +1011,7 @@ async function navTo(tab){
   else if(tab==='attendance'){await loadAttendance();renderAttendance();}
   else if(tab==='memberships'){await loadMemberships();renderMemberships();}
   else if(tab==='clients'){await loadClients();renderClients();}
+  else if(tab==='bulkwa'){await bwaInit();}
   else{await loadExpensesForDate();renderExpenses();}
 }
 
@@ -2066,6 +2173,279 @@ function renderClients(){
     </div>`;
   }).join('');
 }
+
+// ── BULK WHATSAPP ─────────────────────────────────────────────────
+let bwaContacts = [];       // {name, phone, source, visits, lastVisit, service, selected, sent}
+let bwaSendQueue = [];      // selected contacts not yet sent
+let bwaSendIndex = 0;
+
+const BWA_SENT_KEY = 'retreat_bwa_sent';
+
+function bwaGetSent(){ try{ return JSON.parse(localStorage.getItem(BWA_SENT_KEY)||'{}'); }catch(e){ return {}; } }
+function bwaMarkSent(phone){ const s=bwaGetSent(); s[phone]=new Date().toISOString(); try{localStorage.setItem(BWA_SENT_KEY,JSON.stringify(s));}catch(e){} }
+function bwaClearContacted(){ if(confirm('Clear all "sent" records?')){ try{localStorage.removeItem(BWA_SENT_KEY);}catch(e){} bwaRenderList(); showToast('Cleared ✓'); } }
+
+async function bwaInit(){
+  showLoading('Loading contacts...');
+  try{
+    // Use sheetsGet (Apps Script) — same as loadClients, proven to work
+    const br = branch==='both' ? 'indiranagar' : branch;
+    const res = await sheetsGet({action:'getData', branch:br, date:''});
+    let allVisits = res&&res.success ? (res.data.visits||[]) : [];
+
+    // If both branches, also load koramangala
+    if(branch==='both'){
+      const k = await sheetsGet({action:'getData', branch:'koramangala', date:''});
+      if(k&&k.success) allVisits = [...allVisits, ...(k.data.visits||[])];
+    }
+
+    // Aggregate into client map
+    const map = {};
+    allVisits.forEach(v=>{
+      const name = (v['Customer Name']||v['Name']||'').trim();
+      const phone = (v['Phone']||v['Mobile']||'').trim().replace(/\D/g,'').slice(-10);
+      const date = v['Date']||'';
+      const service = v['Service']||'';
+      const key = name.toLowerCase();
+      if(!key) return;
+      if(!map[key]) map[key] = {name, phone:'', dates:[], services:new Set()};
+      if(phone && phone.length>=10 && !map[key].phone) map[key].phone = phone;
+      if(date) map[key].dates.push(date);
+      if(service) map[key].services.add(service);
+    });
+
+    liveClientData = Object.values(map).map(c=>({
+      name: c.name,
+      phone: c.phone,
+      visits: c.dates.length,
+      lastVisit: [...c.dates].sort().slice(-1)[0]||'',
+      allDates: [...new Set(c.dates)].sort(),
+      services: [...c.services].join(', '),
+    })).sort((a,b)=> b.visits - a.visits);
+
+  }finally{ hideLoading(); }
+
+  bwaRefreshList();
+  // Update branch label in header
+  const lbl = document.getElementById('bwa-branch-label');
+  if(lbl) lbl.textContent = branch==='both'?'Both branches':branch.charAt(0).toUpperCase()+branch.slice(1)+' only';
+  const ta = document.getElementById('bwa-message');
+  if(ta && !ta.value) ta.value = getWATemplate();
+  bwaUpdateSelectedCount();
+}
+
+function bwaRefreshList(){
+  const useSpa = document.getElementById('bwa-src-spa')?.checked !== false;
+  const sent = bwaGetSent();
+
+  // Build from spa visitors
+  let spaContacts = [];
+  if(useSpa){
+    spaContacts = liveClientData
+      .filter(c => c.phone)
+      .map(c => ({
+        name: c.name,
+        phone: c.phone.replace(/\D/g,'').slice(-10),
+        source: 'spa',
+        visits: c.visits,
+        lastVisit: c.lastVisit,
+        service: c.services,
+        selected: true,
+        sent: !!sent[c.phone.replace(/\D/g,'').slice(-10)]
+      }));
+  }
+  const spaCount = document.getElementById('bwa-spa-count');
+  if(spaCount) spaCount.textContent = spaContacts.length + ' contacts';
+
+  // Merge with manual contacts (preserve manual ones)
+  const manualContacts = bwaContacts.filter(c=>c.source==='manual'||c.source==='import');
+  const allPhones = new Set(spaContacts.map(c=>c.phone));
+  const uniqueManual = manualContacts.filter(c=>!allPhones.has(c.phone));
+
+  bwaContacts = [...spaContacts, ...uniqueManual].map(c=>({
+    ...c,
+    sent: !!sent[c.phone]
+  }));
+
+  bwaRenderList();
+}
+
+function bwaRenderList(){
+  const q = (document.getElementById('bwa-search')?.value||'').toLowerCase();
+  const sent = bwaGetSent();
+
+  // Update sent status
+  bwaContacts.forEach(c=>{ c.sent = !!sent[c.phone]; });
+
+  const filtered = bwaContacts.filter(c=>
+    !q || c.name.toLowerCase().includes(q) || c.phone.includes(q)
+  );
+
+  const listEl = document.getElementById('bwa-contact-list');
+  const countEl = document.getElementById('bwa-list-count');
+  const selected = bwaContacts.filter(c=>c.selected).length;
+  if(countEl) countEl.textContent = `(${bwaContacts.length} total)`;
+
+  bwaUpdateSelectedCount();
+
+  if(!filtered.length){
+    listEl.innerHTML = '<div style="text-align:center;color:var(--text3);padding:24px;font-size:13px">No contacts found</div>';
+    return;
+  }
+
+  listEl.innerHTML = filtered.map((c,i)=>{
+    const realIdx = bwaContacts.indexOf(c);
+    const sentDate = sent[c.phone] ? new Date(sent[c.phone]).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) : '';
+    const srcBadge = c.source==='spa'
+      ? `<span style="font-size:10px;background:var(--teal-l);color:var(--teal-d);padding:1px 6px;border-radius:99px">Spa</span>`
+      : c.source==='import'
+      ? `<span style="font-size:10px;background:var(--blue-l);color:var(--blue-d);padding:1px 6px;border-radius:99px">Imported</span>`
+      : `<span style="font-size:10px;background:#f3f0ff;color:#6c4fcf;padding:1px 6px;border-radius:99px">Manual</span>`;
+    return `<div style="display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid ${c.sent?'#e0e0e0':c.selected?'var(--teal)':'var(--border)'};border-radius:12px;padding:10px 12px;opacity:${c.sent?'0.6':'1'};transition:.15s" onclick="bwaToggle(${realIdx})">
+      <div style="width:22px;height:22px;border-radius:6px;border:2px solid ${c.selected&&!c.sent?'var(--teal)':'var(--border2)'};background:${c.selected&&!c.sent?'var(--teal)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s">
+        ${c.selected&&!c.sent?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span style="font-size:13px;font-weight:600">${c.name}</span>
+          ${srcBadge}
+          ${c.sent?`<span style="font-size:10px;background:#e8f5e9;color:#2e7d32;padding:1px 6px;border-radius:99px">✓ Sent ${sentDate}</span>`:''}
+        </div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">${c.phone}${c.visits?` · ${c.visits} visits`:''}${c.lastVisit?` · Last: ${c.lastVisit}`:''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function bwaToggle(idx){
+  if(bwaContacts[idx].sent) return; // can't un-send
+  bwaContacts[idx].selected = !bwaContacts[idx].selected;
+  bwaRenderList();
+}
+
+function bwaSelectAll(){ bwaContacts.forEach(c=>{ if(!c.sent) c.selected=true; }); bwaRenderList(); }
+function bwaSelectNone(){ bwaContacts.forEach(c=>c.selected=false); bwaRenderList(); }
+
+function bwaUpdateSelectedCount(){
+  const n = bwaContacts.filter(c=>c.selected&&!c.sent).length;
+  const el = document.getElementById('bwa-selected-count');
+  if(el) el.textContent = n + ' contact' + (n===1?'':'s');
+  const btn = document.getElementById('bwa-send-btn');
+  if(btn) btn.style.opacity = n ? '1' : '0.5';
+
+  // Reset queue when selection changes
+  bwaSendQueue = bwaContacts.filter(c=>c.selected&&!c.sent);
+  bwaSendIndex = 0;
+}
+
+function bwaInsert(token){
+  const ta = document.getElementById('bwa-message');
+  if(!ta) return;
+  const s = ta.selectionStart, e = ta.selectionEnd;
+  ta.value = ta.value.slice(0,s) + token + ta.value.slice(e);
+  ta.selectionStart = ta.selectionEnd = s + token.length;
+  ta.focus();
+}
+
+function bwaLoadDefault(){
+  const ta = document.getElementById('bwa-message');
+  if(ta) ta.value = getWATemplate();
+}
+
+function bwaBuildMsg(c){
+  const ta = document.getElementById('bwa-message');
+  const template = ta ? ta.value : getWATemplate();
+  const lastDate = c.lastVisit ? new Date(c.lastVisit).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '';
+  return template
+    .replace(/{name}/gi, c.name||'there')
+    .replace(/{visits}/gi, c.visits||'')
+    .replace(/{lastvisit}/gi, lastDate)
+    .replace(/{service}/gi, c.service||c.services||'massage');
+}
+
+function bwaSendNext(){
+  const queue = bwaContacts.filter(c=>c.selected&&!c.sent);
+  if(!queue.length){ showToast('No contacts selected or all already sent!', false); return; }
+
+  const msg = document.getElementById('bwa-message')?.value?.trim();
+  if(!msg){ showToast('Please write a message first', false); return; }
+
+  // Send to the FIRST unsent selected contact
+  const c = queue[0];
+  const phone = '91' + c.phone.replace(/\D/g,'').slice(-10);
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(bwaBuildMsg(c))}`;
+  window.open(url, '_blank');
+
+  // Mark as sent after 2s (give time to switch to WA)
+  setTimeout(()=>{
+    bwaMarkSent(c.phone);
+    c.sent = true;
+    bwaRenderList();
+    const remaining = bwaContacts.filter(x=>x.selected&&!x.sent).length;
+    showToast(`Sent to ${c.name} ✓ — ${remaining} remaining`);
+  }, 2000);
+}
+
+function bwaAddManual(){
+  const ta = document.getElementById('bwa-manual-input');
+  if(!ta||!ta.value.trim()){ showToast('Enter at least one number', false); return; }
+  const lines = ta.value.split(/[\n,]+/).map(l=>l.trim()).filter(Boolean);
+  let added = 0;
+  lines.forEach(line=>{
+    // Try to parse "number, name" or just number
+    const parts = line.split(',').map(p=>p.trim());
+    let phone = '', name = 'Contact';
+    if(parts[0].replace(/\D/g,'').length >= 10){
+      phone = parts[0].replace(/\D/g,'').slice(-10);
+      name = parts[1] || 'Contact';
+    } else if(parts[1]&&parts[1].replace(/\D/g,'').length>=10){
+      name = parts[0];
+      phone = parts[1].replace(/\D/g,'').slice(-10);
+    } else {
+      phone = line.replace(/\D/g,'').slice(-10);
+    }
+    if(phone.length < 10) return;
+    if(bwaContacts.find(c=>c.phone===phone)) return; // skip dupes
+    bwaContacts.push({ name, phone, source:'manual', visits:0, lastVisit:'', service:'', selected:true, sent:false });
+    added++;
+  });
+  ta.value = '';
+  bwaRenderList();
+  showToast(`Added ${added} contact${added===1?'':'s'} ✓`);
+}
+
+function bwaImportFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  const status = document.getElementById('bwa-import-status');
+  status.textContent = 'Reading file...';
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const text = e.target.result;
+    const lines = text.split(/\r?\n/).filter(l=>l.trim());
+    let added = 0;
+    const sent = bwaGetSent();
+    lines.forEach((line,i)=>{
+      if(i===0 && !/\d{7}/.test(line)) return; // skip header
+      // Try CSV columns: look for 10-digit number anywhere in the line
+      const nums = line.match(/\d{10}/g);
+      if(!nums) return;
+      const phone = nums[0];
+      // Try to get name from first text column
+      const cols = line.split(',');
+      const nameCol = cols.find(c=>!/^\d/.test(c.trim()) && c.trim().length>1);
+      const name = nameCol ? nameCol.trim().replace(/"/g,'') : 'Contact';
+      if(bwaContacts.find(c=>c.phone===phone)) return;
+      bwaContacts.push({ name, phone, source:'import', visits:0, lastVisit:'', service:'', selected:true, sent:!!sent[phone] });
+      added++;
+    });
+    status.textContent = `✓ Imported ${added} contacts`;
+    bwaRenderList();
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
 
 function renderRankList(items,valFn,subFn){
   if(!items.length)return'<div class="no-data">No data for this period</div>';
