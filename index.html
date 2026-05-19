@@ -249,10 +249,13 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     </div>
     <div class="section" id="tab-expenses">
       <div class="toolbar">
-        <div class="date-nav">
-          <button class="btn icon sm" onclick="changeExpDate(-1)">&#8592;</button>
-          <span class="date-lbl" id="exp-date-lbl"></span>
-          <button class="btn icon sm" onclick="changeExpDate(1)">&#8594;</button>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn sm" onclick="navTo('customers')" id="exp-back-btn" style="font-size:13px;padding:0 10px;height:32px">‹ Back</button>
+          <div class="date-nav">
+            <button class="btn icon sm" onclick="changeExpDate(-1)">&#8592;</button>
+            <span class="date-lbl" id="exp-date-lbl"></span>
+            <button class="btn icon sm" onclick="changeExpDate(1)">&#8594;</button>
+          </div>
         </div>
         <button class="btn primary sm" onclick="openExpModal()" style="font-weight:600">+ Add</button>
       </div>
@@ -261,7 +264,10 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     </div>
     <div class="section" id="tab-memberships">
       <div class="toolbar">
-        <span style="font-size:15px;font-weight:700">Memberships</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn sm" onclick="navTo('customers')" id="mem-back-btn" style="font-size:13px;padding:0 10px;height:32px">‹ Back</button>
+          <span style="font-size:15px;font-weight:700">Memberships</span>
+        </div>
         <button class="btn primary sm" onclick="openMemModal()" style="font-weight:600">+ New</button>
       </div>
       <div class="form-row" style="margin-bottom:12px">
@@ -272,10 +278,13 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     </div>
     <div class="section" id="tab-attendance">
       <div class="toolbar">
-        <div class="date-nav">
-          <button class="btn icon sm" onclick="changeAttDate(-1)">&#8592;</button>
-          <span class="date-lbl" id="att-date-lbl"></span>
-          <button class="btn icon sm" onclick="changeAttDate(1)">&#8594;</button>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn sm" onclick="navTo('customers')" id="att-back-btn" style="font-size:13px;padding:0 10px;height:32px">‹ Back</button>
+          <div class="date-nav">
+            <button class="btn icon sm" onclick="changeAttDate(-1)">&#8592;</button>
+            <span class="date-lbl" id="att-date-lbl"></span>
+            <button class="btn icon sm" onclick="changeAttDate(1)">&#8594;</button>
+          </div>
         </div>
         <button class="btn primary sm" onclick="saveAttendance()" style="font-weight:600">Save</button>
       </div>
@@ -297,7 +306,10 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     </div>
     <div class="section" id="tab-clients">
       <div class="toolbar">
-        <span style="font-size:15px;font-weight:700">📞 Call List</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn sm" onclick="navTo('customers')" id="clients-back-btn" style="font-size:13px;padding:0 10px;height:32px">‹ Back</button>
+          <span style="font-size:15px;font-weight:700">📞 Call List</span>
+        </div>
         <button class="btn sm" onclick="loadClients()" style="font-size:12px">⟳ Refresh</button>
       </div>
 
@@ -341,7 +353,10 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     <!-- ═══ BULK WHATSAPP TAB ═══ -->
     <div class="section" id="tab-bulkwa">
       <div class="toolbar">
-        <span style="font-size:15px;font-weight:700">📣 Bulk WhatsApp</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn sm" onclick="navTo('customers')" style="font-size:13px;padding:0 10px;height:32px">‹ Back</button>
+          <span style="font-size:15px;font-weight:700">📣 Bulk WA</span>
+        </div>
         <span id="bwa-branch-label" style="font-size:12px;color:var(--text3)"></span>
       </div>
 
@@ -470,6 +485,10 @@ e.g. 9845012345, Rahul
     <div class="nav-item" id="nav-memberships" onclick="navTo('memberships')">
       <div class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/><line x1="7" y1="15" x2="10" y2="15"/><line x1="13" y1="15" x2="17" y2="15"/></svg></div>
       <span class="nav-label">Members</span>
+    </div>
+    <div class="nav-item" id="nav-expenses" onclick="navTo('expenses')">
+      <div class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+      <span class="nav-label">Expenses</span>
     </div>
     <div class="nav-item" id="nav-clients" onclick="navTo('clients')">
       <div class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.35 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
@@ -992,6 +1011,10 @@ async function setupApp(){
   document.getElementById('branch-bar').classList.toggle('hidden',!isOwner);
   document.getElementById('owner-tabs').classList.toggle('hidden',!isOwner);
   document.getElementById('bottom-nav').classList.toggle('hidden',isOwner);
+  // Back buttons only for receptionist
+  document.querySelectorAll('#exp-back-btn,#mem-back-btn,#att-back-btn,#clients-back-btn').forEach(b=>{
+    if(b) b.classList.toggle('hidden', isOwner);
+  });
   await loadAllData(true);
   if(isOwner)showTab('customers');
   else navTo('customers');
@@ -1102,11 +1125,17 @@ async function changeAttDate(dir){attDate.setDate(attDate.getDate()+dir);await l
 let _editingVisitIdx = -1;
 let _editingExpenseIdx = -1;
 
-function editVisit(i){
-  const filtered=liveVisits.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(custDate);});
-  const r=filtered[i];
+function editVisit(tsOrIdx){
+  // Find by timestamp (reliable) or fall back to index
+  let r = liveVisits.find(v => (v['Timestamp']||v.timestamp) === tsOrIdx);
+  let i = liveVisits.indexOf(r);
+  if(!r){
+    // Fallback: use as numeric index in filtered list
+    const filtered=liveVisits.filter(v=>{const d=v['Date']||v.date||'';return !d||d===dk(custDate);});
+    r=filtered[tsOrIdx]; i=liveVisits.indexOf(r);
+  }
   if(!r) return;
-  _editingVisitIdx=i;
+  _editingVisitIdx = liveVisits.filter(v=>{const d=v['Date']||v.date||'';return !d||d===dk(custDate);}).indexOf(r);
   // Populate the visit modal with this visit's data
   document.getElementById('c-name').value = r['Customer Name']||r.name||'';
   document.getElementById('c-phone').value = r['Phone']||r.phone||'';
@@ -1203,7 +1232,7 @@ function renderVisits(){
       <div class="visit-bottom">
         <div class="visit-amount">&#8377;${(+(r['Amount (Rs)']||r.amt)||0).toLocaleString('en-IN')}</div>
         <div style="display:flex;gap:6px">
-          <button class="btn sm" onclick="editVisit(${i})" style="font-size:13px">Edit</button>
+          <button class="btn sm" onclick="editVisit('${r['Timestamp']||r.timestamp||i}')" style="font-size:13px">Edit</button>
           ${role==='owner'?`<button class="btn danger" onclick="deleteVisit(${i})">Remove</button>`:''}
         </div>
       </div>
