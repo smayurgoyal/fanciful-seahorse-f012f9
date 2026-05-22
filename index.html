@@ -1779,11 +1779,12 @@ async function saveTherapist(){
   const br=document.getElementById('t-branch').value;
   const id=genTherapistId(br);
   const newTherapist={id,name,spec:document.getElementById('t-spec').value.trim(),branch:br,interbranch:document.getElementById('t-interbranch').checked,phone:document.getElementById('t-phone').value.trim()};
-  liveTherapists.push(newTherapist);
   showLoading('Saving therapist...');
   try{
-    await sheetsPost({type:'saveTherapists',therapists:liveTherapists});
-    cacheTherapists(liveTherapists); // Cache so all devices can read
+    // Add single therapist — never overwrites existing ones
+    await sheetsPost({type:'addTherapist', therapist:newTherapist});
+    liveTherapists.push(newTherapist);
+    cacheTherapists(liveTherapists);
     showToast('Therapist '+name+' added — '+id+' ✓');
     closeTherapistModal();
     ['t-name','t-spec','t-phone'].forEach(i=>document.getElementById(i).value='');
@@ -1791,7 +1792,6 @@ async function saveTherapist(){
     renderTherapists();
   }catch(e){
     showToast('Failed to save — please try again',false);
-    liveTherapists.pop();
   }finally{hideLoading();}
 }
 
@@ -1823,12 +1823,20 @@ function renderTherapists(){
 
 async function deleteTherapist(idx){
   if(!confirm('Remove this therapist?'))return;
+  const t = liveTherapists[idx];
+  if(!t) return;
+  const id = t['ID']||t.id||'';
   liveTherapists.splice(idx,1);
   showLoading('Removing...');
   try{
-    await sheetsPost({type:'saveTherapists',therapists:liveTherapists});
-    cacheTherapists(liveTherapists); // Update cache
+    // Delete by ID — never touches other therapists
+    await sheetsPost({type:'deleteTherapist', id});
+    cacheTherapists(liveTherapists);
     renderTherapists();
+    showToast('Therapist removed ✓');
+  }catch(e){
+    showToast('Failed to remove',false);
+    liveTherapists.splice(idx,0,t); // Restore on failure
   }finally{hideLoading();}
 }
 
