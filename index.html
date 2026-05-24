@@ -345,6 +345,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     <button class="o-tab" id="otab-therapists" onclick="showTab('therapists')">Therapists</button>
     <button class="o-tab" id="otab-analytics" onclick="showTab('analytics')">Analytics</button>
     <button class="o-tab" id="otab-clients" onclick="showTab('clients')">Call List</button>
+    <button class="o-tab" id="otab-fixed" onclick="showTab('fixed')">📋 Fixed Costs</button>
     <button class="o-tab" id="otab-bulkwa" onclick="showTab('bulkwa')">📣 Bulk WA</button>
   </div>
   <div class="content">
@@ -461,6 +462,43 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
         <button class="range-btn" onclick="setRange(30,this)">30 days</button>
       </div>
       <div id="analytics-content"></div>
+    </div>
+
+    <!-- ═══ FIXED MONTHLY COSTS TAB ═══ -->
+    <div class="section" id="tab-fixed">
+      <div class="toolbar">
+        <span style="font-size:15px;font-weight:700">📋 Fixed Monthly Costs</span>
+        <button class="btn primary sm" onclick="openFixedModal()" style="font-weight:600">+ Add</button>
+      </div>
+
+      <!-- SUMMARY CARDS -->
+      <div class="metrics" id="fixed-metrics" style="margin-bottom:18px"></div>
+
+      <!-- MONTH SELECTOR -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <div class="date-nav" style="flex:1">
+          <button class="btn icon sm" onclick="changeFixedMonth(-1)">&#8592;</button>
+          <span class="date-lbl" id="fixed-month-lbl" style="font-size:15px;font-weight:700"></span>
+          <button class="btn icon sm" onclick="changeFixedMonth(1)">&#8594;</button>
+        </div>
+        <button class="btn sm" onclick="copyFromLastMonth()" style="font-size:12px;height:34px">Copy last month</button>
+      </div>
+
+      <!-- CATEGORY FILTERS -->
+      <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px">
+        <button class="range-btn active" id="fcat-all" onclick="setFixedCat('all',this)">All</button>
+        <button class="range-btn" id="fcat-salary" onclick="setFixedCat('salary',this)">💰 Salaries</button>
+        <button class="range-btn" id="fcat-rent" onclick="setFixedCat('rent',this)">🏠 Rent</button>
+        <button class="range-btn" id="fcat-amc" onclick="setFixedCat('amc',this)">🔧 AMC</button>
+        <button class="range-btn" id="fcat-utility" onclick="setFixedCat('utility',this)">⚡ Utilities</button>
+        <button class="range-btn" id="fcat-other" onclick="setFixedCat('other',this)">📦 Other</button>
+      </div>
+
+      <!-- FIXED COST LIST -->
+      <div id="fixed-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
+
+      <!-- BRANCH COMPARISON -->
+      <div id="fixed-branch-compare" style="margin-top:4px"></div>
     </div>
 
     <!-- ═══ BULK WHATSAPP TAB ═══ -->
@@ -853,6 +891,106 @@ e.g. 9845012345, Rahul
   </div>
 </div>
 
+<!-- FIXED COSTS MODAL -->
+<div class="sheet-overlay" id="modal-fixed">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 id="fixed-modal-title">Add Fixed Cost</h3>
+      <button class="btn icon sm" onclick="closeFixedModal()">&#10005;</button>
+    </div>
+    <div class="sheet-body">
+      <div class="form-row">
+        <label>Description *</label>
+        <input id="fx-desc" placeholder="e.g. Anu Salary, Shop Rent, AC AMC"/>
+      </div>
+      <div class="two-col">
+        <div class="form-row">
+          <label>Category *</label>
+          <select id="fx-cat">
+            <option value="salary">💰 Staff Salary</option>
+            <option value="rent">🏠 Rent / Lease</option>
+            <option value="amc">🔧 AMC / Maintenance</option>
+            <option value="utility">⚡ Utility</option>
+            <option value="loan">🏦 Loan / EMI</option>
+            <option value="insurance">🛡️ Insurance</option>
+            <option value="subscription">📱 Subscription</option>
+            <option value="other">📦 Other</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Branch</label>
+          <select id="fx-branch">
+            <option value="indiranagar">Indiranagar</option>
+            <option value="koramangala">Koramangala</option>
+            <option value="both">Both Branches</option>
+          </select>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-row">
+          <label>Amount (₹) *</label>
+          <input id="fx-amount" type="number" inputmode="numeric" placeholder="0"/>
+        </div>
+        <div class="form-row">
+          <label>Payment Mode</label>
+          <select id="fx-payment">
+            <option value="Cash">Cash</option>
+            <option value="UPI">UPI</option>
+            <option value="Bank Transfer">Bank Transfer</option>
+            <option value="Cheque">Cheque</option>
+            <option value="Auto Debit">Auto Debit</option>
+            <option value="Card">Card</option>
+          </select>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-row">
+          <label>Due Date</label>
+          <select id="fx-due-day">
+            <option value="1">1st of month</option>
+            <option value="5">5th of month</option>
+            <option value="7">7th of month</option>
+            <option value="10">10th of month</option>
+            <option value="15">15th of month</option>
+            <option value="20">20th of month</option>
+            <option value="25">25th of month</option>
+            <option value="last">Last day</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Paid By</label>
+          <input id="fx-paid-by" placeholder="e.g. Mayur, Amey"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Vendor / Payee</label>
+        <input id="fx-vendor" placeholder="e.g. Landlord name, Company name"/>
+      </div>
+      <div class="form-row">
+        <label>Notes</label>
+        <input id="fx-notes" placeholder="Any additional info..."/>
+      </div>
+      <!-- PAID THIS MONTH TOGGLE -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:1.5px solid var(--border2);border-radius:var(--radius);background:var(--bg2);margin-bottom:6px">
+        <div>
+          <div style="font-size:14px;font-weight:600">Mark as Paid this month</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">Toggle when payment is done</div>
+        </div>
+        <div style="position:relative;width:44px;height:26px;cursor:pointer" onclick="toggleFxPaid()">
+          <input type="checkbox" id="fx-paid" style="opacity:0;width:0;height:0;position:absolute"/>
+          <div id="fx-paid-track" style="position:absolute;inset:0;background:var(--border2);border-radius:99px;transition:.2s"></div>
+          <div id="fx-paid-thumb" style="position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.2s;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn full" onclick="closeFixedModal()">Cancel</button>
+      <button class="btn primary full" id="fx-save-btn" onclick="saveFixedCost()" style="font-weight:600">Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- LOADING OVERLAY -->
 <div class="loading-overlay hidden" id="loading-overlay">
   <div class="loading-spinner"></div>
@@ -1154,6 +1292,7 @@ async function showTab(tab){
   else if(tab==='therapists'){await loadTherapists();renderTherapists();}
   else if(tab==='clients'){await loadClients();renderClients();}
   else if(tab==='bulkwa'){await bwaInit();}
+  else if(tab==='fixed'){showTab_fixed();}
   else renderAnalytics();
 }
 
@@ -2767,6 +2906,287 @@ function bwaImportFile(input){
   reader.readAsText(file);
 }
 
+
+// ── FIXED MONTHLY COSTS ───────────────────────────────────────────
+const FIXED_KEY = 'retreat_fixed_costs';
+let fixedCosts = [];
+let fixedMonth = new Date().toISOString().slice(0,7); // 'YYYY-MM'
+let fixedCat = 'all';
+let fixedEditId = null;
+let fxPaidState = false;
+
+const FIXED_CAT_META = {
+  salary:       { label:'Staff Salary',    icon:'💰', color:'var(--teal)' },
+  rent:         { label:'Rent / Lease',    icon:'🏠', color:'var(--blue)' },
+  amc:          { label:'AMC / Maint.',    icon:'🔧', color:'var(--amber)' },
+  utility:      { label:'Utility',         icon:'⚡', color:'#7C3AED' },
+  loan:         { label:'Loan / EMI',      icon:'🏦', color:'var(--red)' },
+  insurance:    { label:'Insurance',       icon:'🛡️', color:'#0891B2' },
+  subscription: { label:'Subscription',   icon:'📱', color:'#059669' },
+  other:        { label:'Other',           icon:'📦', color:'var(--text2)' },
+};
+
+function loadFixedCosts(){
+  try{ fixedCosts = JSON.parse(localStorage.getItem(FIXED_KEY)||'[]'); }catch(e){ fixedCosts=[]; }
+  if(!fixedCosts.length) seedDefaultFixedCosts();
+}
+
+function seedDefaultFixedCosts(){
+  // Seed with common spa fixed costs as examples
+  fixedCosts = [
+    {id:'fx_'+Date.now()+'_1', desc:'Shop Rent - Indiranagar', cat:'rent', branch:'indiranagar', amount:0, payment:'Bank Transfer', dueDay:'1', vendor:'Landlord', notes:'', paidMonths:{}},
+    {id:'fx_'+Date.now()+'_2', desc:'Shop Rent - Koramangala', cat:'rent', branch:'koramangala', amount:0, payment:'Bank Transfer', dueDay:'1', vendor:'Landlord', notes:'', paidMonths:{}},
+    {id:'fx_'+Date.now()+'_3', desc:'AC Annual Maintenance', cat:'amc', branch:'indiranagar', amount:0, payment:'UPI', dueDay:'1', vendor:'AC Service', notes:'', paidMonths:{}},
+    {id:'fx_'+Date.now()+'_4', desc:'Electricity Bill', cat:'utility', branch:'indiranagar', amount:0, payment:'UPI', dueDay:'15', vendor:'BESCOM', notes:'', paidMonths:{}},
+  ];
+  saveFixedCosts();
+}
+
+function saveFixedCosts(){
+  try{ localStorage.setItem(FIXED_KEY, JSON.stringify(fixedCosts)); }catch(e){}
+}
+
+function changeFixedMonth(dir){
+  const [y,m] = fixedMonth.split('-').map(Number);
+  const d = new Date(y, m-1+dir, 1);
+  fixedMonth = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+  renderFixedTab();
+}
+
+function setFixedCat(cat, btn){
+  fixedCat = cat;
+  document.querySelectorAll('[id^="fcat-"]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFixedList();
+}
+
+function showTab_fixed(){
+  loadFixedCosts();
+  renderFixedTab();
+}
+
+function renderFixedTab(){
+  // Month label
+  const [y,m] = fixedMonth.split('-').map(Number);
+  const lbl = new Date(y,m-1,1).toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+  document.getElementById('fixed-month-lbl').textContent = lbl;
+  renderFixedMetrics();
+  renderFixedList();
+  renderFixedBranchCompare();
+}
+
+function renderFixedMetrics(){
+  const monthCosts = fixedCosts;
+  const total = monthCosts.reduce((s,c)=>s+Number(c.amount||0),0);
+  const paid = monthCosts.filter(c=>c.paidMonths&&c.paidMonths[fixedMonth]).reduce((s,c)=>s+Number(c.amount||0),0);
+  const unpaid = total - paid;
+  const count = monthCosts.length;
+  document.getElementById('fixed-metrics').innerHTML=`
+    <div class="metric"><div class="lbl">Total Fixed</div><div class="val" style="color:var(--text);font-size:20px">₹${total.toLocaleString('en-IN')}</div></div>
+    <div class="metric"><div class="lbl">Paid ✓</div><div class="val" style="color:var(--teal);font-size:20px">₹${paid.toLocaleString('en-IN')}</div></div>
+    <div class="metric"><div class="lbl">Pending</div><div class="val" style="color:var(--red);font-size:20px">₹${unpaid.toLocaleString('en-IN')}</div></div>
+    <div class="metric"><div class="lbl">Line Items</div><div class="val" style="color:var(--blue);font-size:20px">${count}</div></div>
+  `;
+}
+
+function renderFixedList(){
+  const el = document.getElementById('fixed-list');
+  let list = fixedCosts;
+  if(fixedCat !== 'all') list = list.filter(c=>c.cat===fixedCat);
+  list = [...list].sort((a,b)=>{
+    // Sort: unpaid first, then by category, then amount desc
+    const aPaid = !!(a.paidMonths&&a.paidMonths[fixedMonth]);
+    const bPaid = !!(b.paidMonths&&b.paidMonths[fixedMonth]);
+    if(aPaid !== bPaid) return aPaid ? 1 : -1;
+    return Number(b.amount||0) - Number(a.amount||0);
+  });
+
+  if(!list.length){
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No fixed costs yet</div><div class="empty-sub">Tap + Add to add your first fixed monthly cost</div></div>`;
+    return;
+  }
+
+  el.innerHTML = list.map(c=>{
+    const meta = FIXED_CAT_META[c.cat]||FIXED_CAT_META.other;
+    const isPaid = !!(c.paidMonths&&c.paidMonths[fixedMonth]);
+    const amt = Number(c.amount||0);
+    const branchLabel = c.branch==='both'?'Both branches':c.branch.charAt(0).toUpperCase()+c.branch.slice(1);
+    const realIdx = fixedCosts.indexOf(c);
+    const dueLabel = c.dueDay==='last'?'Last day':`${c.dueDay}${['1','21','31'].includes(c.dueDay)?'st':c.dueDay==='2'?'nd':c.dueDay==='3'?'rd':'th'} of month`;
+
+    return `<div style="background:var(--surface);border:1.5px solid ${isPaid?'var(--teal-m)':'var(--border)'};border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow-sm);opacity:${isPaid?'0.8':'1'}">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="width:46px;height:46px;border-radius:14px;background:${meta.color}20;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${meta.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="font-size:15px;font-weight:700;${isPaid?'text-decoration:line-through;color:var(--text3)':''}">${c.desc}</span>
+            ${isPaid?'<span class="badge b-green" style="font-size:10px">✓ Paid</span>':'<span class="badge b-red" style="font-size:10px">Pending</span>'}
+          </div>
+          <div style="font-size:12px;color:var(--text2);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap">
+            <span>${meta.label}</span>
+            <span>·</span><span>${branchLabel}</span>
+            <span>·</span><span>Due: ${dueLabel}</span>
+            ${c.vendor?`<span>·</span><span>${c.vendor}</span>`:''}
+          </div>
+          ${c.notes?`<div style="font-size:12px;color:var(--text3);margin-top:4px;font-style:italic">${c.notes}</div>`:''}
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:20px;font-weight:800;color:${isPaid?'var(--teal)':'var(--text)'};letter-spacing:-.3px">₹${amt.toLocaleString('en-IN')}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">${c.payment}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+        <button onclick="toggleFixedPaidStatus(${realIdx})" style="flex:2;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px;border:1.5px solid ${isPaid?'var(--border2)':'var(--teal)'};background:${isPaid?'var(--bg2)':'var(--teal-l)'};color:${isPaid?'var(--text2)':'var(--teal-d)'};font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation">
+          ${isPaid?'↩ Mark Unpaid':'✓ Mark as Paid'}
+        </button>
+        <button onclick="editFixedCost(${realIdx})" style="flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;touch-action:manipulation">Edit</button>
+        <button onclick="deleteFixedCost(${realIdx})" style="width:42px;padding:10px;border-radius:10px;border:1.5px solid var(--border2);background:var(--bg2);color:var(--red);font-size:16px;cursor:pointer;touch-action:manipulation">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderFixedBranchCompare(){
+  const ind = fixedCosts.filter(c=>c.branch==='indiranagar'||c.branch==='both').reduce((s,c)=>s+Number(c.amount||0),0);
+  const kor = fixedCosts.filter(c=>c.branch==='koramangala'||c.branch==='both').reduce((s,c)=>s+Number(c.amount||0),0);
+  const max = Math.max(ind,kor,1);
+  document.getElementById('fixed-branch-compare').innerHTML=`
+    <div class="a-card">
+      <h4>📊 Branch Breakdown</h4>
+      <div class="bar-row">
+        <div class="bar-label">Indiranagar</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(ind/max*100).toFixed(1)}%;background:linear-gradient(90deg,var(--teal),var(--teal-d))"></div></div>
+        <div class="bar-val">₹${ind.toLocaleString('en-IN')}</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Koramangala</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(kor/max*100).toFixed(1)}%;background:linear-gradient(90deg,var(--blue),var(--blue-d))"></div></div>
+        <div class="bar-val">₹${kor.toLocaleString('en-IN')}</div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">"Both branches" costs counted in both branches above</div>
+    </div>`;
+}
+
+function toggleFixedPaidStatus(idx){
+  const c = fixedCosts[idx];
+  if(!c) return;
+  if(!c.paidMonths) c.paidMonths = {};
+  if(c.paidMonths[fixedMonth]){
+    delete c.paidMonths[fixedMonth];
+    showToast('Marked as unpaid');
+  } else {
+    c.paidMonths[fixedMonth] = new Date().toISOString();
+    showToast(`₹${Number(c.amount).toLocaleString('en-IN')} marked as paid ✓`);
+  }
+  saveFixedCosts();
+  renderFixedTab();
+}
+
+function openFixedModal(editIdx=null){
+  fixedEditId = editIdx;
+  fxPaidState = false;
+  const isEdit = editIdx !== null;
+  document.getElementById('fixed-modal-title').textContent = isEdit ? 'Edit Fixed Cost' : 'Add Fixed Cost';
+  document.getElementById('fx-save-btn').textContent = isEdit ? 'Update' : 'Save';
+
+  if(isEdit){
+    const c = fixedCosts[editIdx];
+    document.getElementById('fx-desc').value = c.desc||'';
+    document.getElementById('fx-cat').value = c.cat||'salary';
+    document.getElementById('fx-branch').value = c.branch||'indiranagar';
+    document.getElementById('fx-amount').value = c.amount||'';
+    document.getElementById('fx-payment').value = c.payment||'Cash';
+    document.getElementById('fx-due-day').value = c.dueDay||'1';
+    document.getElementById('fx-paid-by').value = c.paidBy||'';
+    document.getElementById('fx-vendor').value = c.vendor||'';
+    document.getElementById('fx-notes').value = c.notes||'';
+    fxPaidState = !!(c.paidMonths&&c.paidMonths[fixedMonth]);
+  } else {
+    ['fx-desc','fx-amount','fx-paid-by','fx-vendor','fx-notes'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('fx-cat').value='salary';
+    document.getElementById('fx-branch').value='indiranagar';
+    document.getElementById('fx-payment').value='Cash';
+    document.getElementById('fx-due-day').value='1';
+  }
+  updateFxPaidToggle();
+  document.getElementById('modal-fixed').classList.add('open');
+  setTimeout(()=>document.getElementById('fx-desc').focus(),300);
+}
+
+function closeFixedModal(){ document.getElementById('modal-fixed').classList.remove('open'); }
+
+function toggleFxPaid(){
+  fxPaidState = !fxPaidState;
+  updateFxPaidToggle();
+}
+
+function updateFxPaidToggle(){
+  const track = document.getElementById('fx-paid-track');
+  const thumb = document.getElementById('fx-paid-thumb');
+  if(track) track.style.background = fxPaidState ? 'var(--teal)' : 'var(--border2)';
+  if(thumb) thumb.style.left = fxPaidState ? '21px' : '3px';
+}
+
+function saveFixedCost(){
+  const desc = document.getElementById('fx-desc').value.trim();
+  const amt = document.getElementById('fx-amount').value.trim();
+  if(!desc){ showToast('Please enter a description',false); return; }
+  if(!amt||isNaN(amt)||Number(amt)<0){ showToast('Please enter a valid amount',false); return; }
+
+  const data = {
+    id: fixedEditId!==null ? fixedCosts[fixedEditId].id : 'fx_'+Date.now(),
+    desc,
+    cat: document.getElementById('fx-cat').value,
+    branch: document.getElementById('fx-branch').value,
+    amount: Number(amt),
+    payment: document.getElementById('fx-payment').value,
+    dueDay: document.getElementById('fx-due-day').value,
+    paidBy: document.getElementById('fx-paid-by').value.trim(),
+    vendor: document.getElementById('fx-vendor').value.trim(),
+    notes: document.getElementById('fx-notes').value.trim(),
+    paidMonths: fixedEditId!==null ? (fixedCosts[fixedEditId].paidMonths||{}) : {},
+  };
+
+  if(fxPaidState){ data.paidMonths[fixedMonth] = new Date().toISOString(); }
+  else { delete data.paidMonths[fixedMonth]; }
+
+  if(fixedEditId !== null){
+    fixedCosts[fixedEditId] = data;
+    showToast('Updated ✓');
+  } else {
+    fixedCosts.push(data);
+    showToast('Fixed cost added ✓');
+  }
+  saveFixedCosts();
+  closeFixedModal();
+  renderFixedTab();
+}
+
+function editFixedCost(idx){ openFixedModal(idx); }
+
+function deleteFixedCost(idx){
+  if(!confirm(`Delete "${fixedCosts[idx].desc}"?`)) return;
+  fixedCosts.splice(idx,1);
+  saveFixedCosts();
+  renderFixedTab();
+  showToast('Deleted');
+}
+
+function copyFromLastMonth(){
+  const [y,m] = fixedMonth.split('-').map(Number);
+  const prev = new Date(y,m-2,1);
+  const prevKey = prev.getFullYear()+'-'+String(prev.getMonth()+1).padStart(2,'0');
+  let copied = 0;
+  fixedCosts.forEach(c=>{
+    if(c.paidMonths&&c.paidMonths[prevKey] && !(c.paidMonths[fixedMonth])){
+      c.paidMonths[fixedMonth] = new Date().toISOString();
+      copied++;
+    }
+  });
+  saveFixedCosts();
+  renderFixedTab();
+  showToast(copied?`${copied} payments copied from last month ✓`:`No paid items in last month to copy`);
+}
 
 function renderRankList(items,valFn,subFn){
   if(!items.length)return'<div class="no-data">No data for this period</div>';
