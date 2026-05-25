@@ -358,6 +358,17 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
         </div>
         <button class="btn primary sm" onclick="openVisitModal()" style="font-weight:600">+ Add</button>
       </div>
+      <!-- Quick date jumps -->
+      <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none">
+        <button class="range-btn" onclick="jumpToDate('today')" style="font-size:12px;padding:6px 12px">Today</button>
+        <button class="range-btn" onclick="jumpToDate('yesterday')" style="font-size:12px;padding:6px 12px">Yesterday</button>
+        <button class="range-btn" onclick="jumpToDate('week')" style="font-size:12px;padding:6px 12px">This Week</button>
+        <button class="range-btn" onclick="jumpToDate('month')" style="font-size:12px;padding:6px 12px">This Month</button>
+      </div>
+      <!-- Search -->
+      <div style="margin-bottom:12px">
+        <input id="visit-search" placeholder="🔍 Search customer name or phone..." style="width:100%;height:42px;font-size:14px;padding:0 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg);color:var(--text);font-family:var(--font);box-sizing:border-box" oninput="renderVisits()"/>
+      </div>
       <div class="metrics" id="cust-metrics"></div>
       <div class="visit-list" id="visit-list"></div>
     </div>
@@ -372,6 +383,16 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
           </div>
         </div>
         <button class="btn primary sm" onclick="openExpModal()" style="font-weight:600">+ Add</button>
+      </div>
+      <!-- Quick date jumps -->
+      <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none">
+        <button class="range-btn" onclick="jumpExpDate('today')" style="font-size:12px;padding:6px 12px">Today</button>
+        <button class="range-btn" onclick="jumpExpDate('yesterday')" style="font-size:12px;padding:6px 12px">Yesterday</button>
+        <button class="range-btn" onclick="jumpExpDate('week')" style="font-size:12px;padding:6px 12px">This Week</button>
+      </div>
+      <!-- Search -->
+      <div style="margin-bottom:12px">
+        <input id="exp-search" placeholder="🔍 Search description or vendor..." style="width:100%;height:42px;font-size:14px;padding:0 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg);color:var(--text);font-family:var(--font);box-sizing:border-box" oninput="renderExpenses()"/>
       </div>
       <div class="metrics" id="exp-metrics"></div>
       <div class="exp-list" id="exp-list"></div>
@@ -1031,10 +1052,11 @@ function showToast(msg,ok=true){
 const SHEET_ID_KEY='1w4xgLMIcvA70_WkCMudey63gf-irB3SfxuldVjnJj5w';
 const CACHE_KEY='retreat_spa_cache_v1';
 
-function saveCache(key,data){try{const c=JSON.parse(localStorage.getItem(CACHE_KEY)||'{}');c[key]=data;localStorage.setItem(CACHE_KEY,JSON.stringify(c));}catch(e){}}
-function loadCache(key){try{const c=JSON.parse(localStorage.getItem(CACHE_KEY)||'{}');return c[key]||null;}catch(e){return null;}}
-function cacheTherapists(t){try{localStorage.setItem('retreat_therapists_shared',JSON.stringify(t));}catch(e){}}
-function getCachedTherapists(){try{const t=localStorage.getItem('retreat_therapists_shared');return t?JSON.parse(t):[];}catch(e){return[];}}
+function saveCache(key,data){}
+function loadCache(key){return null;}
+// Note: therapists always loaded fresh from Sheets — no caching to avoid wipe risk
+function cacheTherapists(t){}
+function getCachedTherapists(){return [];}
 
 // Parse CSV text into array of objects using first row as headers
 function csvToObjects(csv){
@@ -1318,6 +1340,16 @@ function dk(d){
   const dy=String(d.getDate()).padStart(2,'0');
   return yr+'-'+mo+'-'+dy;
 }
+function monthKey(d){
+  // Local-time month key 'YYYY-MM' (IST safe)
+  d = d||new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+function nowIST(){
+  // Local date-time string for logs — IST safe
+  const d = new Date();
+  return dk(d) + ' ' + String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
 function fmt(d){return d.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'2-digit'});}
 function localDateStr(d){
   // Same as dk but for any date — used for memberships expiry default
@@ -1370,7 +1402,26 @@ async function loadExpensesForDate(){
 }
 
 async function changeDate(dir){custDate.setDate(custDate.getDate()+dir);await loadVisitsForDate();renderVisits();}
+
+async function jumpToDate(when){
+  const d = new Date();
+  if(when==='today'){ custDate = d; }
+  else if(when==='yesterday'){ custDate = new Date(d.getTime()-86400000); }
+  else if(when==='week'){ custDate = d; /* still single day but jump to today */ }
+  else if(when==='month'){ custDate = d; }
+  await loadVisitsForDate();
+  renderVisits();
+}
 async function changeExpDate(dir){expDate.setDate(expDate.getDate()+dir);await loadExpensesForDate();renderExpenses();}
+
+async function jumpExpDate(when){
+  const d = new Date();
+  if(when==='today'){ expDate = d; }
+  else if(when==='yesterday'){ expDate = new Date(d.getTime()-86400000); }
+  else if(when==='week'){ expDate = d; }
+  await loadExpensesForDate();
+  renderExpenses();
+}
 async function changeAttDate(dir){attDate.setDate(attDate.getDate()+dir);await loadAttendance();renderAttendance();}
 
 // ── EDIT STATE ──
@@ -1453,10 +1504,18 @@ function renderVisits(){
   document.getElementById('cust-date-lbl').textContent=fmt(custDate);
   // Safety filter — only show visits matching current date (guards against stale data)
   const todayStr=dk(custDate);
-  const list=liveVisits.filter(r=>{
+  const q=(document.getElementById('visit-search')?.value||'').toLowerCase().trim();
+  let list=liveVisits.filter(r=>{
     const d=r['Date']||r.date||'';
     return !d || d===todayStr; // show if no date (locally added) or date matches
   });
+  if(q){
+    list = list.filter(r=>{
+      const name=(r['Customer Name']||r.name||'').toLowerCase();
+      const phone=(r['Phone']||r.phone||'').toLowerCase();
+      return name.includes(q) || phone.includes(q);
+    });
+  }
   const rev=list.filter(r=>r['Status']!=='Cancelled'&&r['Status']!=='No-Show').reduce((s,r)=>s+(+r['Amount (Rs)']||0),0);
   const done=list.filter(r=>r['Status']==='Completed').length;
   const avg=done>0?Math.round(rev/done):0;
@@ -1495,6 +1554,7 @@ function renderVisits(){
 function renderExpenses(){
   document.getElementById('exp-date-lbl').textContent=fmt(expDate);
   const todayExpStr=dk(expDate);
+  const q=(document.getElementById('exp-search')?.value||'').toLowerCase().trim();
   let list=liveExpenses.filter(r=>{
     const d=r['Date']||r.date||'';
     if(d && d!==todayExpStr) return false;
@@ -1505,6 +1565,14 @@ function renderExpenses(){
     }
     return true;
   });
+  if(q){
+    list = list.filter(r=>{
+      const desc=(r['Description']||r.desc||'').toLowerCase();
+      const vendor=(r['Vendor']||r.vendor||'').toLowerCase();
+      const cat=(r['Category']||r.cat||'').toLowerCase();
+      return desc.includes(q) || vendor.includes(q) || cat.includes(q);
+    });
+  }
   const total=list.reduce((s,r)=>s+(+(r['Amount (Rs)']||r.amt)||0),0);
   document.getElementById('exp-metrics').innerHTML=`
     <div class="metric"><div class="lbl">Entries</div><div class="val" style="color:${BLUE}">${list.length}</div></div>
@@ -1975,8 +2043,48 @@ async function useHours(){
 }
 
 // ── DELETE ──
+// Undo system — stores last deleted item with restore handler
+let _undoState = null;
+let _undoTimer = null;
+
+function showUndoToast(label, restoreFn){
+  // Clear any pending undo
+  if(_undoTimer) clearTimeout(_undoTimer);
+  _undoState = { restoreFn, expiresAt: Date.now()+6000 };
+
+  let t = document.getElementById('undo-toast');
+  if(!t){
+    t = document.createElement('div');
+    t.id='undo-toast';
+    t.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#1C1917;color:#fff;padding:12px 16px;border-radius:99px;font-size:14px;font-weight:600;z-index:600;display:flex;align-items:center;gap:14px;box-shadow:0 4px 16px rgba(0,0,0,.3);max-width:90vw';
+    document.body.appendChild(t);
+  }
+  t.innerHTML = `<span style="opacity:.9">${label}</span><button onclick="performUndo()" style="background:#25D366;border:none;color:#fff;font-weight:700;font-size:13px;padding:6px 14px;border-radius:99px;cursor:pointer;touch-action:manipulation">↶ Undo</button>`;
+  t.style.opacity='1';
+  t.style.display='flex';
+  _undoTimer = setTimeout(()=>{
+    t.style.opacity='0';
+    setTimeout(()=>{ t.style.display='none'; _undoState=null; }, 400);
+  }, 5500);
+}
+
+async function performUndo(){
+  if(!_undoState || Date.now() > _undoState.expiresAt) return;
+  const restoreFn = _undoState.restoreFn;
+  _undoState = null;
+  if(_undoTimer) clearTimeout(_undoTimer);
+  const t = document.getElementById('undo-toast');
+  if(t) { t.style.opacity='0'; setTimeout(()=>{ t.style.display='none'; }, 300); }
+  showLoading('Restoring...');
+  try{
+    await restoreFn();
+    showToast('Restored ✓');
+  }catch(e){
+    showToast('Could not restore — please re-add manually', false);
+  }finally{ hideLoading(); }
+}
+
 async function deleteVisit(i){
-  if(!confirm('Remove this visit?'))return;
   const filtered=liveVisits.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(custDate);});
   const v=filtered[i];
   if(!v){showToast('Could not find visit to remove',false);return;}
@@ -1987,14 +2095,31 @@ async function deleteVisit(i){
     const custName=v['Customer Name']||v.name||'';
     const dateStr=v['Date']||dk(custDate);
     await sheetsPost({type:'deleteVisit',branch:br,timestamp:ts,custName:custName,date:dateStr,rowIndex:i});
+    // Store snapshot for undo
+    const snapshot = {...v};
     await loadVisitsForDate();
     renderVisits();
-    showToast('Visit removed ✓');
+    showUndoToast(`Removed ${custName}`, async ()=>{
+      const rec = {
+        name: snapshot['Customer Name']||snapshot.name||'',
+        phone: snapshot['Phone']||snapshot.phone||'',
+        service: snapshot['Service']||snapshot.service||'',
+        therapist: snapshot['Therapist']||snapshot.therapist||'',
+        time: snapshot['Time']||snapshot.time||'',
+        dur: snapshot['Duration (min)']||snapshot.dur||60,
+        pay: snapshot['Payment Mode']||snapshot.pay||'Cash',
+        amt: snapshot['Amount (Rs)']||snapshot.amt||0,
+        notes: snapshot['Notes']||snapshot.notes||'',
+        memberCode: snapshot['Member Code']||''
+      };
+      await sheetsPost({type:'visit', branch:br, date:dateStr, record:rec});
+      await loadVisitsForDate();
+      renderVisits();
+    });
   }finally{hideLoading();}
 }
 
 async function deleteExpense(i){
-  if(!confirm('Remove this expense?'))return;
   const filtered=liveExpenses.filter(r=>{const d=r['Date']||r.date||'';return !d||d===dk(expDate);});
   const e=filtered[i];
   if(!e){showToast('Could not find expense to remove',false);return;}
@@ -2004,9 +2129,24 @@ async function deleteExpense(i){
     const ts=e['Timestamp']||e.timestamp||'';
     const desc=e['Description']||e.desc||'';
     await sheetsPost({type:'deleteExpense',branch:br,timestamp:ts,desc:desc,rowIndex:i});
+    const snapshot = {...e};
     await loadExpensesForDate();
     renderExpenses();
-    showToast('Expense removed ✓');
+    showUndoToast(`Removed ${desc.slice(0,30)}`, async ()=>{
+      const rec = {
+        desc: snapshot['Description']||snapshot.desc||'',
+        category: snapshot['Category']||snapshot.category||'Other',
+        vendor: snapshot['Vendor']||snapshot.vendor||'',
+        amt: snapshot['Amount (Rs)']||snapshot.amt||0,
+        pay: snapshot['Paid By']||snapshot.pay||'Cash',
+        receipt: snapshot['Receipt No']||snapshot.receipt||'',
+        addedBy: snapshot['Added By']||(isOwner?'owner':'receptionist'),
+        shared: snapshot['Shared']||'No'
+      };
+      await sheetsPost({type:'expense', branch:br, date:snapshot['Date']||dk(expDate), record:rec});
+      await loadExpensesForDate();
+      renderExpenses();
+    });
   }finally{hideLoading();}
 }
 
@@ -2296,23 +2436,54 @@ Would you like to book your next session?
 See you soon! 😊
 — Team Retreat Spa`;
 
-let waTemplate = '';
+let waTemplate = DEFAULT_WA_TEMPLATE;
 let contactedClients = {};
 
-function getWATemplate(){
-  try{ return localStorage.getItem('retreat_wa_template')||DEFAULT_WA_TEMPLATE; }catch(e){ return DEFAULT_WA_TEMPLATE; }
+function getWATemplate(){ return waTemplate; }
+
+async function loadWATemplate(){
+  // Find a template named "Default Call Template" in the WA Templates sheet
+  try{
+    const res = await sheetsGet({action:'getData', branch:'indiranagar', date:''});
+    if(res&&res.success&&res.data.waTemplates){
+      const def = res.data.waTemplates.find(t=>t['Name']==='Default Call Template');
+      if(def && def['Body']) waTemplate = def['Body'];
+    }
+  }catch(e){}
 }
-function saveWATemplate(t){
-  try{ localStorage.setItem('retreat_wa_template', t); }catch(e){}
+
+async function saveWATemplate(t){
+  waTemplate = t;
+  // Persist as a special template in sheet
+  await sheetsPost({type:'saveWATemplate', template:{
+    id:'default_call_tpl', name:'Default Call Template', body:t, active:true
+  }});
 }
-function getContactedClients(){
-  try{ return JSON.parse(localStorage.getItem('retreat_contacted')||'{}'); }catch(e){ return {}; }
+
+async function loadContactedClients(){
+  try{
+    const res = await sheetsGet({action:'getData', branch:'indiranagar', date:''});
+    contactedClients = {};
+    if(res&&res.success&&res.data.contacted){
+      res.data.contacted.forEach(c=>{
+        if(c['Phone']) contactedClients[c['Phone']] = c['Contacted At']||nowIST();
+      });
+    }
+  }catch(e){}
+  return contactedClients;
 }
-function markContacted(phone){
-  const c = getContactedClients();
-  c[phone] = new Date().toISOString();
-  try{ localStorage.setItem('retreat_contacted', JSON.stringify(c)); }catch(e){}
-  contactedClients = c;
+
+function getContactedClients(){ return contactedClients; }
+
+async function markContacted(phone, name){
+  contactedClients[phone] = nowIST();
+  await sheetsPost({type:'logContacted', phone, name:name||''});
+  renderClients();
+}
+
+async function unmarkContacted(phone){
+  delete contactedClients[phone];
+  await sheetsPost({type:'unmarkContacted', phone});
   renderClients();
 }
 
@@ -2346,14 +2517,17 @@ function cancelTemplateEdit(){
   document.getElementById('template-edit-btn').textContent = 'Edit';
 }
 
-function saveTemplate(){
+async function saveTemplate(){
   const val = document.getElementById('wa-template-input').value.trim();
   if(!val){ showToast('Template cannot be empty', false); return; }
-  waTemplate = val;
-  saveWATemplate(val);
-  document.getElementById('template-preview').textContent = val;
-  cancelTemplateEdit();
-  showToast('Template saved ✓');
+  showLoading('Saving template...');
+  try{
+    await saveWATemplate(val);
+    document.getElementById('template-preview').textContent = val;
+    cancelTemplateEdit();
+    showToast('Template saved ✓');
+  }catch(e){ showToast('Save failed', false); }
+  finally{ hideLoading(); }
 }
 
 function buildWAMessage(c){
@@ -2370,8 +2544,7 @@ function openWhatsApp(c){
   const phone = '91' + c.phone.replace(/\D/g,'').slice(-10);
   const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank');
-  // Mark as contacted after a short delay
-  setTimeout(()=>markContacted(c.phone), 1500);
+  setTimeout(()=>markContacted(c.phone, c.name), 1500);
 }
 
 function setClientFilter(f, btn){
@@ -2384,6 +2557,11 @@ function setClientFilter(f, btn){
 async function loadClients(){
   showLoading('Building call list...');
   try{
+    // Load WA template and contacted list from sheets in parallel
+    const [templateLoad, contactedLoad] = await Promise.allSettled([
+      loadWATemplate(),
+      loadContactedClients()
+    ]);
     const br = (branch==='both')?'indiranagar':branch;
     const res = await sheetsGet({action:'getData', branch:br, date:''});
     const allVisits = res&&res.success ? (res.data.visits||[]) : [];
@@ -2490,7 +2668,7 @@ function renderClients(){
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.135.561 4.14 1.535 5.873L.057 23.428a.5.5 0 0 0 .609.61l5.703-1.497A11.951 11.951 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.7-.505-5.25-1.385l-.372-.218-3.863 1.015 1.03-3.753-.238-.386A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
           WhatsApp
         </button>
-        ${wasContacted?`<button onclick="delete contactedClients['${c.phone}'];try{localStorage.setItem('retreat_contacted',JSON.stringify(contactedClients));}catch(e){}renderClients();" style="width:40px;display:flex;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;cursor:pointer;font-size:16px;touch-action:manipulation" title="Mark as not contacted">↩</button>`:''}
+        ${wasContacted?`<button onclick="unmarkContacted('${c.phone}')" style="width:40px;display:flex;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;cursor:pointer;font-size:16px;touch-action:manipulation" title="Mark as not contacted">↩</button>`:''}
       </div>` : `<div style="font-size:12px;color:var(--text3);text-align:center;padding:6px;background:var(--bg2);border-radius:8px">No mobile number — cannot contact</div>`}
     </div>`;
   }).join('');
@@ -2501,53 +2679,89 @@ let bwaContacts = [];       // {name, phone, source, visits, lastVisit, service,
 let bwaSendQueue = [];      // selected contacts not yet sent
 let bwaSendIndex = 0;
 
-const BWA_TEMPLATES_KEY = 'retreat_bwa_templates';
-const BWA_ACTIVE_TPL_KEY = 'retreat_bwa_active_tpl';
+// Bulk WA templates and sent tracking — all in Google Sheets
+let _bwaTemplatesCache = null;
+let _bwaSentCache = {};
 
 const DEFAULT_TEMPLATES = [
-  {
-    id: 'tpl_welcome_back',
-    name: '🌿 Welcome Back',
-    body: `Hi {name} 🙏\n\nWe hope you enjoyed your last session at *Retreat Spa Bangalore*! It's been a while and we'd love to welcome you back. 🌿\n\nWe have some great therapists available this week. Would you like to book your next session?\n\n📍 Indiranagar, Bangalore\n\nSee you soon! 😊\n— Team Retreat Spa`
-  },
-  {
-    id: 'tpl_repeat_client',
-    name: '⭐ Repeat Client Special',
-    body: `Hi {name}! 😊\n\nThank you for being one of our valued guests at *Retreat Spa*! You've visited us {visits} times and we truly appreciate your loyalty. 🙏\n\nAs a special thank you, mention this message and get a complimentary head massage on your next visit!\n\nBook now — limited slots available this week.\n\n📍 Indiranagar, Bangalore\n— Team Retreat Spa`
-  },
-  {
-    id: 'tpl_weekend_offer',
-    name: '🎉 Weekend Offer',
-    body: `Hi {name}! 🌟\n\nThis weekend at *Retreat Spa*, we have special slots open just for you!\n\n✨ Aromatherapy\n✨ Swedish Massage\n✨ Deep Tissue\n\nAll therapists available Saturday & Sunday. Don't miss out — slots fill up fast!\n\nCall us or reply to book. 📞\n\n📍 Indiranagar, Bangalore\n— Team Retreat Spa`
-  },
-  {
-    id: 'tpl_been_a_while',
-    name: '⏰ Been a While',
-    body: `Hi {name} 👋\n\nIt's been some time since your last visit to *Retreat Spa* and we miss you!\n\nYour body deserves some care. Come in for a relaxing session with our expert therapists — you'll feel completely refreshed. 💆\n\nWalk-ins welcome or call us to reserve your slot.\n\n📍 Indiranagar, Bangalore\n— Team Retreat Spa`
-  },
-  {
-    id: 'tpl_festive',
-    name: '🪔 Festive Special',
-    body: `Hi {name}! 🎊\n\nWishing you and your family a wonderful festive season from all of us at *Retreat Spa Bangalore*! 🙏\n\nThis festive season, treat yourself to a rejuvenating massage session. Gift vouchers also available for your loved ones!\n\nCall us to book. Limited festive slots available.\n\n📍 Indiranagar, Bangalore\n— Team Retreat Spa`
-  },
-  {
-    id: 'tpl_membership',
-    name: '💳 Membership Offer',
-    body: `Hi {name}! 🌿\n\nDid you know *Retreat Spa* offers exclusive membership packages? Save more with every visit!\n\n✅ Priority booking\n✅ Discounted sessions\n✅ Flexible validity\n\nAsk us about our membership plans today — perfect for regular clients like you!\n\nCall or reply to know more. 😊\n\n📍 Indiranagar, Bangalore\n— Team Retreat Spa`
-  }
+  {id:'tpl_welcome_back', name:'🌿 Welcome Back', body:`Hi {name} 🙏\n\nWe hope you enjoyed your last session at *Retreat Spa Bangalore*! It's been a while and we'd love to welcome you back. 🌿\n\nWe have some great therapists available this week. Would you like to book your next session?\n\n📍 Indiranagar, Bangalore\n\nSee you soon! 😊\n— Team Retreat Spa`},
+  {id:'tpl_repeat_client', name:'⭐ Repeat Client Special', body:`Hi {name}! 😊\n\nThank you for being one of our valued guests at *Retreat Spa*! You've visited us {visits} times and we truly appreciate your loyalty. 🙏\n\nAs a special thank you, mention this message and get a complimentary head massage on your next visit!\n\nBook now — limited slots available this week.\n\n📍 Indiranagar, Bangalore\n— Team Retreat Spa`},
+  {id:'tpl_weekend_offer', name:'🎉 Weekend Offer', body:`Hi {name}! 🌟\n\nThis weekend at *Retreat Spa*, we have special slots open just for you!\n\n✨ Aromatherapy\n✨ Swedish Massage\n✨ Deep Tissue\n\nAll therapists available Saturday & Sunday. Don't miss out!\n\nCall us or reply to book. 📞\n\n📍 Indiranagar, Bangalore\n— Team Retreat Spa`},
+  {id:'tpl_been_a_while', name:'⏰ Been a While', body:`Hi {name} 👋\n\nIt's been some time since your last visit to *Retreat Spa* and we miss you!\n\nYour body deserves some care. Come in for a relaxing session — you'll feel completely refreshed. 💆\n\nWalk-ins welcome or call us to reserve your slot.\n\n📍 Indiranagar, Bangalore\n— Team Retreat Spa`},
+  {id:'tpl_festive', name:'🪔 Festive Special', body:`Hi {name}! 🎊\n\nWishing you and your family a wonderful festive season from all of us at *Retreat Spa Bangalore*! 🙏\n\nThis festive season, treat yourself to a rejuvenating massage session. Gift vouchers also available!\n\nCall us to book. Limited festive slots available.\n\n📍 Indiranagar, Bangalore\n— Team Retreat Spa`},
+  {id:'tpl_membership', name:'💳 Membership Offer', body:`Hi {name}! 🌿\n\nDid you know *Retreat Spa* offers exclusive membership packages? Save more with every visit!\n\n✅ Priority booking\n✅ Discounted sessions\n✅ Flexible validity\n\nAsk us about our membership plans today!\n\nCall or reply to know more. 😊\n\n📍 Indiranagar, Bangalore\n— Team Retreat Spa`}
 ];
 
 let bwaActiveTemplateId = '';
 
-function bwaGetTemplates(){
+async function bwaLoadTemplates(){
   try{
-    const saved = JSON.parse(localStorage.getItem(BWA_TEMPLATES_KEY)||'null');
-    return saved || DEFAULT_TEMPLATES;
-  }catch(e){ return DEFAULT_TEMPLATES; }
+    const res = await sheetsGet({action:'getData', branch:'indiranagar', date:''});
+    if(res&&res.success&&res.data.waTemplates&&res.data.waTemplates.length){
+      _bwaTemplatesCache = res.data.waTemplates.map(t=>({
+        id: t['ID']||'',
+        name: t['Name']||'',
+        body: t['Body']||'',
+        builtin: false
+      }));
+      // Add built-in templates if not yet stored
+      DEFAULT_TEMPLATES.forEach(dt=>{
+        if(!_bwaTemplatesCache.find(t=>t.id===dt.id)){
+          _bwaTemplatesCache.push({...dt, builtin:true});
+        }
+      });
+    } else {
+      _bwaTemplatesCache = DEFAULT_TEMPLATES.map(t=>({...t, builtin:true}));
+    }
+    if(res&&res.success&&res.data.waSent){
+      _bwaSentCache = {};
+      res.data.waSent.forEach(s=>{
+        if(s['Phone']) _bwaSentCache[s['Phone']] = s['Sent At']||nowIST();
+      });
+    }
+  }catch(e){
+    _bwaTemplatesCache = DEFAULT_TEMPLATES.map(t=>({...t, builtin:true}));
+  }
 }
 
-function bwaSaveTemplates(templates){
-  try{ localStorage.setItem(BWA_TEMPLATES_KEY, JSON.stringify(templates)); }catch(e){}
+function bwaGetTemplates(){
+  return _bwaTemplatesCache || DEFAULT_TEMPLATES.map(t=>({...t, builtin:true}));
+}
+
+async function bwaSaveTemplate(t){
+  // Add or update in local cache
+  if(!_bwaTemplatesCache) _bwaTemplatesCache = [];
+  const idx = _bwaTemplatesCache.findIndex(x=>x.id===t.id);
+  if(idx>=0) _bwaTemplatesCache[idx] = {...t, builtin:false};
+  else _bwaTemplatesCache.push({...t, builtin:false});
+  // Persist to sheet
+  await sheetsPost({type:'saveWATemplate', template:{id:t.id, name:t.name, body:t.body, active:true}});
+}
+
+async function bwaDeleteTemplateFromSheet(id){
+  if(_bwaTemplatesCache){
+    _bwaTemplatesCache = _bwaTemplatesCache.filter(t=>t.id!==id);
+  }
+  await sheetsPost({type:'deleteWATemplate', id});
+}
+
+function bwaGetSent(){ return _bwaSentCache; }
+
+async function bwaMarkSent(phone, name, templateId){
+  _bwaSentCache[phone] = nowIST();
+  await sheetsPost({type:'logWASent', phone, name:name||'', templateId:templateId||''});
+}
+
+async function bwaClearContacted(){
+  if(!confirm('Clear all "sent" records from the WA Sent Log sheet?')) return;
+  showLoading('Clearing...');
+  try{
+    await sheetsPost({type:'clearWASent'});
+    _bwaSentCache = {};
+    bwaContacts.forEach(c=>{c.sent=false;});
+    bwaRenderList();
+    showToast('Cleared ✓');
+  }finally{ hideLoading(); }
 }
 
 function bwaRenderTemplatePool(){
@@ -2581,7 +2795,6 @@ function bwaSelectTemplate(id){
     if(ta) ta.value = t.body;
   }
   bwaRenderTemplatePool();
-  try{ localStorage.setItem(BWA_ACTIVE_TPL_KEY, id); }catch(e){}
 }
 
 function bwaShowAddTemplate(){
@@ -2594,42 +2807,46 @@ function bwaHideAddTemplate(){
   document.getElementById('bwa-new-template-body').value = '';
 }
 
-function bwaSaveNewTemplate(){
+async function bwaSaveNewTemplate(){
   const name = document.getElementById('bwa-new-template-name').value.trim();
   const body = document.getElementById('bwa-new-template-body').value.trim();
   if(!name){ showToast('Please enter a template name', false); return; }
   if(!body){ showToast('Please enter the message', false); return; }
-  const templates = bwaGetTemplates();
   const id = 'custom_'+Date.now();
-  templates.push({id, name, body});
-  bwaSaveTemplates(templates);
-  bwaHideAddTemplate();
-  bwaSelectTemplate(id);
-  showToast('Template saved ✓');
+  showLoading('Saving template...');
+  try{
+    await bwaSaveTemplate({id, name, body});
+    bwaHideAddTemplate();
+    bwaSelectTemplate(id);
+    showToast('Template saved ✓');
+  }catch(e){ showToast('Save failed', false); }
+  finally{ hideLoading(); }
 }
 
-function bwaDeleteTemplate(id){
+async function bwaDeleteTemplate(id){
   if(!confirm('Delete this template?')) return;
-  const templates = bwaGetTemplates().filter(t=>t.id!==id);
-  bwaSaveTemplates(templates);
-  if(bwaActiveTemplateId===id){
-    bwaActiveTemplateId = templates[0]?.id||'';
-    const ta = document.getElementById('bwa-message');
-    if(ta && templates[0]) ta.value = templates[0].body;
-  }
-  bwaRenderTemplatePool();
-  showToast('Template deleted');
+  showLoading('Deleting...');
+  try{
+    await bwaDeleteTemplateFromSheet(id);
+    const templates = bwaGetTemplates();
+    if(bwaActiveTemplateId===id){
+      bwaActiveTemplateId = templates[0]?.id||'';
+      const ta = document.getElementById('bwa-message');
+      if(ta && templates[0]) ta.value = templates[0].body;
+    }
+    bwaRenderTemplatePool();
+    showToast('Template deleted');
+  }catch(e){ showToast('Delete failed', false); }
+  finally{ hideLoading(); }
 }
 
 
-
-function bwaGetSent(){ try{ return JSON.parse(localStorage.getItem(BWA_SENT_KEY)||'{}'); }catch(e){ return {}; } }
-function bwaMarkSent(phone){ const s=bwaGetSent(); s[phone]=new Date().toISOString(); try{localStorage.setItem(BWA_SENT_KEY,JSON.stringify(s));}catch(e){} }
-function bwaClearContacted(){ if(confirm('Clear all "sent" records?')){ try{localStorage.removeItem(BWA_SENT_KEY);}catch(e){} bwaRenderList(); showToast('Cleared ✓'); } }
 
 async function bwaInit(){
   showLoading('Loading contacts...');
   try{
+    // Load templates + sent log from sheets first
+    await bwaLoadTemplates();
     // Use sheetsGet (Apps Script) — same as loadClients, proven to work
     const br = branch==='both' ? 'indiranagar' : branch;
     const res = await sheetsGet({action:'getData', branch:br, date:''});
@@ -2669,13 +2886,13 @@ async function bwaInit(){
 
   bwaRefreshList();
   // Render template pool
-  try{ bwaActiveTemplateId = localStorage.getItem(BWA_ACTIVE_TPL_KEY)||''; }catch(e){}
   bwaRenderTemplatePool();
   // Set active template in textarea
   const templates = bwaGetTemplates();
   const activeTpl = templates.find(t=>t.id===bwaActiveTemplateId)||templates[0];
   const ta = document.getElementById('bwa-message');
   if(ta && activeTpl){ ta.value = activeTpl.body; bwaActiveTemplateId = activeTpl.id; }
+  const lbl = document.getElementById('bwa-branch-label');
   if(lbl) lbl.textContent = branch==='both'?'Both branches':branch.charAt(0).toUpperCase()+branch.slice(1)+' only';
   bwaUpdateSelectedCount();
 }
@@ -2799,7 +3016,7 @@ function bwaBuildMsg(c){
     .replace(/{service}/gi, c.service||c.services||'massage');
 }
 
-function bwaSendNext(){
+async function bwaSendNext(){
   const queue = bwaContacts.filter(c=>c.selected&&!c.sent);
   if(!queue.length){ showToast('All done! Everyone has been contacted ✓', true); return; }
 
@@ -2816,9 +3033,9 @@ function bwaSendNext(){
   const url = `https://wa.me/${phone}?text=${encodeURIComponent(bwaBuildMsg(c))}`;
   window.open(url, '_blank');
 
-  // Mark as sent immediately
-  bwaMarkSent(c.phone);
+  // Mark as sent in sheet (fire & forget — UI stays responsive)
   c.sent = true;
+  bwaMarkSent(c.phone, c.name, bwaActiveTemplateId).catch(()=>{});
 
   const stillLeft = queue.length - 1;
   bwaRenderList();
@@ -2836,7 +3053,7 @@ function bwaUpdateSendButton(){
   if(!queue.length && total > 0){
     btn.style.background = '#4CAF50';
     btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> All ${total} sent! Tap to reset`;
-    btn.onclick = ()=>{ if(confirm('Reset sent status and start over?')){ try{localStorage.removeItem(BWA_SENT_KEY);}catch(e){} bwaContacts.forEach(c=>{c.sent=false;}); bwaRenderList(); bwaUpdateSendButton(); } };
+    btn.onclick = bwaClearContacted;
   } else if(queue.length){
     const next = queue[0];
     btn.style.background = '#25D366';
@@ -2909,7 +3126,7 @@ function bwaImportFile(input){
 
 // ── FIXED MONTHLY COSTS ───────────────────────────────────────────
 let fixedCosts = [];
-let fixedMonth = new Date().toISOString().slice(0,7);
+let fixedMonth = monthKey();
 let fixedCat = 'all';
 let fixedEditId = null;
 let fxPaidState = false;
@@ -3060,7 +3277,7 @@ async function toggleFixedPaidStatus(idx){
   if(!c) return;
   if(!c.paidMonths) c.paidMonths = {};
   if(c.paidMonths[fixedMonth]){ delete c.paidMonths[fixedMonth]; }
-  else { c.paidMonths[fixedMonth] = new Date().toISOString(); }
+  else { c.paidMonths[fixedMonth] = nowIST(); }
   renderFixedTab(); // Optimistic update
   try{
     await sheetsPost({type:'updateFixedPaid', id:c.id, paidMonths:c.paidMonths});
@@ -3116,7 +3333,7 @@ async function saveFixedCost(){
   if(!amt||isNaN(amt)||Number(amt)<0){ showToast('Please enter a valid amount',false); return; }
   const existing = fixedEditId!==null ? fixedCosts[fixedEditId] : null;
   const paidMonths = existing ? {...(existing.paidMonths||{})} : {};
-  if(fxPaidState) paidMonths[fixedMonth] = new Date().toISOString();
+  if(fxPaidState) paidMonths[fixedMonth] = nowIST();
   else delete paidMonths[fixedMonth];
   const data = {
     id: existing ? existing.id : 'fx_'+Date.now(),
@@ -3164,7 +3381,7 @@ async function copyFromLastMonth(){
   let copied=0;
   for(const c of fixedCosts){
     if(c.paidMonths&&c.paidMonths[prevKey]&&!(c.paidMonths[fixedMonth])){
-      c.paidMonths[fixedMonth]=new Date().toISOString();
+      c.paidMonths[fixedMonth]=nowIST();
       copied++;
       await sheetsPost({type:'updateFixedPaid',id:c.id,paidMonths:c.paidMonths});
     }
