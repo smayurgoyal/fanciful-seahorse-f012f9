@@ -353,7 +353,8 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
       <div class="toolbar">
         <div class="date-nav">
           <button class="btn icon sm" onclick="changeDate(-1)">&#8592;</button>
-          <span class="date-lbl" id="cust-date-lbl"></span>
+          <span class="date-lbl" id="cust-date-lbl" onclick="document.getElementById('cust-date-picker').showPicker?document.getElementById('cust-date-picker').showPicker():document.getElementById('cust-date-picker').click()" style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px" title="Tap to pick date"></span>
+          <input type="date" id="cust-date-picker" style="position:absolute;opacity:0;width:0;height:0;pointer-events:none" onchange="jumpToSpecificDate(this.value)"/>
           <button class="btn icon sm" onclick="changeDate(1)">&#8594;</button>
         </div>
         <button class="btn primary sm" onclick="openVisitModal()" style="font-weight:600">+ Add</button>
@@ -378,7 +379,8 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
           <button class="btn sm" onclick="navTo('customers')" id="exp-back-btn" style="font-size:13px;padding:0 10px;height:32px">‹ Back</button>
           <div class="date-nav">
             <button class="btn icon sm" onclick="changeExpDate(-1)">&#8592;</button>
-            <span class="date-lbl" id="exp-date-lbl"></span>
+            <span class="date-lbl" id="exp-date-lbl" onclick="document.getElementById('exp-date-picker').showPicker?document.getElementById('exp-date-picker').showPicker():document.getElementById('exp-date-picker').click()" style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px" title="Tap to pick date"></span>
+            <input type="date" id="exp-date-picker" style="position:absolute;opacity:0;width:0;height:0;pointer-events:none" onchange="jumpExpSpecificDate(this.value)"/>
             <button class="btn icon sm" onclick="changeExpDate(1)">&#8594;</button>
           </div>
         </div>
@@ -1419,6 +1421,22 @@ async function jumpExpDate(when){
   if(when==='today'){ expDate = d; }
   else if(when==='yesterday'){ expDate = new Date(d.getTime()-86400000); }
   else if(when==='week'){ expDate = d; }
+  await loadExpensesForDate();
+  renderExpenses();
+}
+
+async function jumpToSpecificDate(val){
+  if(!val) return;
+  const [y,m,d] = val.split('-').map(Number);
+  custDate = new Date(y, m-1, d);
+  await loadVisitsForDate();
+  renderVisits();
+}
+
+async function jumpExpSpecificDate(val){
+  if(!val) return;
+  const [y,m,d] = val.split('-').map(Number);
+  expDate = new Date(y, m-1, d);
   await loadExpensesForDate();
   renderExpenses();
 }
